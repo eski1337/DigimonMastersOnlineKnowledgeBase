@@ -1,0 +1,93 @@
+{
+  "name": "dmo-kb",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Digimon Masters Online Knowledge Base - Modern PWA with Next.js 14, Payload CMS, and MongoDB",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "dev:cms": "pnpm --filter cms dev",
+    "dev:all": "concurrently \"pnpm dev:cms\" \"pnpm dev\"",
+    "build": "pnpm --recursive build",
+    "build:all": "pnpm --recursive build",
+    "start": "pnpm --filter web start",
+    "start:cms": "pnpm --filter cms start",
+    "lint": "pnpm --recursive lint",
+    "typecheck": "pnpm --recursive typecheck",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:all": "pnpm typecheck && pnpm lint && pnpm test --run && pnpm test:e2e",
+    "generate": "pnpm --filter cms generate:types",
+    "migrate": "tsx scripts/migrations/run.ts",
+    "seed": "tsx scripts/seed.ts",
+    "seed:digimon": "tsx scripts/seed-digimon.ts",
+    "create-owner": "tsx scripts/create-owner.ts",
+    "scrape:patch": "tsx scripts/scrape-patch-notes.ts",
+    "import:dmowiki": "tsx scripts/import-dmowiki.ts",
+    "import:wiki": "tsx scripts/import-dmowiki-api.ts",
+    "fix:skills": "tsx scripts/fix-skill-data.ts",
+    "update:skills": "tsx scripts/update-all-skills-api.ts",
+    "update:skills:auth": "tsx scripts/update-skills-authenticated.ts",
+    "fix:roles": "tsx scripts/fix-user-roles.ts",
+    "fix:icons": "tsx scripts/fix-missing-icons.ts",
+    "upload:badges": "tsx scripts/upload-badges.ts",
+    "ingest:patch": "tsx scripts/ingest-patch.ts",
+    "ingest:events": "tsx scripts/ingest-events.ts",
+    "import:all-digimon": "tsx scripts/bulk-import-all-digimon.ts",
+    "import:optimized": "tsx scripts/bulk-import-optimized.ts",
+    "import:auth": "tsx scripts/bulk-import-authenticated.ts",
+    "import:puppeteer": "tsx scripts/bulk-import-puppeteer.ts",
+    "import:batches": "tsx scripts/generate-import-batches.ts",
+    "import:session": "tsx scripts/bulk-import-with-session.ts",
+    "dashboard": "node dashboard.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node-fetch": "^2.6.13",
+    "@types/sanitize-html": "^2.16.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "@vitest/coverage-v8": "^4.0.5",
+    "concurrently": "^8.2.2",
+    "dotenv": "^16.6.1",
+    "jsdom": "^27.0.1",
+    "puppeteer": "^24.25.0",
+    "tsx": "^4.7.0",
+    "typescript": "5.9.3",
+    "vitest": "^4.0.5"
+  },
+  "engines": {
+    "node": ">=18.17.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cheerio": "^1.1.2",
+    "express": "^4.18.2",
+    "form-data": "^4.0.0",
+    "mongodb": "^6.20.0",
+    "node-fetch": "^2.7.0",
+    "sanitize-html": "^2.17.1",
+    "sharp": "0.33.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "sharp": "0.33.5",
+      "typescript": "5.9.3"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "cms",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon",
+    "build": "tsc && payload build",
+    "start": "cross-env NODE_ENV=production node dist/server.js",
+    "generate:types": "payload generate:types",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dmo-kb/shared": "workspace:*",
+    "@payloadcms/bundler-webpack": "^1.0.7",
+    "@payloadcms/db-mongodb": "^1.7.2",
+    "@payloadcms/richtext-slate": "^1.5.2",
+    "@types/react": "^18.3.26",
+    "@types/react-dom": "^18.3.7",
+    "cheerio": "^1.1.2",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.8",
+    "payload": "^2.26.0",
+    "pino": "^10.1.0",
+    "pino-pretty": "^13.1.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sharp": "0.33.5",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.19.21",
+    "@types/nodemailer": "^6.4.14",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.1",
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "5.9.3"
+  }
+}

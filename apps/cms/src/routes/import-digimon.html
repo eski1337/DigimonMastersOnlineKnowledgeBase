@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Digimon - DMO KB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #333;
+        }
+        
+        h1 {
+            color: #0066ff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #888;
+        }
+        
+        .card {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            background: #1a1a1a;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #0066ff;
+        }
+        
+        .help-text {
+            font-size: 14px;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #0066ff;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: #0052cc;
+        }
+        
+        .btn-primary:disabled {
+            background: #444;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #444;
+            color: #fff;
+        }
+        
+        .btn-secondary:hover {
+            background: #555;
+        }
+        
+        .btn-success {
+            background: #00cc44;
+            color: #000;
+        }
+        
+        .btn-success:hover {
+            background: #00aa33;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .alert-error {
+            background: #ff4444;
+            color: #fff;
+        }
+        
+        .alert-warning {
+            background: #ff9800;
+            color: #000;
+        }
+        
+        .alert-success {
+            background: #00cc44;
+            color: #000;
+        }
+        
+        .preview-section {
+            margin-top: 2rem;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preview-item {
+            background: #1a1a1a;
+            padding: 0.75rem;
+            border-radius: 4px;
+        }
+        
+        .preview-item strong {
+            color: #0066ff;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-item {
+            background: #2a2a2a;
+            padding: 0.5rem;
+            text-align: center;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 3px solid #333;
+            border-top: 3px solid #0066ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #0066ff;
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Damage display animation */
+        [id^="damage-"] {
+            transition: transform 0.2s ease, color 0.2s ease;
+            display: inline-block;
+        }
+        
+        /* Smooth select dropdown styling */
+        select {
+            transition: border-color 0.2s ease;
+        }
+        
+        select:hover {
+            border-color: #00ff88 !important;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #00ff88 !important;
+            box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/admin/collections/digimon" class="back-link">← Back to Digimon Collection</a>
+        
+        <div style="background: #ff9800; color: #000; padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1.5rem; font-size: 14px;">
+            <strong>💡 Tip:</strong> Bookmark this page (Ctrl+D) for easy access! URL: <code style="background: rgba(0,0,0,0.1); padding: 0.2rem 0.4rem; border-radius: 2px;">http://localhost:3001/import-digimon</code>
+        </div>
+        
+        <header>
+            <h1>Import Digimon from DMO Wiki</h1>
+            <p class="subtitle">Automatically import Digimon data from dmowiki.com (via Wayback Machine to bypass Cloudflare)</p>
+        </header>
+        
+        <div id="errorMessage"></div>
+        <div id="successMessage"></div>
+        
+        <div id="importForm" class="card">
+            <!-- Mode tabs -->
+            <div style="display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid #444;">
+                <button onclick="switchMode('auto')" id="tabAuto" class="btn" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid #0066ff; background: transparent; color: #0066ff; font-weight: 600;">Auto Import</button>
+                <button onclick="switchMode('paste')" id="tabPaste" class="btn" style="border-radius: 4px 4px 0 0; border-bottom: 2px solid transparent; background: transparent; color: #888;">Paste HTML</button>
+            </div>
+
+            <!-- Auto mode -->
+            <div id="modeAuto">
+                <div class="form-group">
+                    <label for="digimonInput">Digimon Name or URL</label>
+                    <input 
+                        type="text" 
+                        id="digimonInput" 
+                        list="popularDigimon"
+                        placeholder="e.g., Agumon or https://dmowiki.com/Agumon"
+                        autofocus
+                        onkeypress="if(event.key === 'Enter') importDigimon()"
+                    >
+                    <datalist id="popularDigimon"></datalist>
+                    <p class="help-text">
+                        💡 Start typing to see suggestions, or paste the full dmowiki.com URL. Press Enter to import.
+                    </p>
+                    <div style="margin-top: 0.5rem;">
+                        <details style="cursor: pointer;">
+                            <summary style="color: #0066ff; font-size: 14px; user-select: none;">🌟 Quick Access: Popular Digimon</summary>
+                            <div id="quickAccessButtons" style="margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paste HTML mode -->
+            <div id="modePaste" style="display: none;">
+                <div class="form-group">
+                    <label for="pasteSlug">Digimon Name</label>
+                    <input type="text" id="pasteSlug" placeholder="e.g., Agumon" style="margin-bottom: 1rem;">
+                </div>
+                <div class="form-group">
+                    <label for="pasteHtml">Page HTML Source</label>
+                    <textarea id="pasteHtml" rows="8" placeholder="Open dmowiki.com/Agumon in your browser, press Ctrl+U to view source, then Ctrl+A to select all and Ctrl+C to copy. Paste it here." style="width:100%; padding:0.75rem; background:#1a1a1a; border:1px solid #555; border-radius:4px; color:#fff; font-family:monospace; font-size:12px; resize:vertical;"></textarea>
+                    <p class="help-text">This bypasses Cloudflare protection. The HTML is parsed locally — nothing is sent to external servers.</p>
+                </div>
+            </div>
+            
+            <button onclick="importDigimon()" class="btn btn-primary" id="importBtn">
+                Import & Preview
+            </button>
+        </div>
+        
+        <div id="previewSection" style="display: none;">
+            <div class="card">
+                <h2 style="margin-bottom: 1rem; color: #0066ff;">Preview Data</h2>
+                
+                <div id="previewContent"></div>
+                
+                <div class="alert alert-warning" style="margin-top: 1.5rem;">
+                    <strong>⚠️ Review Carefully</strong><br>
+                    Check all fields before saving. This will create a new Digimon entry (unpublished).
+                </div>
+                
+                <div class="btn-group">
+                    <button onclick="saveDigimon()" class="btn btn-success" id="saveBtn">
+                        ✓ Save to Database
+                    </button>
+                    <button onclick="resetForm()" class="btn btn-secondary">
+                        ← Start Over
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="loadingSection" class="card" style="display: none;">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p id="loadingText">Importing from DMO Wiki...</p>
+                <p style="color: #888; font-size: 13px; margin-top: 0.5rem;">Downloading images to your server...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let previewData = null;
+        
+        // Load popular Digimon on page load
+        async function loadPopularDigimon() {
+            try {
+                const response = await fetch('/api/import-digimon/popular');
+                const data = await response.json();
+                
+                if (data.success && data.digimon) {
+                    // Populate datalist for autocomplete
+                    const datalist = document.getElementById('popularDigimon');
+                    data.digimon.forEach(name => {
+                        const option = document.createElement('option');
+                        option.value = name;
+                        datalist.appendChild(option);
+                    });
+                    
+                    // Create quick access buttons (first 20)
+                    const quickAccessDiv = document.getElementById('quickAccessButtons');
+                    data.digimon.slice(0, 20).forEach(name => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button'; // Prevent form submission
+                        btn.textContent = name;
+                        btn.className = 'btn btn-secondary';
+                        btn.style.fontSize = '12px';
+                        btn.style.padding = '0.25rem 0.5rem';
+                        btn.onclick = () => {
+                            document.getElementById('digimonInput').value = name;
+                            importDigimon();
+                        };
+                        quickAccessDiv.appendChild(btn);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load popular Digimon:', error);
+            }
+        }
+        
+        // Load popular list when page loads
+        window.addEventListener('DOMContentLoaded', loadPopularDigimon);
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = `<div class="alert alert-error">${message}</div>`;
+            setTimeout(() => errorDiv.innerHTML = '', 5000);
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.innerHTML = `<div class="alert alert-success">${message}</div>`;
+        }
+        
+        function updateDamage(selectElement, skillName) {
+            const damage = selectElement.value;
+            const damageSpan = document.getElementById(`damage-${skillName.replace(/\s+/g, '-')}`);
+            if (damageSpan) {
+                damageSpan.textContent = damage;
+                // Add a little animation
+                damageSpan.style.transform = 'scale(1.2)';
+                damageSpan.style.color = '#00ff88';
+                setTimeout(() => {
+                    damageSpan.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }
+        
+        function extractSlug(input) {
+            if (input.includes('dmowiki.com')) {
+                const match = input.match(/dmowiki\.com\/(?:wiki\/)?([^/?#]+)/);
+                return match ? match[1] : input;
+            }
+            return input;
+        }
+        
+        let currentMode = 'auto';
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('modeAuto').style.display = mode === 'auto' ? 'block' : 'none';
+            document.getElementById('modePaste').style.display = mode === 'paste' ? 'block' : 'none';
+            document.getElementById('tabAuto').style.borderBottomColor = mode === 'auto' ? '#0066ff' : 'transparent';
+            document.getElementById('tabAuto').style.color = mode === 'auto' ? '#0066ff' : '#888';
+            document.getElementById('tabPaste').style.borderBottomColor = mode === 'paste' ? '#0066ff' : 'transparent';
+            document.getElementById('tabPaste').style.color = mode === 'paste' ? '#0066ff' : '#888';
+        }
+
+        async function importDigimon() {
+            let slug, bodyPayload;
+
+            if (currentMode === 'paste') {
+                slug = document.getElementById('pasteSlug').value.trim();
+                const html = document.getElementById('pasteHtml').value.trim();
+                if (!slug) { showError('Please enter the Digimon name'); return; }
+                if (!html || html.length < 200) { showError('Please paste the full HTML source of the wiki page'); return; }
+                bodyPayload = { slug, html };
+            } else {
+                const input = document.getElementById('digimonInput').value.trim();
+                if (!input) { showError('Please enter a Digimon name or URL'); return; }
+                slug = extractSlug(input);
+                bodyPayload = { slug };
+            }
+            
+            document.getElementById('importForm').style.display = 'none';
+            document.getElementById('loadingSection').style.display = 'block';
+            document.getElementById('errorMessage').innerHTML = '';
+            
+            const loadingText = document.getElementById('loadingText');
+            loadingText.textContent = currentMode === 'paste' ? `Parsing HTML for ${slug}...` : `Fetching ${slug} via Wayback Machine...`;
+            
+            try {
+                const response = await fetch('/api/import-digimon', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyPayload)
+                });
+                
+                loadingText.textContent = 'Processing data...';
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Import failed');
+                }
+                
+                // DEBUG: Log what we received
+                console.log('=== FRONTEND RECEIVED RESPONSE ===');
+                console.log('Icon ID:', result.preview.icon || '❌ NOT SET');
+                console.log('Icon URL:', result.preview.iconUrl || '❌ NOT SET');
+                console.log('Main Image ID:', result.preview.mainImage || '❌ NOT SET');
+                console.log('Main Image URL:', result.preview.mainImageUrl || '❌ NOT SET');
+                console.log('================================');
+                
+                loadingText.textContent = 'Rendering preview...';
+                displayPreview(result.preview, result.validation);
+                
+            } catch (error) {
+                showError(error.message);
+                document.getElementById('importForm').style.display = 'block';
+            } finally {
+                document.getElementById('loadingSection').style.display = 'none';
+            }
+        }
+        
+        function getAttributeIcon(attribute) {
+            const icons = {
+                'Vaccine': '/Images/Attributes/Vaccine.png',
+                'Virus': '/Images/Attributes/Virus.png',
+                'Data': '/Images/Attributes/Data.png',
+                'Unknown': '/Images/Attributes/Unknown_Attribute.png',
+                'None': '/Images/Attributes/None.png'
+            };
+            const iconUrl = icons[attribute] || '';
+            return iconUrl ? `<img src="${iconUrl}" alt="" title="${attribute}" style="height: 40px; vertical-align: middle; margin-right: 4px;" onerror="this.style.display='none'">${attribute}` : attribute;
+        }
+        
+        function getElementIcon(element) {
+            const icons = {
+                'Fire': '/Images/Elements/Fire.png',
+                'Water': '/Images/Elements/Water.png',
+                'Ice': '/Images/Elements/Ice.png',
+                'Land': '/Images/Elements/Land.png',
+                'Wind': '/Images/Elements/Wind.png',
+                'Thunder': '/Images/Elements/Thunder.png',
+                'Light': '/Images/Elements/Light.png',
+                'Pitch Black': '/Images/Elements/Pitch_Black.png',
+                'Steel': '/Images/Elements/Steel.png',
+                'Wood': '/Images/Elements/Wood.png',
+                'Neutral': '/Images/Elements/Neutral.png'
+            };
+            const iconUrl = icons[element] || '';
+            return iconUrl ? `<img src="${iconUrl}" alt="" title="${element}" style="height: 40px; vertical-align: middle; margin-right: 4px;" onerror="this.style.display='none'">${element}` : element;
+        }
+        
+        function getAttackerTypeIcon(type) {
+            const icons = {
+                'Quick Attacker': '/Images/AttackerType/QuickAttacker.png',
+                'Short Attacker': '/Images/AttackerType/ShortAttacker.png',
+                'Near Attacker': '/Images/AttackerType/NearAttacker.png',
+                'Normal Attacker': '/Images/AttackerType/NearAttacker.png',
+                'Defender': '/Images/AttackerType/Defender.png'
+            };
+            const iconUrl = icons[type] || '';
+            return iconUrl ? `<img src="${iconUrl}" alt="" title="${type}" style="height: 40px; vertical-align: middle; margin-right: 4px;" onerror="this.style.display='none'">${type}` : type;
+        }
+        
+        function getRankIcon(rank) {
+            if (!rank) return '';
+            const rankIcons = {
+                'U': '/Images/Ranks/U.png',
+                'SSS+': '/Images/Ranks/SSS+.png',
+                'SSS': '/Images/Ranks/SSS.png',
+                'SS+': '/Images/Ranks/SS+.png',
+                'SS': '/Images/Ranks/SS.png',
+                'S+': '/Images/Ranks/S+.png',
+                'S': '/Images/Ranks/S.png',
+                'A': '/Images/Ranks/A.png',
+                'N': '/Images/Ranks/N.png'
+            };
+            const iconPath = rankIcons[rank] || '';
+            return iconPath ? `<img src="${iconPath}" alt="" title="${rank}-Rank" style="height: 40px; vertical-align: middle; margin-right: 4px;" onerror="this.style.display='none'">` : '';
+        }
+        
+        function getFamilyIcon(family) {
+            const icons = {
+                'Wind Guardians': '/Images/Families/WindGuardians.png',
+                'Nature Spirits': '/Images/Families/NatureSpirits.png',
+                'Deep Savers': '/Images/Families/DeepSavers.png',
+                'Metal Empire': '/Images/Families/MetalEmpire.png',
+                'Virus Busters': '/Images/Families/VirusBusters.png',
+                'Nightmare Soldiers': '/Images/Families/NightmareSoliders.png',
+                'Dragon\'s Roar': '/Images/Families/DragonsRoar.png',
+                'Jungle Troopers': '/Images/Families/JungleTroopers.png',
+                'Dark Area': '/Images/Families/DarkArea.png',
+                'Unknown': '/Images/Families/Unknown.png',
+                'TBD': '/Images/Families/TBD.png'
+            };
+            const iconUrl = icons[family] || '';
+            return iconUrl ? `<img src="${iconUrl}" alt="${family}" title="${family}" style="height: 40px; vertical-align: middle; margin-right: 4px;">` : '';
+        }
+        
+        function displayPreview(data, validation) {
+            // Store data globally for save function
+            previewData = data;
+            
+            // Build validation summary HTML
+            let validationHTML = '';
+            if (validation) {
+                validationHTML = `
+                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: #1a1a1a; border-radius: 8px; border: 2px solid #0066ff;">
+                        <strong style="color: #0066ff; font-size: 16px;">📊 Data Validation Summary</strong>
+                        <div style="margin-top: 0.75rem; display: grid; gap: 0.75rem;">
+                            ${validation.complete.length > 0 ? `
+                                <div>
+                                    <div style="font-weight: bold; color: #00ff88; margin-bottom: 0.5rem;">✅ COMPLETE (${validation.complete.length} fields):</div>
+                                    <div style="color: #ccc; font-size: 13px; line-height: 1.6;">${validation.complete.join(' • ')}</div>
+                                </div>
+                            ` : ''}
+                            ${validation.partial.length > 0 ? `
+                                <div>
+                                    <div style="font-weight: bold; color: #ff9800; margin-bottom: 0.5rem;">⚠️  PARTIAL (${validation.partial.length} fields):</div>
+                                    <div style="color: #ccc; font-size: 13px; line-height: 1.6;">${validation.partial.join(' • ')}</div>
+                                </div>
+                            ` : ''}
+                            ${validation.missing.length > 0 ? `
+                                <div>
+                                    <div style="font-weight: bold; color: #ff6b6b; margin-bottom: 0.5rem;">❌ MISSING (${validation.missing.length} fields):</div>
+                                    <div style="color: #ccc; font-size: 13px; line-height: 1.6;">${validation.missing.join(' • ')}</div>
+                                    <div style="margin-top: 0.5rem; padding: 0.5rem; background: #2a2a2a; border-radius: 4px; font-size: 12px; color: #888;">
+                                        💡 <strong>Tip:</strong> Missing fields are usually optional or not available in the DMO Wiki for this Digimon.
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            const skillsList = data.skills?.map(skill => {
+                const elementIcon = skill.element ? getElementIcon(skill.element) : '';
+                const skillIcon = skill.iconUrl ? `<img src="${skill.iconUrl}" alt="${skill.name}" style="width: 96px; height: 96px; border-radius: 4px; background: #2a2a2a; padding: 4px; border: 2px solid #0066ff; margin-right: 12px;">` : `<div style="width: 96px; height: 96px; background: #2a2a2a; border-radius: 4px; border: 2px solid #444; display: flex; align-items: center; justify-content: center; font-size: 48px; margin-right: 12px;">❓</div>`;
+                const downloadedBadge = skill.iconUrl ? '<span style="color: #00ff88; font-size: 11px; margin-left: 8px;">✅ Downloaded</span>' + (skill.iconSourceUrl ? `<br><small style="color: #666; font-size: 9px; display: block; margin-top: 2px;">${skill.iconSourceUrl}</small>` : '') : '<span style="color: #888; font-size: 11px; margin-left: 8px;">⚠️ No Icon</span>';
+                
+                return `
+                <div style="background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; border-left: 4px solid #0066ff; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem;">
+                        ${skillIcon}
+                        <div style="flex: 1;">
+                            <div style="font-size: 18px; font-weight: bold; margin-bottom: 0.5rem;">
+                                ${skill.name} 
+                                ${elementIcon ? `<span style="font-size: 14px; opacity: 0.9;">${elementIcon}</span>` : ''}
+                                ${downloadedBadge}
+                            </div>
+                            ${skill.description ? `<div style="color: #ccc; font-size: 14px; margin-bottom: 0.75rem; line-height: 1.6;">${skill.description}</div>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem; padding: 0.75rem; background: #0f0f0f; border-radius: 4px;">
+                        ${skill.cooldown ? `
+                            <div style="padding: 0.5rem; background: #1a1a1a; border-radius: 4px; text-align: center;">
+                                <div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 0.25rem;">Cooldown</div>
+                                <div style="color: #0066ff; font-weight: bold; font-size: 16px;">${skill.cooldown}s</div>
+                            </div>
+                        ` : ''}
+                        ${skill.dsConsumption ? `
+                            <div style="padding: 0.5rem; background: #1a1a1a; border-radius: 4px; text-align: center;">
+                                <div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 0.25rem;">DS Cost</div>
+                                <div style="color: #00ff88; font-weight: bold; font-size: 16px;">${skill.dsConsumption}</div>
+                            </div>
+                        ` : ''}
+                        ${skill.animationTime ? `
+                            <div style="padding: 0.5rem; background: #1a1a1a; border-radius: 4px; text-align: center;">
+                                <div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 0.25rem;">Animation</div>
+                                <div style="color: #ff9800; font-weight: bold; font-size: 16px;">${skill.animationTime}s</div>
+                            </div>
+                        ` : ''}
+                        ${skill.skillPointsRequired ? `
+                            <div style="padding: 0.5rem; background: #1a1a1a; border-radius: 4px; text-align: center;">
+                                <div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 0.25rem;">SP Required</div>
+                                <div style="color: #9b59b6; font-weight: bold; font-size: 16px;">${skill.skillPointsRequired}</div>
+                            </div>
+                        ` : ''}
+                        <div style="padding: 0.5rem; background: #1a1a1a; border-radius: 4px; text-align: center;">
+                            <div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 0.25rem;">SP Per Upgrade</div>
+                            <div style="color: #e74c3c; font-weight: bold; font-size: 16px;">${skill.skillPointsPerUpgrade !== undefined && skill.skillPointsPerUpgrade !== null ? skill.skillPointsPerUpgrade : '?'}</div>
+                        </div>
+                    </div>
+                    
+                    ${skill.damagePerLevel ? `
+                        <div style="margin-top: 0.75rem; background: #1a1a1a; padding: 0.75rem; border-radius: 4px;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <label style="color: #0066ff; font-weight: bold; font-size: 13px; flex-shrink: 0;">📊 Damage at Level:</label>
+                                <select 
+                                    onchange="updateDamage(this, '${skill.name.replace(/'/g, "\\'")}')" 
+                                    style="flex: 0 0 auto; min-width: 120px; padding: 0.5rem; background: #2a2a2a; color: #fff; border: 1px solid #0066ff; border-radius: 4px; font-size: 14px; cursor: pointer;"
+                                >
+                                    ${(() => {
+                                        const damageStr = typeof skill.damagePerLevel === 'string' ? skill.damagePerLevel : '';
+                                        const damageArray = damageStr.split(',').map(d => d.trim()).filter(d => d);
+                                        return damageArray.map((dmg, idx) => `
+                                            <option value="${dmg}" ${idx === 0 ? 'selected' : ''}>
+                                                Level ${idx + 1}
+                                            </option>
+                                        `).join('');
+                                    })()}
+                                </select>
+                                <div style="flex: 1; text-align: right;">
+                                    <span style="color: #888; font-size: 12px; margin-right: 0.5rem;">Damage:</span>
+                                    <span id="damage-${skill.name.replace(/\s+/g, '-')}" style="color: #00ff88; font-weight: bold; font-size: 24px;">
+                                        ${(() => {
+                                            const damageStr = typeof skill.damagePerLevel === 'string' ? skill.damagePerLevel : '';
+                                            const damageArray = damageStr.split(',').map(d => d.trim()).filter(d => d);
+                                            return damageArray[0] || '0';
+                                        })()}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `}).join('') || '<p style="color: #888;">No skills found - you can add them manually after saving</p>';
+            
+            const digivolvesFromList = data.digivolutions?.digivolvesFrom?.map(d => `<span style="background: #2a2a2a; padding: 0.25rem 0.5rem; border-radius: 3px; margin-right: 0.5rem; display: inline-block; margin-bottom: 0.25rem;">${d.name}</span>`).join('') || '<em style="color: #888;">None found</em>';
+            const digivolvesToList = data.digivolutions?.digivolvesTo?.map(d => `<span style="background: #2a2a2a; padding: 0.25rem 0.5rem; border-radius: 3px; margin-right: 0.5rem; display: inline-block; margin-bottom: 0.25rem;">${d.name}</span>`).join('') || '<em style="color: #888;">None found</em>';
+            
+            const localizedNames = [];
+            if (data.names?.katakana) localizedNames.push(`<span style="background: #2a2a2a; padding: 0.25rem 0.75rem; border-radius: 4px; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.25rem;">🇯🇵 <strong>Katakana:</strong> ${data.names.katakana}</span>`);
+            if (data.names?.japanese) localizedNames.push(`<span style="background: #2a2a2a; padding: 0.25rem 0.75rem; border-radius: 4px; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.25rem;">🇯🇵 <strong>Japanese:</strong> ${data.names.japanese}</span>`);
+            if (data.names?.korean) localizedNames.push(`<span style="background: #2a2a2a; padding: 0.25rem 0.75rem; border-radius: 4px; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.25rem;">🇰🇷 <strong>Korean:</strong> ${data.names.korean}</span>`);
+            if (data.names?.chinese) localizedNames.push(`<span style="background: #2a2a2a; padding: 0.25rem 0.75rem; border-radius: 4px; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.25rem;">🇨🇳 <strong>Chinese:</strong> ${data.names.chinese}</span>`);
+            if (data.names?.thai) localizedNames.push(`<span style="background: #2a2a2a; padding: 0.25rem 0.75rem; border-radius: 4px; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.25rem;">🇹🇭 <strong>Thai:</strong> ${data.names.thai}</span>`);
+            
+            const preview = `
+                ${validationHTML}
+                
+                <h3 style="margin-bottom: 1rem;">
+                    ${data.name}
+                    ${data.rank ? `<span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 12px; margin-left: 0.5rem; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${getRankIcon(data.rank)}${data.rank}-RANK</span>` : ''}
+                </h3>
+                
+                ${localizedNames.length > 0 ? `
+                    <div style="margin-bottom: 1rem; padding: 0.75rem; background: #1a1a1a; border-radius: 4px;">
+                        <strong style="color: #0066ff;">Localized Names:</strong>
+                        <div style="margin-top: 0.5rem; font-size: 14px; color: #ccc; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            ${localizedNames.join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${data.iconUrl || data.mainImageUrl ? `
+                    <div style="display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem;">
+                        ${data.mainImageUrl ? `
+                            <div style="flex: 1; text-align: center;">
+                                <div style="background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%); padding: 1rem; border-radius: 8px; border: 2px solid #00ff88; box-shadow: 0 4px 8px rgba(0,255,136,0.2);">
+                                    <img src="${data.mainImageUrl}" alt="Digimon Artwork" style="max-width: 400px; max-height: 500px; width: auto; height: auto; display: block; margin: 0 auto;">
+                                </div>
+                                <div style="margin-top: 0.5rem;">
+                                    <strong style="color: #00ff88; font-size: 13px;">🎨 Digimon Artwork</strong>
+                                    <br>
+                                    <small style="color: #00ff88; font-size: 11px;">✅ Downloaded</small>
+                                    ${data.mainImageSourceUrl ? `<br><small style="color: #888; font-size: 9px; word-break: break-all;">Source: ${data.mainImageSourceUrl}</small>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                        ${data.iconUrl ? `
+                            <div style="text-align: center;">
+                                <div style="background: #1a1a1a; padding: 0.75rem; border-radius: 8px; border: 2px solid #0066ff;">
+                                    <img src="${data.iconUrl}" alt="Icon" style="width: 128px; height: 128px; display: block; object-fit: contain;">
+                                </div>
+                                <div style="margin-top: 0.5rem;">
+                                    <strong style="color: #0066ff; font-size: 13px;">🖼️ Icon</strong>
+                                    <br>
+                                    <small style="color: #0066ff; font-size: 11px;">✅ Downloaded</small>
+                                    ${data.iconSourceUrl ? `<br><small style="color: #888; font-size: 9px; word-break: break-all;">Source: ${data.iconSourceUrl}</small>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+                
+                <div class="preview-grid">
+                    <div class="preview-item"><strong>Form:</strong> ${data.form || 'N/A'}</div>
+                    <div class="preview-item"><strong>Rank:</strong> ${data.rank ? `${getRankIcon(data.rank)}${data.rank}` : '<em style="color: #ff9800;">Not found - will be left empty</em>'}</div>
+                    <div class="preview-item"><strong>Attribute:</strong> ${getAttributeIcon(data.attribute || 'N/A')}</div>
+                    <div class="preview-item"><strong>Element:</strong> ${getElementIcon(data.element || 'N/A')}</div>
+                    ${data.attackerType ? `<div class="preview-item"><strong>Attacker Type:</strong> ${getAttackerTypeIcon(data.attackerType)}</div>` : ''}
+                    ${data.type ? `<div class="preview-item"><strong>Type:</strong> ${data.type}</div>` : ''}
+                    ${data.defaultLevel ? `<div class="preview-item"><strong>Unlocked at level:</strong> ${data.defaultLevel}</div>` : ''}
+                    <div class="preview-item"><strong>Families:</strong> ${data.families?.map(f => getFamilyIcon(f) + f).join(', ') || 'None'}</div>
+                </div>
+                
+                ${(data.isRiding || data.availableFromEgg || data.location || data.availableInGDMO !== null || data.jogressRequirement) ? `
+                    <div style="margin-top: 1rem; padding: 0.75rem; background: #1a1a1a; border-radius: 4px;">
+                        <strong style="color: #0066ff; font-size: 14px;">📋 Availability & Requirements:</strong>
+                        <div style="margin-top: 0.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
+                            ${data.canBeRidden !== undefined ? `<div style="color: ${data.canBeRidden ? '#4ade80' : '#ccc'};">🐉 <strong>Can be ridden:</strong> ${data.canBeRidden ? 'Yes' : 'No'}</div>` : ''}
+                            ${data.canBeHatched !== undefined ? `<div style="color: ${data.canBeHatched ? '#4ade80' : '#ccc'};">🥚 <strong>Can be hatched:</strong> ${data.canBeHatched ? 'Yes' : 'No'}</div>` : ''}
+                            ${data.available !== undefined ? `<div style="color: ${data.available ? '#4ade80' : '#ccc'};">✨ <strong>Available:</strong> ${data.available ? 'Yes' : 'No'}</div>` : ''}
+                            ${data.availableFromEgg ? `<div style="color: #ccc;">🥚 <strong>From Egg:</strong> Yes</div>` : ''}
+                            ${data.availableInGDMO !== null ? `<div style="color: #ccc;">🌐 <strong>GDMO:</strong> ${data.availableInGDMO ? 'Yes' : 'No'}</div>` : ''}
+                            ${data.location ? `<div style="color: #ccc;">📍 <strong>Location:</strong> ${data.location}</div>` : ''}
+                            ${data.jogressRequirement ? `<div style="color: #ccc;">🔧 <strong>Requires:</strong> ${data.jogressRequirement}</div>` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${data.stats ? `
+                    <div style="margin-top: 1.5rem;">
+                        <strong style="color: #0066ff; font-size: 16px;">Base Stats:</strong>
+                        <div class="stats-grid" style="margin-top: 0.5rem;">
+                            <div class="stat-item">HP: ${data.stats.hp || 0}</div>
+                            <div class="stat-item">AT: ${data.stats.at || 0}</div>
+                            <div class="stat-item">DE: ${data.stats.de || 0}</div>
+                            <div class="stat-item">AS: ${data.stats.as || 0}</div>
+                            <div class="stat-item">DS: ${data.stats.ds || 0}</div>
+                            <div class="stat-item">CT: ${data.stats.ct || 0}%</div>
+                            <div class="stat-item">HT: ${data.stats.ht || 0}</div>
+                            <div class="stat-item">EV: ${data.stats.ev || 0}%</div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${data.maxStats ? `
+                    <div style="margin-top: 1rem;">
+                        <strong style="color: #00ff88; font-size: 16px;">Max Stats (100% Size, Lv 140):</strong>
+                        <div class="stats-grid" style="margin-top: 0.5rem;">
+                            <div class="stat-item">HP: ${data.maxStats.hp || '<em style="color: #888;">Not found</em>'}</div>
+                            <div class="stat-item">AT: ${data.maxStats.at || '<em style="color: #888;">Not found</em>'}</div>
+                            <div class="stat-item">DE: ${data.maxStats.de || '<em style="color: #888;">Not found</em>'}</div>
+                            <div class="stat-item">AS: ${data.maxStats.as || '<em style="color: #888;">Not found</em>'}</div>
+                            <div class="stat-item">DS: ${data.maxStats.ds || '<em style="color: #888;">Not found</em>'}</div>
+                            <div class="stat-item">CT: ${data.maxStats.ct ? data.maxStats.ct + '%' : '<em style="color: #888;">Not found</em>'}</div>
+                            <div class="stat-item">HT: ${data.maxStats.ht || '<em style="color: #888;">Not found</em>'}</div>
+                            <div class="stat-item">EV: ${data.maxStats.ev ? data.maxStats.ev + '%' : '<em style="color: #888;">Not found</em>'}</div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div style="margin-top: 1.5rem;">
+                    <strong style="color: #0066ff; font-size: 16px;">Skills/Attacks:</strong>
+                    <div style="margin-top: 0.5rem;">
+                        ${skillsList}
+                    </div>
+                </div>
+                
+                ${data.statsNote ? `
+                    <div style="margin-top: 1rem; padding: 0.5rem; background: #2a2a2a; border-radius: 4px; text-align: center;">
+                        <small style="color: #888;">Note: <strong style="color: #0066ff;">${data.statsNote.text}</strong></small>
+                    </div>
+                ` : ''}
+                
+                ${data.deckBuffs && data.deckBuffs.length > 0 ? `
+                    <div style="margin-top: 1.5rem;">
+                        <strong style="color: #ff9800; font-size: 16px;">🎖️ Deck Buffs Unlocked:</strong>
+                        <div style="margin-top: 0.5rem; background: #1a1a1a; padding: 0.75rem; border-radius: 4px;">
+                            ${data.deckBuffs.map(buff => `<div style="padding: 0.25rem 0; border-bottom: 1px solid #333;">• ${buff}</div>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${data.rideable ? `
+                    <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 4px; color: white;">
+                        <strong style="font-size: 14px;">🐉 Rideable:</strong> ${data.rideable}
+                    </div>
+                ` : ''}
+                
+                ${data.jogressFrom ? `
+                    <div style="margin-top: 1rem; padding: 0.75rem; background: #2a2a2a; border-radius: 4px; border-left: 3px solid #ff9800;">
+                        <strong style="color: #ff9800;">⚡ Jogress Components:</strong> 
+                        <div style="margin-top: 0.5rem;">
+                            ${data.jogressFrom.map(comp => `<span style="background: #1a1a1a; padding: 0.25rem 0.75rem; border-radius: 3px; margin-right: 0.5rem; display: inline-block; margin-bottom: 0.25rem;">${comp}</span>`).join(' + ')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${data.specialEffects ? `
+                    <div style="margin-top: 1.5rem;">
+                        <strong style="color: #ff9800; font-size: 16px;">✨ Special Effects (F1-F4):</strong>
+                        <div style="margin-top: 0.5rem; background: #1a1a1a; padding: 0.75rem; border-radius: 4px;">
+                            ${data.specialEffects.f1 ? `
+                                <div style="margin-bottom: 0.75rem; padding: 0.5rem; background: #2a2a2a; border-radius: 4px;">
+                                    <strong style="color: #00ff88;">F1: ${data.specialEffects.f1.name}</strong><br>
+                                    <small style="color: #888;">Duration: ${data.specialEffects.f1.duration}s | Activation: ${data.specialEffects.f1.activation}%</small><br>
+                                    <small style="color: #ccc;">${data.specialEffects.f1.effect}</small>
+                                </div>
+                            ` : ''}
+                            ${data.specialEffects.f2 ? `
+                                <div style="margin-bottom: 0.75rem; padding: 0.5rem; background: #2a2a2a; border-radius: 4px;">
+                                    <strong style="color: #00ff88;">F2: ${data.specialEffects.f2.name}</strong><br>
+                                    <small style="color: #888;">Duration: ${data.specialEffects.f2.duration}s | Activation: ${data.specialEffects.f2.activation}%</small><br>
+                                    <small style="color: #ccc;">${data.specialEffects.f2.effect}</small>
+                                </div>
+                            ` : ''}
+                            ${data.specialEffects.f3 ? `
+                                <div style="margin-bottom: 0.75rem; padding: 0.5rem; background: #2a2a2a; border-radius: 4px;">
+                                    <strong style="color: #00ff88;">F3: ${data.specialEffects.f3.name}</strong><br>
+                                    <small style="color: #888;">Duration: ${data.specialEffects.f3.duration}s | Activation: ${data.specialEffects.f3.activation}%</small><br>
+                                    <small style="color: #ccc;">${data.specialEffects.f3.effect}</small>
+                                </div>
+                            ` : ''}
+                            ${data.specialEffects.f4 ? `
+                                <div style="padding: 0.5rem; background: #2a2a2a; border-radius: 4px;">
+                                    <strong style="color: #00ff88;">F4: ${data.specialEffects.f4.name}</strong><br>
+                                    <small style="color: #888;">Duration: ${data.specialEffects.f4.duration}s | Activation: ${data.specialEffects.f4.activation}%</small><br>
+                                    <small style="color: #ccc;">${data.specialEffects.f4.effect}</small>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${data.uRankPassives ? `
+                    <div style="margin-top: 1.5rem;">
+                        <strong style="color: #ff9800; font-size: 16px;">🌟 U-Rank Passives:</strong>
+                        <div style="margin-top: 0.5rem; background: #1a1a1a; padding: 0.75rem; border-radius: 4px;">
+                            ${data.uRankPassives.attribute ? `
+                                <div style="margin-bottom: 0.5rem;">
+                                    <strong style="color: #0066ff;">Attribute Passive:</strong> 
+                                    <span style="background: #2a2a2a; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${data.uRankPassives.attribute}</span>
+                                </div>
+                            ` : ''}
+                            ${data.uRankPassives.element ? `
+                                <div>
+                                    <strong style="color: #00ff88;">Element Passive:</strong> 
+                                    <span style="background: #2a2a2a; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${data.uRankPassives.element}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${data.sssPassives ? `
+                    <div style="margin-top: 1.5rem;">
+                        <strong style="color: #ff9800; font-size: 16px;">⭐ SSS+ Rank Passives:</strong>
+                        <div style="margin-top: 0.5rem; background: #1a1a1a; padding: 0.75rem; border-radius: 4px;">
+                            ${data.sssPassives.virus ? `
+                                <div style="margin-bottom: 0.5rem;">
+                                    <strong style="color: #ff6b6b;">Virus:</strong> 
+                                    <span style="background: #2a2a2a; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${data.sssPassives.virus}</span>
+                                </div>
+                            ` : ''}
+                            ${data.sssPassives.darkness ? `
+                                <div style="margin-bottom: 0.5rem;">
+                                    <strong style="color: #9b59b6;">Darkness:</strong> 
+                                    <span style="background: #2a2a2a; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${data.sssPassives.darkness}</span>
+                                </div>
+                            ` : ''}
+                            ${data.sssPassives.vaccine ? `
+                                <div style="margin-bottom: 0.5rem;">
+                                    <strong style="color: #51cf66;">Vaccine:</strong> 
+                                    <span style="background: #2a2a2a; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${data.sssPassives.vaccine}</span>
+                                </div>
+                            ` : ''}
+                            ${data.sssPassives.data ? `
+                                <div>
+                                    <strong style="color: #4dabf7;">Data:</strong> 
+                                    <span style="background: #2a2a2a; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${data.sssPassives.data}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div style="margin-top: 1.5rem;">
+                    <strong style="color: #0066ff; font-size: 16px;">Digivolution Chains:</strong>
+                    <div style="margin-top: 0.5rem; background: #1a1a1a; padding: 0.75rem; border-radius: 4px;">
+                        <div style="margin-bottom: 0.5rem;"><strong>Digivolves From:</strong> ${digivolvesFromList}</div>
+                        <div><strong>Digivolves To:</strong> ${digivolvesToList}</div>
+                    </div>
+                </div>
+                
+                ${data.introduction ? `
+                    <div style="margin-top: 1.5rem;">
+                        <strong style="color: #0066ff; font-size: 16px;">Introduction:</strong>
+                        <div style="margin-top: 0.5rem; color: #ccc; font-size: 14px; line-height: 1.8; background: #1a1a1a; padding: 1rem; border-radius: 4px; border-left: 3px solid #0066ff;">
+                            ${data.introduction.split('\n\n').map(para => `<p style="margin: 0 0 1rem 0;">${para.trim()}</p>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${(data.overview?.pros?.length > 0 || data.overview?.cons?.length > 0) ? `
+                    <div style="margin-top: 1.5rem;">
+                        <strong style="color: #0066ff; font-size: 16px;">📊 Overview:</strong>
+                        <div style="margin-top: 0.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            ${data.overview.pros.length > 0 ? `
+                                <div style="background: linear-gradient(135deg, #1a3a1a 0%, #2a2a2a 100%); padding: 1rem; border-radius: 4px; border-left: 3px solid #00ff88;">
+                                    <div style="font-weight: bold; color: #00ff88; margin-bottom: 0.75rem; font-size: 14px;">✅ PROS</div>
+                                    <ul style="margin: 0; padding-left: 1.25rem; color: #ccc; font-size: 13px; line-height: 1.8;">
+                                        ${data.overview.pros.map(pro => `<li>${pro}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                            ${data.overview.cons.length > 0 ? `
+                                <div style="background: linear-gradient(135deg, #3a1a1a 0%, #2a2a2a 100%); padding: 1rem; border-radius: 4px; border-left: 3px solid #ff6b6b;">
+                                    <div style="font-weight: bold; color: #ff6b6b; margin-bottom: 0.75rem; font-size: 14px;">❌ CONS</div>
+                                    <ul style="margin: 0; padding-left: 1.25rem; color: #ccc; font-size: 13px; line-height: 1.8;">
+                                        ${data.overview.cons.map(con => `<li>${con}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div style="margin-top: 1.5rem; padding: 1rem; background: #00ff88; color: #000; border-radius: 4px;">
+                    <strong>✅ Images Downloaded to Your Server</strong><br>
+                    <small>All images have been downloaded from DMO Wiki and stored locally on your server.<br>
+                    They will NOT link to dmowiki.com - they are now yours!</small>
+                </div>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: #ff9800; color: #000; border-radius: 4px;">
+                    <strong>⚠️ Review Carefully</strong><br>
+                    <small>Check all fields before saving. This will create a new Digimon entry (unpublished).<br>
+                    <strong>You can edit all fields after saving</strong> by going to the Digimon collection and clicking the entry.</small>
+                </div>
+            `;
+            
+            document.getElementById('previewContent').innerHTML = preview;
+            document.getElementById('previewSection').style.display = 'block';
+        }
+        
+        async function saveDigimon() {
+            if (!previewData) return;
+            
+            document.getElementById('saveBtn').disabled = true;
+            document.getElementById('saveBtn').textContent = 'Saving...';
+            
+            try {
+                const response = await fetch('/api/import-digimon/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(previewData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const action = result.isUpdate ? 'updated' : 'created';
+                    alert(`✅ Digimon ${action} successfully!`);
+                    // Clear preview
+                    const previewContent = document.getElementById('previewContent');
+                    if (previewContent) previewContent.innerHTML = '';
+                    const digimonInput = document.getElementById('digimonInput');
+                    if (digimonInput) digimonInput.value = '';
+                    // Hide preview section
+                    const previewSection = document.getElementById('previewSection');
+                    if (previewSection) previewSection.style.display = 'none';
+                    // Show import form
+                    const importForm = document.getElementById('importForm');
+                    if (importForm) importForm.style.display = 'block';
+                } else {
+                    alert('Error saving Digimon: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error saving Digimon: ' + error.message);
+            } finally {
+                document.getElementById('saveBtn').disabled = false;
+                document.getElementById('saveBtn').textContent = 'Save to Database';
+            }
+        }
+        
+        function resetForm() {
+            previewData = null;
+            document.getElementById('digimonInput').value = '';
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('importForm').style.display = 'block';
+            document.getElementById('errorMessage').innerHTML = '';
+            document.getElementById('successMessage').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+.vitest
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Next.js
+.next/
+out/
+build
+dist/
+
+# Production
+build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local env files
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# Typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDEs
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+
+# Payload
+media/
+build/
+*.log
+
+# Docker
+data/
+
+# Large data/import files
+*.json.bak
+Vaccine-Digimon-*.md
+Data-Digimon-*.md
+Virus-Digimon-*.md
+Unknown-Type-Digimon.md
+None-Digimon.md
+Vaccine-Digimon-N-Z-extracted.json
+MDs/
+
+# Windsurf
+.windsurf/
+
+# Deployment
+.deployment/

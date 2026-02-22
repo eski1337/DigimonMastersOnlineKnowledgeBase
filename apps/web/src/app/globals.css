@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Scrollbar for Digivolution Chain */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: rgba(55, 65, 81, 0.5);
+  border-radius: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #f97316, #ea580c);
+  border-radius: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #ea580c, #c2410c);
+}
+
+@layer base {
+  :root {
+    --background: 40 14% 16%;
+    --foreground: 40 31% 92%;
+    --card: 40 14% 19%;
+    --card-foreground: 40 31% 92%;
+    --popover: 40 14% 19%;
+    --popover-foreground: 40 31% 92%;
+    --primary: 39 84% 59%;
+    --primary-foreground: 40 14% 16%;
+    --secondary: 40 14% 24%;
+    --secondary-foreground: 40 31% 92%;
+    --muted: 40 14% 29%;
+    --muted-foreground: 40 11% 65%;
+    --accent: 28 75% 56%;
+    --accent-foreground: 40 14% 16%;
+    --destructive: 4 79% 60%;
+    --destructive-foreground: 40 31% 99%;
+    --border: 40 14% 29%;
+    --input: 40 14% 29%;
+    --ring: 39 84% 59%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    hyphens: none;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+  }
+
+  /* Disable hyphens globally */
+  * {
+    hyphens: none;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar for Gruvbox theme */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gruvbox-bg1;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gruvbox-bg3 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gruvbox-bg4;
+}
+
+/* Focus visible styles */
+.focus-visible:focus-visible {
+  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+}
+
+/* Typography improvements */
+.prose {
+  @apply text-foreground;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  @apply text-foreground font-bold;
+}
+
+.prose a {
+  @apply text-primary hover:text-primary/80 underline-offset-4;
+}
+
+.prose code {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm;
+}
+
+.prose pre {
+  @apply bg-gruvbox-bg1 border border-border;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-200 hover:scale-105 hover:shadow-lg;
+}
+
+/* Skeleton loader */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    to right,
+    hsl(var(--muted)) 4%,
+    hsl(var(--muted-foreground) / 0.1) 25%,
+    hsl(var(--muted)) 36%
+  );
+  background-size: 1000px 100%;
+}

@@ -1,0 +1,27 @@
+/* Custom Import Button */
+.import-digimon-btn {
+  display: inline-block;
+  background: #0066ff;
+  color: white !important;
+  padding: 0.5rem 1rem;
+  border-radius: 3px;
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 0.5rem;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.import-digimon-btn:hover {
+  background: #0052cc;
+}
+
+/* Position button in header */
+.collection-list__header {
+  position: relative;
+}
+
+.import-btn-container {
+  display: inline-block;
+  margin-left: 0.5rem;
+}

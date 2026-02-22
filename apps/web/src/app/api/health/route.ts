@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,6 +76,7 @@ async function checkDatabase(): Promise<ServiceStatus> {
   const startTime = Date.now();
   
   try {
+    const { default: clientPromise } = await import('@/lib/mongodb');
     const client = await clientPromise;
     
     // Simple ping to verify connection

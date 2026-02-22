@@ -7,6 +7,8 @@ import { fetchCMSCollection } from '@/lib/cms-client';
 import { stripHTML } from '@/lib/sanitize-html';
 import type { PatchNoteDoc } from '@/types/payload-responses';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   // Fetch latest 3 patch notes for the homepage
   let latestPatchNotes: PatchNoteDoc[] = [];

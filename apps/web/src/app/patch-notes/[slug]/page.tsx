@@ -9,6 +9,8 @@ import { fetchCMSBySlug } from '@/lib/cms-client';
 import { sanitizeHTML } from '@/lib/sanitize-html';
 import type { PatchNoteDoc } from '@/types/payload-responses';
 
+export const dynamic = 'force-dynamic';
+
 interface PatchNotePageProps {
   params: {
     slug: string;

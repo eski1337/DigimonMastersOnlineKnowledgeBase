@@ -145,9 +145,65 @@ if (process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET) {
 //   );
 // }
 
+// Sync a Discord user to Payload CMS (create or update)
+async function syncDiscordUserToCMS(profile: { id: string; email: string; username: string; avatar?: string; global_name?: string }): Promise<{ id: string; role: string } | null> {
+  try {
+    // Check if user with this discordId already exists
+    const existingRes = await fetch(
+      `${CMS_URL}/api/users?where[discordId][equals]=${profile.id}&limit=1`,
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    
+    if (existingRes.ok) {
+      const existingData = await existingRes.json();
+      if (existingData.docs && existingData.docs.length > 0) {
+        const existingUser = existingData.docs[0];
+        return { id: existingUser.id, role: existingUser.role || 'member' };
+      }
+    }
+
+    // Check if user with this email already exists (link accounts)
+    const emailRes = await fetch(
+      `${CMS_URL}/api/users?where[email][equals]=${encodeURIComponent(profile.email)}&limit=1`,
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    
+    if (emailRes.ok) {
+      const emailData = await emailRes.json();
+      if (emailData.docs && emailData.docs.length > 0) {
+        const existingUser = emailData.docs[0];
+        return { id: existingUser.id, role: existingUser.role || 'member' };
+      }
+    }
+
+    // Create new user in CMS
+    const randomPassword = require('crypto').randomBytes(32).toString('hex');
+    const createRes = await fetch(`${CMS_URL}/api/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: profile.email,
+        password: randomPassword,
+        username: profile.username,
+        name: profile.global_name || profile.username,
+        discordId: profile.id,
+      }),
+    });
+
+    if (createRes.ok) {
+      const created = await createRes.json();
+      return { id: created.doc?.id || created.id, role: 'member' };
+    }
+    
+    console.error('Failed to create CMS user for Discord:', await createRes.text());
+    return null;
+  } catch (error) {
+    console.error('Failed to sync Discord user to CMS:', error);
+    return null;
+  }
+}
+
 export const authOptions: NextAuthOptions = {
-  // Note: MongoDBAdapter disabled for JWT sessions
-  // adapter: MongoDBAdapter(clientPromise) as any,
   providers,
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -158,15 +214,35 @@ export const authOptions: NextAuthOptions = {
     signOut: '/auth/signout',
     error: '/auth/error',
     verifyRequest: '/auth/verify',
-    newUser: '/auth/welcome', // Redirect new users to welcome page
+    newUser: '/auth/welcome',
   },
   debug: process.env.NODE_ENV === 'development',
   callbacks: {
+    async signIn({ user, account, profile }) {
+      // Discord OAuth: sync user to Payload CMS
+      if (account?.provider === 'discord' && profile) {
+        const discordProfile = profile as any;
+        if (!discordProfile.email) {
+          // Discord account has no email — cannot create CMS user
+          return '/auth/error?error=OAuthCallback';
+        }
+        const cmsUser = await syncDiscordUserToCMS({
+          id: discordProfile.id,
+          email: discordProfile.email,
+          username: discordProfile.username,
+          avatar: discordProfile.avatar,
+          global_name: discordProfile.global_name,
+        });
+        if (cmsUser) {
+          // Attach CMS user data to the user object for the JWT callback
+          (user as any).cmsId = cmsUser.id;
+          (user as any).cmsRole = cmsUser.role;
+        }
+      }
+      return true;
+    },
     async redirect({ url, baseUrl }) {
-      // Check if this is after a Discord OAuth callback
-      // Discord redirects will have the baseUrl + some path
       if (url.startsWith(baseUrl)) {
-        // If coming from Discord callback, redirect to welcome
         if (url.includes('callbackUrl')) {
           const params = new URL(url).searchParams;
           const callbackUrl = params.get('callbackUrl');
@@ -176,7 +252,6 @@ export const authOptions: NextAuthOptions = {
         }
         return url;
       }
-      // For Discord provider, always show welcome
       return baseUrl;
     },
     async session({ session, token }) {
@@ -189,22 +264,23 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user, account, profile: _profile }) {
       if (user) {
-        token.sub = user.id;
-        token.email = user.email;
-        token.name = user.name;
-        
         // Credentials provider (Payload CMS) - Role from user object
         if (account?.provider === 'credentials' && (user as any).role) {
+          token.sub = user.id;
+          token.email = user.email;
+          token.name = user.name;
           token.role = (user as any).role;
           token.roles = [(user as any).role];
         }
-        // Discord OAuth - Assign member role by default
+        // Discord OAuth - Use CMS user ID + role synced from Discord
         else if (account?.provider === 'discord') {
-          // Default role for all Discord users
-          token.role = 'member';
-          token.roles = ['member'];
+          token.sub = (user as any).cmsId || user.id;
+          token.email = user.email;
+          token.name = user.name;
+          token.role = (user as any).cmsRole || 'member';
+          token.roles = [(user as any).cmsRole || 'member'];
           
-          // Try to sync roles from Discord server (optional)
+          // Try to upgrade role based on Discord server roles
           try {
             const guildId = process.env.DISCORD_GUILD_ID;
             if (guildId && account.access_token) {
@@ -221,7 +297,6 @@ export const authOptions: NextAuthOptions = {
                 const member = await response.json();
                 const roles = member.roles || [];
                 const highestRole = getHighestRole(roles);
-                // Only upgrade role if they have a special Discord role
                 if (highestRole !== 'member') {
                   token.role = highestRole;
                   token.roles = [highestRole];
@@ -230,10 +305,11 @@ export const authOptions: NextAuthOptions = {
             }
           } catch (error) {
             console.error('Failed to fetch Discord roles (non-critical):', error);
-            // Keep default member role on error
           }
         } else {
-          // Email auth or other providers - Default to member
+          token.sub = user.id;
+          token.email = user.email;
+          token.name = user.name;
           token.role = token.role || 'member';
           token.roles = token.roles || ['member'];
         }

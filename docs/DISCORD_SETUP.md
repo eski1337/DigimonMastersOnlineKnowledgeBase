@@ -36,7 +36,7 @@ These role IDs are already added to your `.env` file.
 4. Add Redirect URIs:
    ```
    http://localhost:3000/api/auth/callback/discord
-   https://your-domain.com/api/auth/callback/discord
+   https://dmokb.info/api/auth/callback/discord
    ```
 5. Click **"Save Changes"**
 
@@ -79,9 +79,10 @@ If you want the bot to read guild members:
 ### Role Sync Flow
 
 1. **User logs in** via Discord OAuth
-2. **NextAuth** fetches user's Discord profile and guild roles
-3. **Role mapper** checks user's Discord roles against configured role IDs
-4. **Website role** assigned based on highest Discord role:
+2. **NextAuth** syncs user to Payload CMS (creates account if new)
+3. **NextAuth** fetches user's Discord profile and guild roles
+4. **Role mapper** checks user's Discord roles against configured role IDs
+5. **Website role** assigned based on highest Discord role:
    - Discord Owner role → Website Owner
    - Discord Admin role → Website Admin
    - Discord Editor role → Website Editor
@@ -97,8 +98,10 @@ Role sync happens:
 
 ### Code Location
 
-- **OAuth Config**: `apps/web/src/app/api/auth/[...nextauth]/route.ts`
+- **Auth Config**: `apps/web/src/lib/auth.ts`
+- **NextAuth Route**: `apps/web/src/app/api/auth/[...nextauth]/route.ts`
 - **Role Mapping**: Automatic based on env vars
+- **CMS User Sync**: `syncDiscordUserToCMS()` in `apps/web/src/lib/auth.ts`
 - **User Management**: Payload CMS Users collection
 
 ---
@@ -138,7 +141,7 @@ Role sync happens:
 ### Update Environment Variables
 
 ```env
-NEXTAUTH_URL=https://your-domain.com
+NEXTAUTH_URL=https://dmokb.info
 DISCORD_CLIENT_ID=your-production-client-id
 DISCORD_CLIENT_SECRET=your-production-client-secret
 DISCORD_GUILD_ID=1427056567693476016
@@ -148,7 +151,7 @@ DISCORD_GUILD_ID=1427056567693476016
 
 In Discord Developer Portal:
 ```
-https://your-domain.com/api/auth/callback/discord
+https://dmokb.info/api/auth/callback/discord
 ```
 
 ### Security Notes

@@ -22,7 +22,7 @@ interface ErrorResponse {
   errors?: RegistrationError[];
 }
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+// Registration goes through our own API proxy to avoid CORS issues
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -73,7 +73,7 @@ export default function RegisterPage() {
 
     try {
       // Register user with Payload CMS
-      const response = await fetch(`${CMS_URL}/api/users`, {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,9 +82,8 @@ export default function RegisterPage() {
           username: formData.username,
           email: formData.email,
           password: formData.password,
-          passwordConfirm: formData.confirmPassword, // Payload might require this
+          confirmPassword: formData.confirmPassword,
           name: formData.name || formData.username,
-          // Role will be automatically set to 'member' by the CMS hook
         }),
       });
 

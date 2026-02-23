@@ -12,6 +12,16 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'cms.dmokb.info',
+        pathname: '/media/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cms.dmokb.info',
+        pathname: '/Images/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'res.cloudinary.com',
         pathname: '/**',
       },

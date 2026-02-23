@@ -60,8 +60,8 @@ Complete guide for local development and production deployment to Strato VPS.
 ```
 Strato VPS
 ├── nginx (Reverse Proxy + SSL)
-│   ├── dmokb.com → Next.js (Port 3000)
-│   └── cms.dmokb.com → Payload CMS (Port 3001)
+│   ├── dmokb.info → Next.js (Port 3000)
+│   └── cms.dmokb.info → Payload CMS (Port 3001)
 ├── Node.js Applications
 │   ├── Web App (Next.js standalone)
 │   └── CMS (Payload Express)
@@ -163,7 +163,7 @@ Update with production values:
 MONGODB_URI=mongodb://localhost:27017/dmo-kb-prod
 
 # NextAuth
-NEXTAUTH_URL=https://dmokb.com
+NEXTAUTH_URL=https://dmokb.info
 NEXTAUTH_SECRET=GENERATE_STRONG_SECRET_HERE
 
 # Discord OAuth (configure in Discord Developer Portal)
@@ -172,15 +172,15 @@ DISCORD_CLIENT_SECRET=your_production_discord_client_secret
 
 # Email (configure with real SMTP)
 EMAIL_SERVER=smtp://smtp.strato.com:465
-EMAIL_FROM=noreply@dmokb.com
+EMAIL_FROM=noreply@dmokb.info
 
 # Payload
 PAYLOAD_SECRET=GENERATE_ANOTHER_STRONG_SECRET
 
 # App
 NODE_ENV=production
-NEXT_PUBLIC_APP_URL=https://dmokb.com
-NEXT_PUBLIC_CMS_URL=https://cms.dmokb.com
+NEXT_PUBLIC_APP_URL=https://dmokb.info
+NEXT_PUBLIC_CMS_URL=https://cms.dmokb.info
 
 # Rate Limiting
 RATE_LIMIT_MAX=100
@@ -267,17 +267,17 @@ pm2 save
 
 ## 🌐 Nginx Configuration
 
-### Step 1: Configure Main Domain (dmokb.com)
+### Step 1: Configure Main Domain (dmokb.info)
 
 ```bash
-sudo nano /etc/nginx/sites-available/dmokb.com
+sudo nano /etc/nginx/sites-available/dmokb.info
 ```
 
 ```nginx
-# Web App - dmokb.com
+# Web App - dmokb.info
 server {
     listen 80;
-    server_name dmokb.com www.dmokb.com;
+    server_name dmokb.info www.dmokb.info;
 
     # Redirect to HTTPS (will be configured later)
     return 301 https://$server_name$request_uri;
@@ -285,11 +285,11 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name dmokb.com www.dmokb.com;
+    server_name dmokb.info www.dmokb.info;
 
     # SSL certificates (configure after obtaining)
-    ssl_certificate /etc/letsencrypt/live/dmokb.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/dmokb.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/dmokb.info/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/dmokb.info/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
@@ -335,26 +335,26 @@ server {
 }
 ```
 
-### Step 2: Configure CMS Subdomain (cms.dmokb.com)
+### Step 2: Configure CMS Subdomain (cms.dmokb.info)
 
 ```bash
-sudo nano /etc/nginx/sites-available/cms.dmokb.com
+sudo nano /etc/nginx/sites-available/cms.dmokb.info
 ```
 
 ```nginx
-# CMS - cms.dmokb.com
+# CMS - cms.dmokb.info
 server {
     listen 80;
-    server_name cms.dmokb.com;
+    server_name cms.dmokb.info;
     return 301 https://$server_name$request_uri;
 }
 
 server {
     listen 443 ssl http2;
-    server_name cms.dmokb.com;
+    server_name cms.dmokb.info;
 
-    ssl_certificate /etc/letsencrypt/live/cms.dmokb.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/cms.dmokb.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/cms.dmokb.info/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cms.dmokb.info/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
@@ -391,8 +391,8 @@ server {
 
 ```bash
 # Enable configurations
-sudo ln -s /etc/nginx/sites-available/dmokb.com /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/cms.dmokb.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/dmokb.info /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/cms.dmokb.info /etc/nginx/sites-enabled/
 
 # Test configuration
 sudo nginx -t
@@ -415,10 +415,10 @@ sudo apt install -y certbot python3-certbot-nginx
 
 ```bash
 # For main domain
-sudo certbot --nginx -d dmokb.com -d www.dmokb.com
+sudo certbot --nginx -d dmokb.info -d www.dmokb.info
 
 # For CMS subdomain
-sudo certbot --nginx -d cms.dmokb.com
+sudo certbot --nginx -d cms.dmokb.info
 ```
 
 ### Auto-Renewal
@@ -655,12 +655,18 @@ pm2 restart all
 In your Strato domain panel, add:
 
 ```
-Type    Name    Value               TTL
-A       @       YOUR_VPS_IP         3600
-A       www     YOUR_VPS_IP         3600
-A       cms     YOUR_VPS_IP         3600
-CNAME   www     dmokb.com           3600
+Type    Name                Value                              TTL
+A       @                   YOUR_VPS_IP                        3600
+A       www                 YOUR_VPS_IP                        3600
+A       cms                 YOUR_VPS_IP                        3600
+A       mail                YOUR_VPS_IP                        3600
+CNAME   www                 dmokb.info                         3600
+MX      @                   mail.dmokb.info (Priority 10)      3600
+TXT     @                   v=spf1 mx a:mail.dmokb.info ~all   3600
+TXT     _dmarc              v=DMARC1; p=quarantine; rua=mailto:postmaster@dmokb.info  3600
 ```
+
+> DKIM TXT record is added after Mailcow setup — see `docs/MAIL_SETUP.md`
 
 Wait for DNS propagation (up to 24 hours, usually faster).
 
@@ -670,7 +676,7 @@ Wait for DNS propagation (up to 24 hours, usually faster).
 
 - [ ] Applications running (`pm2 status`)
 - [ ] Nginx configured and running (`sudo nginx -t`)
-- [ ] SSL certificates active (visit https://dmokb.com)
+- [ ] SSL certificates active (visit https://dmokb.info)
 - [ ] MongoDB secure and accessible
 - [ ] Firewall configured (`sudo ufw status`)
 - [ ] PM2 startup enabled (`pm2 startup`)
@@ -754,4 +760,4 @@ Your DMO Knowledge Base is now running on Strato VPS with:
 ✅ Automated backups  
 ✅ Monitoring tools  
 
-**Your site is live at https://dmokb.com!** 🚀
+**Your site is live at https://dmokb.info!** 🚀

@@ -88,6 +88,14 @@
     "overrides": {
       "sharp": "0.33.5",
       "typescript": "5.9.3"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "esbuild",
+      "sharp",
+      "unrs-resolver",
+      "es5-ext",
+      "puppeteer"
+    ]
   }
 }

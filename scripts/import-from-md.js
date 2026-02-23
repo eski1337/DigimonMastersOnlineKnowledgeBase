@@ -438,6 +438,8 @@ async function main() {
   console.log(`Existing in CMS: ${existingMap.size}\n`);
 
   // Import
+  const retryOnly = process.argv.includes('--retry-only');
+  if (retryOnly) console.log('RETRY MODE: only creating missing entries\n');
   let created = 0, updated = 0, failed = 0, skipped = 0;
 
   for (let i = 0; i < allDigimon.length; i++) {
@@ -468,15 +470,15 @@ async function main() {
     if (d.unlockedAtLevel) payload.unlockedAtLevel = d.unlockedAtLevel;
     if (d.unlockedWithItem) payload.unlockedWithItem = d.unlockedWithItem;
 
-    // Delay to avoid rate limiting
-    if (i > 0 && i % 10 === 0) await new Promise(r => setTimeout(r, 3000));
-    else if (i > 0) await new Promise(r => setTimeout(r, 200));
-
     try {
       const existingId = existingMap.get(d.slug);
       let res;
 
       if (existingId) {
+        if (retryOnly) { skipped++; continue; }
+        // Delay to avoid rate limiting
+        if (i > 0 && i % 10 === 0) await new Promise(r => setTimeout(r, 3000));
+        else if (i > 0) await new Promise(r => setTimeout(r, 200));
         // Update existing
         res = await req('PATCH', `/api/digimon/${existingId}`, payload, token);
         if (res.status === 200 && res.body.doc) {
@@ -487,6 +489,8 @@ async function main() {
           failed++;
         }
       } else {
+        // Delay before create
+        await new Promise(r => setTimeout(r, 2000));
         // Create new
         res = await req('POST', '/api/digimon', payload, token);
         if ((res.status === 200 || res.status === 201) && res.body.doc) {

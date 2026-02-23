@@ -92,15 +92,19 @@ export default function RegisterPage() {
       if (!response.ok) {
         console.error('Registration failed:', data);
         
-        // Check if email already exists
         const errorData = data as ErrorResponse;
-        if (errorData.errors && errorData.errors.some((e) => e.message?.includes('already exists') || e.message?.includes('unique'))) {
+        const msg = errorData.message || '';
+        
+        // Check common error patterns
+        if (msg.includes('already registered') || msg.includes('already exists') || msg.includes('unique')) {
           setError('This email is already registered. Please sign in instead.');
+        } else if (msg) {
+          setError(msg);
         } else if (errorData.errors) {
           const errorMsg = errorData.errors.map((e) => e.message).join(', ');
-          setError(errorMsg);
+          setError(errorMsg || 'Registration failed. Please try again.');
         } else {
-          setError(errorData.message || 'Registration failed. Please try again.');
+          setError('Registration failed. Please try again.');
         }
         setIsLoading(false);
         return;

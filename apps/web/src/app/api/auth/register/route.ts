@@ -44,14 +44,22 @@ export async function POST(request: NextRequest) {
     }
 
     if (!response.ok) {
-      // Forward Payload CMS error with better message
+      // Extract the actual error messages from Payload CMS response
       const errors = data.errors;
       if (errors && Array.isArray(errors)) {
-        const messages = errors.map((e: { message?: string; field?: string }) => {
-          if (e.field) return `The following field is invalid: ${e.field}`;
-          return e.message || 'Unknown error';
-        });
-        return Response.json({ message: messages.join('. '), errors }, { status: response.status });
+        // Payload nests detailed messages in errors[].data[].message
+        const messages: string[] = [];
+        for (const err of errors) {
+          if (err.data && Array.isArray(err.data)) {
+            for (const d of err.data) {
+              if (d.message) messages.push(d.message);
+            }
+          } else if (err.message) {
+            messages.push(err.message);
+          }
+        }
+        const msg = messages.length > 0 ? messages.join('. ') : (data.message || 'Registration failed');
+        return Response.json({ message: msg, errors }, { status: response.status });
       }
       return Response.json(data, { status: response.status });
     }

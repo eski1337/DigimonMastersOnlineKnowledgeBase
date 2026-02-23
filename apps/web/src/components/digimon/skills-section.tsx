@@ -50,10 +50,23 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
             ? skill.icon 
             : skill.icon?.url;
           
-          // Parse damage per level
-          const damageArray = skill.damagePerLevel 
-            ? skill.damagePerLevel.split(',').map(d => d.trim()).filter(d => d)
-            : [];
+          // Parse damage per level (stored as JSON string: [{"level":1,"damage":1234},...])
+          let damageEntries: { level: number; damage: number }[] = [];
+          if (skill.damagePerLevel) {
+            try {
+              const parsed = JSON.parse(skill.damagePerLevel);
+              if (Array.isArray(parsed)) {
+                damageEntries = parsed.map((entry: any) => ({
+                  level: entry.level || 0,
+                  damage: entry.damage || 0,
+                }));
+              }
+            } catch {
+              // Fallback: try comma-separated plain numbers
+              const parts = skill.damagePerLevel.split(',').map(d => d.trim()).filter(d => d);
+              damageEntries = parts.map((d, i) => ({ level: i + 1, damage: parseInt(d) || 0 }));
+            }
+          }
           
           const currentLevel = selectedLevels[index] || 0;
           
@@ -117,7 +130,7 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
                       </div>
                     </div>
                     
-                    {damageArray.length > 0 && (
+                    {damageEntries.length > 0 && (
                       <div className="bg-muted/30 rounded-lg p-3 border border-muted">
                         <div className="flex items-center gap-3">
                           <label className="text-sm font-semibold text-muted-foreground">Damage at Level:</label>
@@ -131,16 +144,16 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
                               }));
                             }}
                           >
-                            {damageArray.map((dmg, idx) => (
+                            {damageEntries.map((entry, idx) => (
                               <option key={idx} value={idx}>
-                                Level {idx + 1}
+                                Level {entry.level}
                               </option>
                             ))}
                           </select>
                           <div className="flex items-baseline gap-2">
                             <span className="text-xs text-muted-foreground">Damage:</span>
                             <span className="text-2xl font-bold text-green-400">
-                              {damageArray[currentLevel]}
+                              {damageEntries[currentLevel]?.damage?.toLocaleString() ?? '?'}
                             </span>
                           </div>
                         </div>

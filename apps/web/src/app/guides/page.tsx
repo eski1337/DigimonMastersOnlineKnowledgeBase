@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Gem, Swords, Map, Wrench } from 'lucide-react';
+import { Gem } from 'lucide-react';
 import Link from 'next/link';
 
 const guides = [

@@ -94,7 +94,13 @@ function parseOneDigimon(lines) {
   };
 
   // Line 0 is typically the name
-  d.name = lines[0].replace(/\s*\(.*$/, '').trim();
+  // Keep parenthesized English names like "Agumon (Classic)" but strip Japanese katakana like "(アグモン)›"
+  let rawName = lines[0].trim();
+  // Remove trailing › and katakana in parens
+  rawName = rawName.replace(/\s*[（(][ァ-ヿー・\s]+[）)].*$/, '').trim();
+  // Remove trailing › if present
+  rawName = rawName.replace(/[›»].*$/, '').trim();
+  d.name = rawName;
   if (!d.name || d.name.length > 100) return null;
 
   // Extract katakana from first few lines

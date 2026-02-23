@@ -314,7 +314,39 @@ export const authOptions: NextAuthOptions = {
           token.role = token.role || 'member';
           token.roles = token.roles || ['member'];
         }
+        token.roleRefreshedAt = Date.now();
       }
+
+      // Periodically re-fetch role from CMS (every 60 seconds)
+      // This ensures admin role changes propagate without requiring re-login
+      const ROLE_REFRESH_INTERVAL = 60 * 1000; // 60 seconds
+      const lastRefresh = (token.roleRefreshedAt as number) || 0;
+      if (token.sub && Date.now() - lastRefresh > ROLE_REFRESH_INTERVAL) {
+        try {
+          const userRes = await fetch(
+            `${CMS_URL}/api/users?where[id][equals]=${token.sub}&limit=1&depth=0`,
+            { headers: { 'Content-Type': 'application/json' } }
+          );
+          if (userRes.ok) {
+            const userData = await userRes.json();
+            if (userData.docs && userData.docs.length > 0) {
+              const cmsUser = userData.docs[0];
+              const roleMapping: Record<string, UserRole> = {
+                'owner': 'owner', 'admin': 'admin', 'editor': 'editor',
+                'member': 'member', 'user': 'member', 'guest': 'guest',
+              };
+              const newRole = roleMapping[cmsUser.role] || 'guest';
+              token.role = newRole;
+              token.roles = [newRole];
+              token.name = cmsUser.name || token.name;
+            }
+          }
+        } catch (error) {
+          // Non-critical: keep existing role if CMS is unreachable
+        }
+        token.roleRefreshedAt = Date.now();
+      }
+
       return token;
     },
   },

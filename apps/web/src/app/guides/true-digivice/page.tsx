@@ -10,6 +10,87 @@ export const metadata: Metadata = {
   description: 'Complete crafting guide for all 11 True Digivice types in Digimon Masters Online. Materials, locations, costs, and resetting guide.',
 };
 
+/* ─── Image Paths ──────────────────────────────────────────────────────── */
+
+const IMG = '/images/guides/true-digivice';
+
+const itemIcon: Record<string, string> = {
+  'Digivice of Beginning Lv. 0': `${IMG}/Digivice_of_Beginning_Lv_0.png`,
+  'Digivice of Beginning Lv. 1': `${IMG}/Digivice_of_Beginning_Lv_0.png`,
+  'Digivice of Beginning Lv. 2': `${IMG}/Digivice_of_Beginning_Lv_2.png`,
+  'Digivice of Adventure Lv. 0': `${IMG}/Digivice_of_Adventure_Lv_0.png`,
+  'Digivice of Adventure Lv. 1': `${IMG}/Digivice_of_Adventure_Lv_1.png`,
+  'Digivice of Adventure Lv. 2': `${IMG}/Digivice_of_Adventure_Lv_2.png`,
+  'True Digivice': `${IMG}/True_Digivice.png`,
+  'Essence of Evolution': `${IMG}/Essence_of_Evolution.png`,
+  'Fragment of Evolution': `${IMG}/Fragment_of_Evolution.png`,
+  'Piece of Evolution': `${IMG}/Piece_of_Evolution.png`,
+  "Myotismon's Digicore": `${IMG}/Myotismons_Digicore.png`,
+  'Infective Virus': `${IMG}/Infective_Virus.png`,
+  "Digimon's Bionic Energy": `${IMG}/Digimons_Bionic_Energy.png`,
+  'Digital Energy': `${IMG}/Digital_Energy.png`,
+  "SkullMeramon's Digicore": `${IMG}/SkullMeramons_Digicore.png`,
+  'Absolute Essence of Evolution': `${IMG}/Absolute_Essence_of_Evolution.png`,
+  'Soul of Myotismon': `${IMG}/Soul_of_Myotismon.png`,
+  'Heinous Digicore': `${IMG}/Heinous_Digicore.png`,
+  "VenomMyotismon's Venom": `${IMG}/VenomMyotismons_Venom.png`,
+  'Condensed Dark Energy': `${IMG}/Condensed_Dark_Energy.png`,
+  'Option Change Stone': `${IMG}/Option_Change_Stone.png`,
+  'Number Change Stone': `${IMG}/Number_Change_Stone.png`,
+  '103-Orange-OT': `${IMG}/103-Orange-OT.png`,
+  '103-Purple-OT': `${IMG}/103-Purple-OT.png`,
+  'OT Digivice': `${IMG}/OT_Digivice.png`,
+  'Money': `${IMG}/Coin_Currency.png`,
+  'Digivice of Courage': `${IMG}/Digivice_of_Courage.png`,
+  'Digivice of Friendship': `${IMG}/Digivice_of_Friendship.png`,
+  'Digivice of Love': `${IMG}/Digivice_of_Love.png`,
+  'Digivice of Purity': `${IMG}/Digivice_of_Purity.png`,
+  'Digivice of Knowledge': `${IMG}/Digivice_of_Knowledge.png`,
+  'Digivice of Sincerity': `${IMG}/Digivice_of_Reliability.png`,
+  'Digivice of Kindness': `${IMG}/Digivice_of_Kindness.png`,
+  'Digivice of Hope': `${IMG}/Digivice_of_Hope.png`,
+  'Digivice of Light': `${IMG}/Digivice_of_Light.png`,
+  'Digivice of Fate': `${IMG}/Digivice_of_Fate.png`,
+  'Digivice of Miracle': `${IMG}/Digivice_of_Miracles.png`,
+};
+
+const auraImage: Record<string, string> = {
+  'Courage': `${IMG}/300px-Courage_True_Vice_aura.png`,
+  'Friendship': `${IMG}/300px-Friendship_truevice_aura.png`,
+  'Love': `${IMG}/300px-Love_truevice_aura.png`,
+  'Purity': `${IMG}/300px-Purity_true_vice_aura.png`,
+  'Knowledge': `${IMG}/300px-Knowledge_truevice_aura.png`,
+  'Sincerity': `${IMG}/300px-Sincerity_truevice_aura.png`,
+  'Kindness': `${IMG}/300px-Kindness_truevice_aura.png`,
+  'Hope': `${IMG}/Hope_truevice_aura.png`,
+  'Light': `${IMG}/300px-Light_truevice_aura.png`,
+  'Fate': `${IMG}/300px-Fate_truevice_aura.png`,
+  'Miracle': `${IMG}/296px-Miracle_truevice_aura.png`,
+};
+
+function ItemImg({ name, size = 24 }: { name: string; size?: number }) {
+  const src = itemIcon[name];
+  if (!src) return null;
+  return <img src={src} alt={name} width={size} height={size} className="inline-block align-middle" />;
+}
+
+function parseMaterial(m: string): { name: string; qty: string } {
+  const match = m.match(/^(.+?)\s+(x\d+)$/);
+  if (match) return { name: match[1], qty: match[2] };
+  return { name: m, qty: '' };
+}
+
+function MaterialLine({ text }: { text: string }) {
+  const { name, qty } = parseMaterial(text);
+  return (
+    <li className="flex items-center gap-1.5 text-muted-foreground">
+      <ItemImg name={name} size={20} />
+      <span>{name}</span>
+      {qty && <span className="text-foreground/70 font-medium">{qty}</span>}
+    </li>
+  );
+}
+
 /* ─── Data ─────────────────────────────────────────────────────────────── */
 
 const digiviceTypes = [
@@ -304,15 +385,21 @@ export default function TrueDigivicePage() {
 
         {/* Aura Types */}
         <Section id="auras" title="Aura Types">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {digiviceTypes.map(type => (
-              <Card key={type} className="text-center">
+              <Card key={type} className="text-center overflow-hidden">
                 <CardContent className="pt-4 pb-3 px-3">
-                  <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-lg">
-                    ✦
+                  <div className="relative w-full aspect-square max-w-[200px] mx-auto mb-3">
+                    <img
+                      src={auraImage[type]}
+                      alt={`Digivice of ${type} aura`}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                  <div className="text-xs font-medium text-foreground">Digivice of</div>
-                  <div className="text-sm font-bold text-primary">{type}</div>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <ItemImg name={`Digivice of ${type}`} size={20} />
+                    <span className="text-sm font-bold text-primary">{type}</span>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -339,11 +426,16 @@ export default function TrueDigivicePage() {
               <tbody>
                 {craftingSteps.map((step, i) => (
                   <tr key={i} className="hover:bg-secondary/20 transition-colors">
-                    <TableCell className="font-semibold text-foreground whitespace-nowrap">{step.product}</TableCell>
+                    <TableCell className="font-semibold text-foreground whitespace-nowrap">
+                      <span className="flex items-center gap-2">
+                        <ItemImg name={step.product} size={28} />
+                        {step.product}
+                      </span>
+                    </TableCell>
                     <TableCell>
-                      <ul className="space-y-0.5">
+                      <ul className="space-y-1">
                         {step.materials.map((m, j) => (
-                          <li key={j} className="text-muted-foreground">{m}</li>
+                          <MaterialLine key={j} text={m} />
                         ))}
                       </ul>
                     </TableCell>
@@ -373,11 +465,16 @@ export default function TrueDigivicePage() {
               <tbody>
                 {digiviceMaterials.map((step, i) => (
                   <tr key={i} className="hover:bg-secondary/20 transition-colors">
-                    <TableCell className="font-semibold text-foreground whitespace-nowrap">{step.product}</TableCell>
+                    <TableCell className="font-semibold text-foreground whitespace-nowrap">
+                      <span className="flex items-center gap-2">
+                        <ItemImg name={step.product} size={28} />
+                        {step.product}
+                      </span>
+                    </TableCell>
                     <TableCell>
-                      <ul className="space-y-0.5">
+                      <ul className="space-y-1">
                         {step.materials.map((m, j) => (
-                          <li key={j} className="text-muted-foreground">{m}</li>
+                          <MaterialLine key={j} text={m} />
                         ))}
                       </ul>
                     </TableCell>
@@ -406,7 +503,12 @@ export default function TrueDigivicePage() {
               <tbody>
                 {materialLocations.map((loc, i) => (
                   <tr key={i} className="hover:bg-secondary/20 transition-colors">
-                    <TableCell className="font-semibold text-foreground whitespace-nowrap">{loc.material}</TableCell>
+                    <TableCell className="font-semibold text-foreground whitespace-nowrap">
+                      <span className="flex items-center gap-2">
+                        <ItemImg name={loc.material} size={24} />
+                        {loc.material}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-muted-foreground">{loc.raid.join(', ')}</TableCell>
                     <TableCell className="text-muted-foreground">{loc.location}</TableCell>
                   </tr>
@@ -439,7 +541,12 @@ export default function TrueDigivicePage() {
               <tbody>
                 {totalItems.map((item, i) => (
                   <tr key={i} className={`hover:bg-secondary/20 transition-colors ${item.item === 'Money' ? 'bg-primary/5' : ''}`}>
-                    <TableCell className={`font-semibold ${item.item === 'Money' ? 'text-primary' : 'text-foreground'}`}>{item.item}</TableCell>
+                    <TableCell className={`font-semibold ${item.item === 'Money' ? 'text-primary' : 'text-foreground'}`}>
+                      <span className="flex items-center gap-2">
+                        <ItemImg name={item.item} size={24} />
+                        {item.item}
+                      </span>
+                    </TableCell>
                     <TableCell className={`font-medium ${item.item === 'Money' ? 'text-primary' : 'text-muted-foreground'}`}>{item.amount}</TableCell>
                   </tr>
                 ))}
@@ -470,11 +577,16 @@ export default function TrueDigivicePage() {
               <tbody>
                 {resetRecipes.map((recipe, i) => (
                   <tr key={i} className="hover:bg-secondary/20 transition-colors">
-                    <TableCell className="font-semibold text-foreground whitespace-nowrap">{recipe.source}</TableCell>
+                    <TableCell className="font-semibold text-foreground whitespace-nowrap">
+                      <span className="flex items-center gap-2">
+                        <ItemImg name={recipe.source} size={24} />
+                        {recipe.source}
+                      </span>
+                    </TableCell>
                     <TableCell>
-                      <ul className="space-y-0.5">
+                      <ul className="space-y-1">
                         {recipe.materials.slice(1).map((m, j) => (
-                          <li key={j} className="text-muted-foreground">{m}</li>
+                          <MaterialLine key={j} text={m} />
                         ))}
                       </ul>
                     </TableCell>

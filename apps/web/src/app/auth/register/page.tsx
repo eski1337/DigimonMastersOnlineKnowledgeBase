@@ -25,7 +25,7 @@ interface ErrorResponse {
 // Registration goes through our own API proxy to avoid CORS issues
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const _router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
     email: '',

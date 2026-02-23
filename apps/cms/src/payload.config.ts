@@ -19,7 +19,9 @@ import resendVerification from './endpoints/resendVerification';
 import updateDigimonSkills from './endpoints/update-digimon-skills';
 
 export default buildConfig({
-  serverURL: process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001',
+  serverURL: process.env.NODE_ENV === 'production'
+    ? 'https://cms.dmokb.info'
+    : (process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001'),
   admin: {
     user: Users.slug,
     bundler: webpackBundler(),
@@ -47,6 +49,14 @@ export default buildConfig({
     logMockCredentials: true, // Logs mock email credentials to console in dev
   },
   endpoints: [resendVerification, updateDigimonSkills],
-  cors: [process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'],
-  csrf: [process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'],
+  cors: [
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    'https://dmokb.info',
+    'https://cms.dmokb.info',
+  ],
+  csrf: [
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    'https://dmokb.info',
+    'https://cms.dmokb.info',
+  ],
 });

@@ -3,10 +3,7 @@ import { CollectionConfig } from 'payload/types';
 const Users: CollectionConfig = {
   slug: 'users',
   auth: {
-    // Email verification disabled until PTR/rDNS is configured for the VPS IP
-    // (web.de and other providers reject mail without valid PTR record)
-    // Re-enable verify once Strato PTR record points to mail.dmokb.info
-    verify: false,
+    verify: true,
   },
   admin: {
     useAsTitle: 'email',

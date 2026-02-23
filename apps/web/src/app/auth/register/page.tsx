@@ -110,22 +110,8 @@ export default function RegisterPage() {
         return;
       }
 
-      // Registration successful, now sign in
+      // Registration successful - user must verify email before logging in
       setSuccess(true);
-      
-      const signInResult = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
-
-      if (signInResult?.error) {
-        setError('Registration successful, but auto-login failed. Please sign in manually.');
-        setTimeout(() => router.push('/auth/signin'), 2000);
-      } else {
-        // Successfully registered and logged in - redirect to welcome page
-        setTimeout(() => router.push('/auth/welcome?new=true'), 1500);
-      }
     } catch (err) {
       console.error('Registration error:', err);
       setError('Something went wrong. Please try again.');
@@ -172,7 +158,13 @@ export default function RegisterPage() {
               <AlertDescription>
                 <div>✅ Account created successfully!</div>
                 <div className="mt-2 text-sm">
-                  Logging you in...
+                  A verification email has been sent to <strong>{formData.email}</strong>.
+                  Please check your inbox (and spam folder) and click the verification link to activate your account.
+                </div>
+                <div className="mt-3">
+                  <Link href="/auth/signin" className="text-blue-400 hover:text-blue-300 font-semibold">
+                    Go to Sign In →
+                  </Link>
                 </div>
               </AlertDescription>
             </Alert>

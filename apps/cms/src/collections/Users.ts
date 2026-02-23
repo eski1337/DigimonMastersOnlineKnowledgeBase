@@ -85,6 +85,10 @@ const Users: CollectionConfig = {
       if (!user) return false;
       return ['admin', 'owner'].includes(user.role);
     },
+    admin: ({ req: { user } }) => {
+      if (!user) return false;
+      return ['editor', 'admin', 'owner'].includes(user.role);
+    },
   },
   fields: [
     {

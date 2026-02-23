@@ -1,10 +1,11 @@
 import { CollectionConfig } from 'payload/types';
+import path from 'path';
 
 const Media: CollectionConfig = {
   slug: 'media',
   upload: {
     staticURL: '/media',
-    staticDir: 'media',
+    staticDir: path.resolve(process.cwd(), 'media'),
     imageSizes: [
       {
         name: 'thumbnail',

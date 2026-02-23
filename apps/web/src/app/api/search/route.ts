@@ -4,7 +4,7 @@ import { searchQuerySchema } from '@/lib/validation-schemas';
 import { logger } from '@/lib/logger';
 import type { PayloadResponse, DigimonDoc, GuideDoc, QuestDoc, MapDoc, ToolDoc } from '@/types/payload-responses';
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
 interface SearchResult {
   type: 'digimon' | 'guide' | 'quest' | 'map' | 'tool';
@@ -28,7 +28,7 @@ async function searchHandler(request: NextRequest) {
   // Search Digimon
   const digimonRes = await fetch(
     `${CMS_URL}/api/digimon?where[name][like]=${encodeURIComponent(query)}&where[published][equals]=true&limit=5`,
-    { next: { revalidate: 10 } } // Auto-updates quickly
+    { cache: 'no-store' }
   );
 
   if (digimonRes.ok) {
@@ -53,7 +53,7 @@ async function searchHandler(request: NextRequest) {
   // Search Guides
   const guidesRes = await fetch(
     `${CMS_URL}/api/guides?where[title][like]=${encodeURIComponent(query)}&where[published][equals]=true&limit=5`,
-    { next: { revalidate: 30 } }
+    { cache: 'no-store' }
   );
 
   if (guidesRes.ok) {
@@ -73,7 +73,7 @@ async function searchHandler(request: NextRequest) {
   // Search Quests
   const questsRes = await fetch(
     `${CMS_URL}/api/quests?where[title][like]=${encodeURIComponent(query)}&where[published][equals]=true&limit=5`,
-    { next: { revalidate: 30 } }
+    { cache: 'no-store' }
   );
 
   if (questsRes.ok) {
@@ -96,7 +96,7 @@ async function searchHandler(request: NextRequest) {
   // Search Maps
   const mapsRes = await fetch(
     `${CMS_URL}/api/maps?where[name][like]=${encodeURIComponent(query)}&where[published][equals]=true&limit=5`,
-    { next: { revalidate: 30 } }
+    { cache: 'no-store' }
   );
 
   if (mapsRes.ok) {
@@ -120,7 +120,7 @@ async function searchHandler(request: NextRequest) {
   // Search Tools
   const toolsRes = await fetch(
     `${CMS_URL}/api/tools?where[title][like]=${encodeURIComponent(query)}&where[published][equals]=true&limit=5`,
-    { next: { revalidate: 30 } }
+    { cache: 'no-store' }
   );
 
   if (toolsRes.ok) {

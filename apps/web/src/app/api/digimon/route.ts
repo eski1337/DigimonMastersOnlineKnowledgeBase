@@ -2,7 +2,8 @@ import { NextRequest } from 'next/server';
 import { withErrorHandler, apiResponse } from '@/lib/api-handler';
 import { parseFilterParams } from '@/lib/filters';
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+// Use internal URL for server-side fetches (faster, avoids SSL roundtrip)
+const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
 async function digimonListHandler(request: NextRequest) {
     const { searchParams } = new URL(request.url);
@@ -48,7 +49,7 @@ async function digimonListHandler(request: NextRequest) {
     const response = await fetch(`${CMS_URL}/api/digimon?${cmsParams.toString()}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-      next: { revalidate: 10 }, // Cache for 10 seconds - auto-updates quickly
+      cache: 'no-store', // Always fetch fresh data from CMS
     });
     
     if (!response.ok) {

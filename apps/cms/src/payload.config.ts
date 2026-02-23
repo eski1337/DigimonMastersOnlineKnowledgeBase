@@ -54,6 +54,9 @@ export default buildConfig({
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      tls: {
+        rejectUnauthorized: false,
+      },
     },
   } : {
     fromName: 'DMO Knowledge Base',

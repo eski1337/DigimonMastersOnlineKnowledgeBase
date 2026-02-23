@@ -4,6 +4,7 @@ import DiscordProvider from 'next-auth/providers/discord';
 // import EmailProvider from 'next-auth/providers/email';
 // import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import type { UserRole } from '@dmo-kb/shared';
+import crypto from 'crypto';
 // import clientPromise from './mongodb';
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
@@ -177,7 +178,7 @@ async function syncDiscordUserToCMS(profile: { id: string; email: string; userna
     }
 
     // Create new user in CMS
-    const randomPassword = require('crypto').randomBytes(32).toString('hex');
+    const randomPassword = crypto.randomBytes(32).toString('hex');
     const createRes = await fetch(`${CMS_URL}/api/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -22,13 +22,13 @@ export const DIGIMON_FAMILIES = [
 ] as const;
 
 export const DIGIMON_FORMS = [
-  'Fresh', 'In-Training', 'Rookie', 'Champion', 'Ultimate', 'Mega', 'Side Mega',
-  'Burst Mode', 'Jogress', 'Jogress Mega', 'Armor', 'Ultra',
+  'In-Training', 'Rookie', 'Champion', 'Ultimate', 'Mega', 'Side Mega',
+  'Burst Mode', 'Jogress', 'Armor',
   'Rookie X', 'Champion X', 'Ultimate X', 'Mega X',
-  'Burst Mode X', 'Jogress X', 'X-Antibody',
-  'H-Hybrid', 'B-Hybrid', 'A-Hybrid', 'Z-Hybrid', 'O-Hybrid',
+  'Burst Mode X', 'Jogress X',
+  'H-Hybrid', 'B-Hybrid', 'O-Hybrid',
   'DigiXros', 'Double Xros', 'Great Xros',
-  'Spirit', 'De-Digivolve', 'Mutant', 'Variant', 'Unknown',
+  'Variant',
 ] as const;
 
 export const DIGIMON_ATTACKER_TYPES = [

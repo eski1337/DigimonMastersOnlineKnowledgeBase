@@ -3,39 +3,10 @@ import { CollectionConfig } from 'payload/types';
 const Users: CollectionConfig = {
   slug: 'users',
   auth: {
-    // Email verification enabled
-    verify: {
-      generateEmailHTML: ({ token }) => {
-        return `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #1a1a1a; color: #fff;">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #f97316; margin-bottom: 10px;">Welcome to DMO Knowledge Base!</h1>
-              <p style="color: #999; font-size: 14px;">Please verify your email address to complete registration</p>
-            </div>
-            
-            <div style="background: #2a2a2a; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin-bottom: 20px;">Click the button below to verify your email address:</p>
-              <div style="text-align: center;">
-                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${token}"
-                   style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);">
-                  ✓ Verify Email Address
-                </a>
-              </div>
-            </div>
-            
-            <div style="background: #1f1f1f; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 3px solid #f97316;">
-              <p style="color: #999; font-size: 13px; margin: 0 0 8px 0;">Or copy and paste this link:</p>
-              <p style="color: #f97316; font-size: 12px; word-break: break-all; margin: 0;">${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${token}</p>
-            </div>
-            
-            <hr style="border: none; border-top: 1px solid #333; margin: 30px 0;">
-            <p style="color: #666; font-size: 12px; text-align: center;">If you didn't create this account, you can safely ignore this email.</p>
-            <p style="color: #555; font-size: 11px; text-align: center; margin-top: 20px;">© ${new Date().getFullYear()} DMO Knowledge Base. All rights reserved.</p>
-          </div>
-        `;
-      },
-      generateEmailSubject: () => 'Verify your DMO KB account',
-    },
+    // Email verification disabled until PTR/rDNS is configured for the VPS IP
+    // (web.de and other providers reject mail without valid PTR record)
+    // Re-enable verify once Strato PTR record points to mail.dmokb.info
+    verify: false,
   },
   admin: {
     useAsTitle: 'email',

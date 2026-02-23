@@ -30,6 +30,18 @@ const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: ({ req: { user } }) => {
+      if (!user) return false;
+      return ['editor', 'admin', 'owner'].includes(user.role);
+    },
+    update: ({ req: { user } }) => {
+      if (!user) return false;
+      return ['editor', 'admin', 'owner'].includes(user.role);
+    },
+    delete: ({ req: { user } }) => {
+      if (!user) return false;
+      return ['admin', 'owner'].includes(user.role);
+    },
   },
   fields: [
     {

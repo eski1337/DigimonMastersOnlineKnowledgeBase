@@ -172,16 +172,7 @@ export default function RegisterPage() {
               <AlertDescription>
                 <div>✅ Account created successfully!</div>
                 <div className="mt-2 text-sm">
-                  Please check your email for a verification link.
-                </div>
-                <div className="mt-2 text-sm">
-                  Didn't receive it?{' '}
-                  <Link 
-                    href="/auth/resend-verification" 
-                    className="underline hover:no-underline font-semibold"
-                  >
-                    Resend verification email
-                  </Link>
+                  Logging you in...
                 </div>
               </AlertDescription>
             </Alert>

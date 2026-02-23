@@ -21,7 +21,7 @@ const getElementIconPath = (element: string) =>
 
 const getAttributeIconPath = (attribute: string) => {
   if (attribute === 'Unknown') return '/icons/Attributes/Unknown_Attribute.png';
-  if (attribute === 'Free') return '/icons/Attributes/None.png';
+  // 'Free' removed - use 'None' instead
   return `/icons/Attributes/${attribute}.png`;
 };
 
@@ -135,7 +135,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
                     : 'bg-muted/20 hover:bg-muted/40 opacity-70 hover:opacity-100'
                 }`}
               >
-                <Image src={getElementIconPath(element)} alt={element} width={32} height={32} />
+                <Image src={getElementIconPath(element)} alt={element} width={32} height={32} unoptimized />
               </button>
             ))}
           </div>
@@ -158,7 +158,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
                     : 'bg-muted/20 hover:bg-muted/40 opacity-70 hover:opacity-100'
                 }`}
               >
-                <Image src={getAttributeIconPath(attribute)} alt={attribute} width={32} height={32} />
+                <Image src={getAttributeIconPath(attribute)} alt={attribute} width={32} height={32} unoptimized />
               </button>
             ))}
           </div>
@@ -181,7 +181,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
                     : 'bg-muted/20 hover:bg-muted/40 opacity-70 hover:opacity-100'
                 }`}
               >
-                <Image src={getRankIconPath(rank)} alt={rank} width={36} height={36} />
+                <Image src={getRankIconPath(rank)} alt={rank} width={36} height={36} unoptimized />
               </button>
             ))}
           </div>
@@ -204,7 +204,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
                     : 'bg-muted/20 hover:bg-muted/40 opacity-70 hover:opacity-100'
                 }`}
               >
-                <Image src={getFamilyIconPath(family)} alt={family} width={32} height={32} />
+                <Image src={getFamilyIconPath(family)} alt={family} width={32} height={32} unoptimized />
               </button>
             ))}
           </div>
@@ -246,7 +246,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
                     : 'bg-muted/20 hover:bg-muted/40 opacity-70 hover:opacity-100'
                 }`}
               >
-                <Image src={getAttackerTypeIconPath(type)} alt={type} width={36} height={36} />
+                <Image src={getAttackerTypeIconPath(type)} alt={type} width={36} height={36} unoptimized />
               </button>
             ))}
           </div>

@@ -36,7 +36,6 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
       Virus: 'bg-red-500/20 text-red-400 border-red-500',
       Unknown: 'bg-black/40 text-gray-300 border-black',
       None: 'bg-yellow-500/20 text-yellow-400 border-yellow-500',
-      Free: 'bg-teal-500/20 text-teal-400 border-teal-500',
     };
     return colors[attribute] || 'bg-gray-500/20 text-gray-400 border-gray-500/50';
   };
@@ -133,6 +132,7 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
                   width={48}
                   height={48}
                   className="inline-block drop-shadow-lg"
+                  unoptimized
                 />
               </div>
             )}
@@ -163,6 +163,7 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
                   width={20}
                   height={20}
                   className="inline-block"
+                  unoptimized
                 />
                 <span className="text-xs">{d.element}</span>
               </Badge>
@@ -179,6 +180,7 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
                   width={20}
                   height={20}
                   className="inline-block"
+                  unoptimized
                 />
                 <span className="text-xs">{d.attribute}</span>
               </Badge>

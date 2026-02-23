@@ -166,7 +166,7 @@ export default function DigimonPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <aside className="lg:col-span-1">
-          <div className="sticky top-20 space-y-4">
+          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
             <DigimonFilters filters={filters} onFiltersChange={setFilters} />
           </div>
         </aside>
@@ -208,7 +208,7 @@ export default function DigimonPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                     disabled={!hasPrevPage}
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" />
@@ -232,7 +232,7 @@ export default function DigimonPage() {
                           <Button
                             variant={currentPage === page ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => setCurrentPage(page)}
+                            onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                             className="min-w-[2.5rem]"
                           >
                             {page}
@@ -243,7 +243,7 @@ export default function DigimonPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                     disabled={!hasNextPage}
                   >
                     Next

@@ -43,10 +43,22 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.MONGODB_URI!,
   }),
-  email: {
+  email: process.env.SMTP_HOST ? {
+    fromName: 'DMO Knowledge Base',
+    fromAddress: process.env.EMAIL_FROM || 'noreply@dmokb.info',
+    transportOptions: {
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    },
+  } : {
     fromName: 'DMO Knowledge Base',
     fromAddress: process.env.EMAIL_FROM || 'noreply@dmokb.local',
-    logMockCredentials: true, // Logs mock email credentials to console in dev
+    logMockCredentials: true,
   },
   endpoints: [resendVerification, updateDigimonSkills],
   cors: [

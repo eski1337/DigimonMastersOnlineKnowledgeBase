@@ -44,11 +44,28 @@ const Media: CollectionConfig = {
       return ['admin', 'owner'].includes(user.role);
     },
   },
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        // Auto-populate alt text from filename if not provided
+        if (!data.alt && data.filename) {
+          data.alt = data.filename
+            .replace(/\.[^.]+$/, '')
+            .replace(/[-_]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        }
+        return data;
+      },
+    ],
+  },
   fields: [
     {
       name: 'alt',
       type: 'text',
-      required: true,
+      admin: {
+        description: 'Auto-generated from filename if left blank',
+      },
     },
     {
       name: 'imageType',
@@ -60,127 +77,43 @@ const Media: CollectionConfig = {
         { label: 'Digimon Sprite', value: 'digimon-sprite' },
         { label: 'Skill Icon', value: 'skill-icon' },
         { label: 'Item Icon', value: 'item-icon' },
-        { label: 'Attribute Icon', value: 'attribute-icon' },
-        { label: 'Element Icon', value: 'element-icon' },
-        { label: 'UI Element', value: 'ui-element' },
         { label: 'Other', value: 'other' },
       ],
       admin: {
         description: 'What type of image is this?',
       },
     },
+    // --- Advanced metadata (collapsed by default) ---
     {
-      name: 'sourceUrl',
-      label: 'Source URL',
-      type: 'text',
+      type: 'collapsible',
+      label: 'Advanced Metadata',
       admin: {
-        description: 'Original URL from DMO Wiki or other source',
-      },
-    },
-    {
-      name: 'sourceFile',
-      label: 'Source Filename',
-      type: 'text',
-      admin: {
-        description: 'Original filename from source (e.g., Falcomon_Icon.png)',
-      },
-    },
-    {
-      name: 'belongsTo',
-      label: 'Belongs To',
-      type: 'group',
-      admin: {
-        description: 'What does this image belong to?',
+        initCollapsed: true,
       },
       fields: [
         {
-          name: 'digimon',
-          label: 'Digimon Name',
-          type: 'text',
-          admin: {
-            description: 'If this is a Digimon image, which Digimon?',
-          },
+          name: 'belongsTo',
+          label: 'Belongs To',
+          type: 'group',
+          fields: [
+            { name: 'digimon', label: 'Digimon Name', type: 'text' },
+            { name: 'skill', label: 'Skill Name', type: 'text' },
+            { name: 'item', label: 'Item Name', type: 'text' },
+          ],
         },
+        { name: 'sourceUrl', label: 'Source URL', type: 'text' },
+        { name: 'sourceFile', label: 'Source Filename', type: 'text' },
+        { name: 'hash', label: 'File Hash', type: 'text', admin: { readOnly: true } },
+        { name: 'importedAt', label: 'Imported At', type: 'date', admin: { readOnly: true } },
+        { name: 'lastChecked', label: 'Last Checked', type: 'date' },
+        { name: 'isOutdated', label: 'Is Outdated', type: 'checkbox', defaultValue: false },
         {
-          name: 'skill',
-          label: 'Skill Name',
-          type: 'text',
-          admin: {
-            description: 'If this is a skill icon, which skill?',
-          },
+          name: 'tags', type: 'array', label: 'Tags',
+          fields: [{ name: 'tag', type: 'text' }],
         },
-        {
-          name: 'item',
-          label: 'Item Name',
-          type: 'text',
-          admin: {
-            description: 'If this is an item icon, which item?',
-          },
-        },
+        { name: 'source', type: 'text' },
+        { name: 'credits', type: 'text' },
       ],
-    },
-    {
-      name: 'hash',
-      label: 'File Hash',
-      type: 'text',
-      admin: {
-        description: 'MD5 hash for duplicate detection',
-        readOnly: true,
-      },
-    },
-    {
-      name: 'importedAt',
-      label: 'Imported At',
-      type: 'date',
-      admin: {
-        description: 'When was this image imported?',
-        readOnly: true,
-      },
-    },
-    {
-      name: 'lastChecked',
-      label: 'Last Checked',
-      type: 'date',
-      admin: {
-        description: 'Last time we checked if source was updated',
-      },
-    },
-    {
-      name: 'isOutdated',
-      label: 'Is Outdated',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: {
-        description: 'Mark as outdated if source has newer version',
-      },
-    },
-    {
-      name: 'tags',
-      type: 'array',
-      label: 'Tags',
-      admin: {
-        description: 'Additional tags for organization',
-      },
-      fields: [
-        {
-          name: 'tag',
-          type: 'text',
-        },
-      ],
-    },
-    {
-      name: 'source',
-      type: 'text',
-      admin: {
-        description: 'Original source of the image',
-      },
-    },
-    {
-      name: 'credits',
-      type: 'text',
-      admin: {
-        description: 'Credits for the image',
-      },
     },
   ],
 };

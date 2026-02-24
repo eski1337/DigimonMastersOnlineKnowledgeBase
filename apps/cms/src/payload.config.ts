@@ -15,6 +15,9 @@ import Tools from './collections/Tools';
 import PatchNotes from './collections/PatchNotes';
 import Events from './collections/Events';
 import Media from './collections/Media';
+import Tasks from './collections/Tasks';
+import TaskComments from './collections/TaskComments';
+import KanbanNavLink from './views/Kanban/NavLink';
 import resendVerification from './endpoints/resendVerification';
 import updateDigimonSkills from './endpoints/update-digimon-skills';
 
@@ -31,9 +34,18 @@ export default buildConfig({
       ogImage: '/og-image.png',
     },
     css: path.resolve(__dirname, 'styles/custom.css'),
+    components: {
+      views: {
+        kanban: {
+          Component: path.resolve(__dirname, 'views/Kanban/index.tsx') as any,
+          path: '/kanban',
+        },
+      },
+      afterNavLinks: [KanbanNavLink],
+    },
   },
   editor: slateEditor({}),
-  collections: [Users, Digimon, EvolutionLines, Items, Maps, Quests, Guides, Tools, PatchNotes, Events, Media],
+  collections: [Users, Digimon, EvolutionLines, Items, Maps, Quests, Guides, Tools, PatchNotes, Events, Media, Tasks, TaskComments],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
   },

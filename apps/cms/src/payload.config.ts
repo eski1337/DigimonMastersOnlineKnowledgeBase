@@ -17,6 +17,7 @@ import Events from './collections/Events';
 import Media from './collections/Media';
 import Tasks from './collections/Tasks';
 import TaskComments from './collections/TaskComments';
+import KanbanView from './views/Kanban/index';
 import KanbanNavLink from './views/Kanban/NavLink';
 import resendVerification from './endpoints/resendVerification';
 import updateDigimonSkills from './endpoints/update-digimon-skills';
@@ -37,7 +38,7 @@ export default buildConfig({
     components: {
       views: {
         kanban: {
-          Component: path.resolve(__dirname, 'views/Kanban/index.tsx') as any,
+          Component: KanbanView,
           path: '/kanban',
         },
       },

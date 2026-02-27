@@ -23,17 +23,17 @@ app.use(express.json({ limit: '10mb' }));
 
 // CORS: Allow requests from web app and dev proxies
 app.use((req, res, next) => {
-  const allowedOrigins = [
+  const allowedOrigins = new Set([
     'http://localhost:3000',
+    'http://localhost:3001',
     'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
     process.env.NEXT_PUBLIC_APP_URL,
-  ].filter(Boolean);
+    'https://dmokb.info',
+    'https://cms.dmokb.info',
+  ].filter(Boolean) as string[]);
   const origin = req.headers.origin;
-  if (origin && (
-    origin.includes('localhost') || 
-    origin.includes('127.0.0.1') ||
-    allowedOrigins.includes(origin)
-  )) {
+  if (origin && allowedOrigins.has(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
@@ -41,6 +41,135 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
+  }
+  next();
+});
+
+// Custom login page — replaces Payload's built-in login form.
+// Registered BEFORE payload.init() so it takes precedence over Payload's SPA catch-all.
+// Uses type="text" natively so usernames work without any client-side hacks.
+app.get('/admin/login', (_req, res) => {
+  const serverURL = process.env.NODE_ENV === 'production'
+    ? 'https://cms.dmokb.info'
+    : (process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001');
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - DMO KB CMS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0c0c0c; color: #e0e0e0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .login-card { width: 100%; max-width: 420px; padding: 48px 40px; background: #1a1a1a; border-radius: 12px; border: 1px solid #333; }
+    .logo { text-align: center; margin-bottom: 32px; }
+    .logo h1 { font-size: 24px; font-weight: 700; color: #fff; }
+    .logo p { font-size: 13px; color: #888; margin-top: 4px; }
+    .field { margin-bottom: 20px; }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: #ccc; margin-bottom: 6px; }
+    .field input { width: 100%; padding: 10px 14px; background: #111; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 15px; outline: none; transition: border-color 0.2s; }
+    .field input:focus { border-color: #f97316; }
+    .field input::placeholder { color: #666; }
+    .btn { width: 100%; padding: 12px; background: #f97316; color: #fff; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #ea580c; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error { background: #dc2626; color: #fff; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .forgot { text-align: center; margin-top: 16px; }
+    .forgot a { color: #888; font-size: 13px; text-decoration: none; }
+    .forgot a:hover { color: #f97316; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="logo">
+      <h1>DMO Knowledge Base</h1>
+      <p>CMS Admin Panel</p>
+    </div>
+    <div class="error" id="error"></div>
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="identifier">Email or Username</label>
+        <input type="text" id="identifier" name="email" placeholder="Username or email@example.com" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn" id="submitBtn">Login</button>
+    </form>
+    <div class="forgot">
+      <a href="/admin/forgot">Forgot password?</a>
+    </div>
+  </div>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var btn = document.getElementById('submitBtn');
+      var errEl = document.getElementById('error');
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+      errEl.style.display = 'none';
+      try {
+        var res = await fetch('${serverURL}/api/users/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: document.getElementById('identifier').value.trim(),
+            password: document.getElementById('password').value
+          })
+        });
+        var data = await res.json();
+        if (res.ok && data.token) {
+          document.cookie = 'payload-token=' + data.token + '; path=/; max-age=7200; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}';
+          window.location.href = '/admin';
+        } else {
+          errEl.textContent = data.errors?.[0]?.message || 'Invalid credentials. Please try again.';
+          errEl.style.display = 'block';
+        }
+      } catch (err) {
+        errEl.textContent = 'Connection error. Please try again.';
+        errEl.style.display = 'block';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Login';
+    });
+  </script>
+</body>
+</html>`);
+});
+
+// Username-to-email login middleware — allows CMS login with username OR email
+app.use('/api/users/login', async (req, res, next) => {
+  if (req.method === 'POST' && req.body?.email && !req.body.email.includes('@')) {
+    try {
+      const username = req.body.email;
+      // Case-insensitive lookup using regex
+      const result = await payload.find({
+        collection: 'users',
+        where: { username: { like: `^${username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$` } },
+        limit: 1,
+        depth: 0,
+      });
+      if (result.docs.length === 0) {
+        // Fallback: try exact match in case 'like' doesn't work as expected
+        const exact = await payload.find({
+          collection: 'users',
+          where: { username: { equals: username } },
+          limit: 1,
+          depth: 0,
+        });
+        if (exact.docs.length > 0) {
+          req.body.email = exact.docs[0].email;
+          logger.info({ username }, 'Resolved username to email for login (exact)');
+        }
+      } else {
+        req.body.email = result.docs[0].email;
+        logger.info({ username }, 'Resolved username to email for login');
+      }
+    } catch (e) {
+      // Fall through — Payload will return its own invalid-credentials error
+    }
   }
   next();
 });
@@ -200,7 +329,51 @@ async function downloadAndUploadImage(
   }
 }
 
+// SECURITY: Strip sensitive fields from /api/users responses for unauthenticated requests
+app.use('/api/users', (req, res, next) => {
+  // Only intercept GET requests (list/read operations)
+  if (req.method !== 'GET') return next();
+
+  const originalJson = res.json.bind(res);
+  res.json = (body: any) => {
+    // Check if the request has a valid JWT token (authenticated)
+    const authHeader = req.headers.authorization;
+    const hasCookie = req.headers.cookie?.includes('payload-token');
+    const isAuthenticated = !!(authHeader || hasCookie);
+
+    if (!isAuthenticated && body) {
+      const stripUser = (user: any) => {
+        if (!user || typeof user !== 'object') return user;
+        const { email, discordId, loginAttempts, lockUntil, ...safe } = user;
+        return safe;
+      };
+
+      if (body.docs && Array.isArray(body.docs)) {
+        body.docs = body.docs.map(stripUser);
+      } else if (body.id) {
+        body = stripUser(body);
+      }
+    }
+    return originalJson(body);
+  };
+  next();
+});
+
 const start = async () => {
+  // Clean up any old script patches from build/index.html
+  try {
+    const fs = require('fs');
+    const adminHtmlPath = path.resolve(__dirname, '..', 'build', 'index.html');
+    if (fs.existsSync(adminHtmlPath)) {
+      let html = fs.readFileSync(adminHtmlPath, 'utf8');
+      if (html.includes('username-login-patch')) {
+        html = html.replace(/<!-- username-login-patch[^>]*-->[\s\S]*?<\/script>\s*/g, '');
+        fs.writeFileSync(adminHtmlPath, html, 'utf8');
+        logger.info('Cleaned old patches from admin HTML');
+      }
+    }
+  } catch (_e) { /* non-critical */ }
+
   await payload.init({
     secret: env.PAYLOAD_SECRET,
     express: app,
@@ -208,6 +381,29 @@ const start = async () => {
       payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`);
     },
   });
+
+  // SECURITY: Auth middleware for import/batch endpoints — requires editor+ role
+  const requireEditorAuth = async (req: any, res: any, next: any) => {
+    try {
+      const token = req.headers.authorization?.replace('JWT ', '') || req.cookies?.['payload-token'];
+      if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      const user = await payload.find({
+        collection: 'users',
+        where: { id: { equals: req.user?.id } },
+        limit: 1,
+        depth: 0,
+      });
+      const role = req.user?.role || user.docs?.[0]?.role;
+      if (!role || !['editor', 'admin', 'owner'].includes(role)) {
+        return res.status(403).json({ error: 'Editor role or higher required' });
+      }
+      next();
+    } catch {
+      return res.status(401).json({ error: 'Authentication failed' });
+    }
+  };
 
   // Serve import Digimon page
   app.get('/import-digimon', (req, res) => {
@@ -239,7 +435,7 @@ const start = async () => {
 
   // Import API endpoint
   // Accepts { slug } to auto-fetch, or { slug, html } to use pasted HTML
-  app.post('/api/import-digimon', async (req, res) => {
+  app.post('/api/import-digimon', requireEditorAuth, async (req, res) => {
     try {
       const { slug, html: pastedHtml } = req.body;
 
@@ -2322,7 +2518,7 @@ const start = async () => {
   });
 
   // Save imported Digimon
-  app.post('/api/import-digimon/save', async (req, res) => {
+  app.post('/api/import-digimon/save', requireEditorAuth, async (req, res) => {
     let digimonData: any = null;
     try {
       digimonData = req.body;
@@ -3259,7 +3455,7 @@ const start = async () => {
   });
 
   // Batch import API endpoint
-  app.post('/api/batch-import-digimon', async (req, res) => {
+  app.post('/api/batch-import-digimon', requireEditorAuth, async (req, res) => {
     try {
       const { letters, names } = req.body;
       
@@ -3840,7 +4036,7 @@ const start = async () => {
   });
 
   // Batch fix endpoint: fix forms for X-Antibody variants + download missing images
-  app.post('/api/batch-fix', async (req, res) => {
+  app.post('/api/batch-fix', requireEditorAuth, async (req, res) => {
     try {
       const fixes: any[] = [];
       const errors: any[] = [];

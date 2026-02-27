@@ -5,18 +5,18 @@ import DiscordProvider from 'next-auth/providers/discord';
 // import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import type { UserRole } from '@dmo-kb/shared';
 import crypto from 'crypto';
+import { getCmsToken } from './cms-token';
 // import clientPromise from './mongodb';
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
 // Discord role ID to website role mapping
-const DISCORD_ROLE_MAPPING: Record<string, UserRole> = {
-  // Replace these IDs with your actual Discord server role IDs
-  [process.env.DISCORD_OWNER_ROLE_ID || 'owner-role-id']: 'owner',
-  [process.env.DISCORD_ADMIN_ROLE_ID || 'admin-role-id']: 'admin',
-  [process.env.DISCORD_EDITOR_ROLE_ID || 'editor-role-id']: 'editor',
-  [process.env.DISCORD_MEMBER_ROLE_ID || 'member-role-id']: 'member',
-};
+// Only include entries where env vars are actually configured
+const DISCORD_ROLE_MAPPING: Record<string, UserRole> = {};
+if (process.env.DISCORD_OWNER_ROLE_ID) DISCORD_ROLE_MAPPING[process.env.DISCORD_OWNER_ROLE_ID] = 'owner';
+if (process.env.DISCORD_ADMIN_ROLE_ID) DISCORD_ROLE_MAPPING[process.env.DISCORD_ADMIN_ROLE_ID] = 'admin';
+if (process.env.DISCORD_EDITOR_ROLE_ID) DISCORD_ROLE_MAPPING[process.env.DISCORD_EDITOR_ROLE_ID] = 'editor';
+if (process.env.DISCORD_MEMBER_ROLE_ID) DISCORD_ROLE_MAPPING[process.env.DISCORD_MEMBER_ROLE_ID] = 'member';
 
 // Function to get highest role from Discord roles
 function getHighestRole(discordRoles: string[]): UserRole {
@@ -50,39 +50,17 @@ providers.push(
       }
 
       try {
-        const loginIdentifier = credentials.email;
-        const isEmail = loginIdentifier.includes('@');
+        const loginIdentifier = credentials.email.trim();
         
-        // If it's not an email, try to find user by username first
-        let email = loginIdentifier;
-        if (!isEmail) {
-          // Find user by username
-          const userResponse = await fetch(`${CMS_URL}/api/users?where[username][equals]=${loginIdentifier}&limit=1`, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            if (userData.docs && userData.docs.length > 0) {
-              email = userData.docs[0].email;
-            } else {
-              return null; // Username not found
-            }
-          } else {
-            return null;
-          }
-        }
-        
-        // Authenticate with Payload CMS using email
+        // Pass identifier directly to CMS login endpoint.
+        // The CMS middleware resolves usernames to emails automatically (case-insensitive).
         const response = await fetch(`${CMS_URL}/api/users/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: email,
+            email: loginIdentifier,
             password: credentials.password,
           }),
         });
@@ -149,10 +127,14 @@ if (process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET) {
 // Sync a Discord user to Payload CMS (create or update)
 async function syncDiscordUserToCMS(profile: { id: string; email: string; username: string; avatar?: string; global_name?: string }): Promise<{ id: string; role: string } | null> {
   try {
+    const cmsToken = await getCmsToken();
+    const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (cmsToken) authHeaders['Authorization'] = `JWT ${cmsToken}`;
+
     // Check if user with this discordId already exists
     const existingRes = await fetch(
       `${CMS_URL}/api/users?where[discordId][equals]=${profile.id}&limit=1`,
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: authHeaders }
     );
     
     if (existingRes.ok) {
@@ -166,7 +148,7 @@ async function syncDiscordUserToCMS(profile: { id: string; email: string; userna
     // Check if user with this email already exists (link accounts)
     const emailRes = await fetch(
       `${CMS_URL}/api/users?where[email][equals]=${encodeURIComponent(profile.email)}&limit=1`,
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: authHeaders }
     );
     
     if (emailRes.ok) {
@@ -181,7 +163,7 @@ async function syncDiscordUserToCMS(profile: { id: string; email: string; userna
     const randomPassword = crypto.randomBytes(32).toString('hex');
     const createRes = await fetch(`${CMS_URL}/api/users`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders,
       body: JSON.stringify({
         email: profile.email,
         password: randomPassword,
@@ -258,6 +240,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub!;
+        (session.user as any).username = token.username;
         session.user.role = token.role || 'guest';
         session.user.roles = token.roles || ['guest'];
       }
@@ -270,6 +253,7 @@ export const authOptions: NextAuthOptions = {
           token.sub = user.id;
           token.email = user.email;
           token.name = user.name;
+          token.username = (user as any).username;
           token.role = (user as any).role;
           token.roles = [(user as any).role];
         }
@@ -278,6 +262,7 @@ export const authOptions: NextAuthOptions = {
           token.sub = (user as any).cmsId || user.id;
           token.email = user.email;
           token.name = user.name;
+          token.username = (user as any).username;
           token.role = (user as any).cmsRole || 'member';
           token.roles = [(user as any).cmsRole || 'member'];
           
@@ -311,6 +296,7 @@ export const authOptions: NextAuthOptions = {
           token.sub = user.id;
           token.email = user.email;
           token.name = user.name;
+          token.username = (user as any).username;
           token.role = token.role || 'member';
           token.roles = token.roles || ['member'];
         }
@@ -323,9 +309,12 @@ export const authOptions: NextAuthOptions = {
       const lastRefresh = (token.roleRefreshedAt as number) || 0;
       if (token.sub && Date.now() - lastRefresh > ROLE_REFRESH_INTERVAL) {
         try {
+          const roleToken = await getCmsToken();
+          const roleHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+          if (roleToken) roleHeaders['Authorization'] = `JWT ${roleToken}`;
           const userRes = await fetch(
             `${CMS_URL}/api/users?where[id][equals]=${token.sub}&limit=1&depth=0`,
-            { headers: { 'Content-Type': 'application/json' } }
+            { headers: roleHeaders }
           );
           if (userRes.ok) {
             const userData = await userRes.json();
@@ -339,6 +328,7 @@ export const authOptions: NextAuthOptions = {
               token.role = newRole;
               token.roles = [newRole];
               token.name = cmsUser.name || token.name;
+              token.username = cmsUser.username || token.username;
             }
           }
         } catch (error) {

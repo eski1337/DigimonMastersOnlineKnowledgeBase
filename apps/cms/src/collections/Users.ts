@@ -99,7 +99,11 @@ const Users: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'email',
+    group: 'System',
+    listSearchableFields: ['email', 'username', 'name'],
+    defaultColumns: ['email', 'username', 'name', 'role'],
   },
+  defaultSort: 'role',
   hooks: {
     beforeChange: [
       ({ data, req, operation }) => {
@@ -130,7 +134,19 @@ const Users: CollectionConfig = {
     ],
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      // Admins/owners can read all users
+      if (user && ['admin', 'owner'].includes(user.role)) return true;
+      // Authenticated users can read themselves + public profiles
+      if (user) return {
+        or: [
+          { id: { equals: user.id } },
+          { profileVisibility: { equals: 'public' } },
+        ],
+      };
+      // Public: only public profiles
+      return { profileVisibility: { equals: 'public' } };
+    },
     create: () => true, // Allow public registration
     update: ({ req: { user } }) => {
       if (!user) return false;
@@ -179,7 +195,7 @@ const Users: CollectionConfig = {
       name: 'role',
       type: 'select',
       required: true,
-      defaultValue: process.env.NODE_ENV === 'development' ? 'editor' : 'member',
+      defaultValue: 'member',
       options: [
         { label: 'Guest', value: 'guest' },
         { label: 'Member', value: 'member' },
@@ -208,6 +224,98 @@ const Users: CollectionConfig = {
     {
       name: 'discordId',
       type: 'text',
+      access: {
+        read: ({ req: { user }, id }) => {
+          if (!user) return false;
+          if (['admin', 'owner'].includes(user.role)) return true;
+          return user.id === id;
+        },
+      },
+    },
+
+    /* ═══════════════════════════════════════════════════════════════
+       PROFILE — public-facing user profile fields
+       ═══════════════════════════════════════════════════════════════ */
+    {
+      type: 'collapsible',
+      label: 'Profile',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: 'banner',
+          label: 'Profile Banner',
+          type: 'upload',
+          relationTo: 'media',
+          admin: { description: 'Banner image for your profile page (recommended 1200×400)' },
+        },
+        {
+          name: 'bio',
+          label: 'Bio',
+          type: 'textarea',
+          maxLength: 500,
+          admin: { description: 'Tell others about yourself (max 500 chars)' },
+        },
+        {
+          name: 'location',
+          type: 'text',
+          maxLength: 100,
+          admin: { description: 'Your location (optional)' },
+        },
+        {
+          name: 'socialLinks',
+          label: 'Social Links',
+          type: 'group',
+          admin: { description: 'Your social media profiles' },
+          fields: [
+            { name: 'discord', type: 'text', admin: { width: '50%', description: 'Discord username' } },
+            { name: 'twitter', type: 'text', admin: { width: '50%', description: 'Twitter/X handle' } },
+            { name: 'youtube', type: 'text', admin: { width: '50%', description: 'YouTube channel URL' } },
+            { name: 'twitch', type: 'text', admin: { width: '50%', description: 'Twitch username' } },
+            { name: 'website', type: 'text', admin: { width: '50%', description: 'Personal website URL' } },
+          ],
+        },
+        {
+          name: 'profileVisibility',
+          label: 'Profile Visibility',
+          type: 'select',
+          defaultValue: 'public',
+          options: [
+            { label: 'Public', value: 'public' },
+            { label: 'Registered Users Only', value: 'registered' },
+            { label: 'Private', value: 'private' },
+          ],
+          admin: { description: 'Who can see your profile' },
+        },
+        {
+          name: 'allowMessages',
+          label: 'Allow Direct Messages',
+          type: 'select',
+          defaultValue: 'everyone',
+          options: [
+            { label: 'Everyone', value: 'everyone' },
+            { label: 'Registered Users', value: 'registered' },
+            { label: 'Nobody', value: 'nobody' },
+          ],
+          admin: { description: 'Who can send you direct messages' },
+        },
+        {
+          name: 'allowProfileComments',
+          label: 'Allow Profile Comments',
+          type: 'select',
+          defaultValue: 'everyone',
+          options: [
+            { label: 'Everyone', value: 'everyone' },
+            { label: 'Registered Users', value: 'registered' },
+            { label: 'Nobody', value: 'nobody' },
+          ],
+          admin: { description: 'Who can comment on your profile wall' },
+        },
+        {
+          name: 'lastSeen',
+          type: 'date',
+          admin: { readOnly: true, description: 'Last activity timestamp' },
+        },
+      ],
     },
   ],
 };

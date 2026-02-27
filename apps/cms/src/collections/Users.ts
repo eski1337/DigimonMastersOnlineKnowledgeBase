@@ -137,13 +137,8 @@ const Users: CollectionConfig = {
     read: ({ req: { user } }) => {
       // Admins/owners can read all users
       if (user && ['admin', 'owner'].includes(user.role)) return true;
-      // Authenticated users can read themselves + public profiles
-      if (user) return {
-        or: [
-          { id: { equals: user.id } },
-          { profileVisibility: { equals: 'public' } },
-        ],
-      };
+      // Authenticated users can read all users (sensitive fields hidden via field-level access)
+      if (user) return true;
       // Public: only public profiles
       return { profileVisibility: { equals: 'public' } };
     },

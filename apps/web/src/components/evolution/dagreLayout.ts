@@ -51,6 +51,20 @@ export function buildFlowElements(
         },
       };
     });
+
+    // Apply saved edge handle info (top/bottom connections)
+    // Keys are "sourceSlug->targetSlug" format from the API
+    if (layout!.edgeHandles) {
+      for (const edge of edges) {
+        const key = `${edge.source}->${edge.target}`;
+        const handles = layout!.edgeHandles[key];
+        if (handles) {
+          if (handles.sourceHandle) edge.sourceHandle = handles.sourceHandle;
+          if (handles.targetHandle) edge.targetHandle = handles.targetHandle;
+        }
+      }
+    }
+
     return { nodes, edges };
   }
 

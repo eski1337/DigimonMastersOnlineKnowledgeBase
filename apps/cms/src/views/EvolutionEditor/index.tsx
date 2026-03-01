@@ -803,11 +803,10 @@ const EvolutionEditor: React.FC = () => {
           });
         }
 
-        // Try to load saved layout
+        // Try to load saved layout (field is 'nodes' in collection schema)
         const layoutRes = await fetch(`/api/evolution-graph-layouts?where[rootDigimon][equals]=${resolveId(lineDoc.rootDigimon)}&depth=0&limit=1`);
         const layoutData = await layoutRes.json();
-        const savedLayout = layoutData.docs?.[0]?.nodePositions;
-        const savedEdgeHandles = layoutData.docs?.[0]?.edgeHandles;
+        const savedLayout = layoutData.docs?.[0]?.nodes;
 
         if (savedLayout && typeof savedLayout === 'object') {
           for (const n of newNodes) {
@@ -816,15 +815,16 @@ const EvolutionEditor: React.FC = () => {
               n.position = { x: pos.x, y: pos.y };
             }
           }
-        }
 
-        // Restore edge handle info (top/bottom connections)
-        if (savedEdgeHandles && typeof savedEdgeHandles === 'object') {
-          for (const edge of newEdges) {
-            const handles = savedEdgeHandles[edge.id];
-            if (handles) {
-              if (handles.sourceHandle) edge.sourceHandle = handles.sourceHandle;
-              if (handles.targetHandle) edge.targetHandle = handles.targetHandle;
+          // Restore edge handle info (top/bottom connections)
+          const savedEdgeHandles = savedLayout.__edgeHandles;
+          if (savedEdgeHandles && typeof savedEdgeHandles === 'object') {
+            for (const edge of newEdges) {
+              const handles = savedEdgeHandles[edge.id];
+              if (handles) {
+                if (handles.sourceHandle) edge.sourceHandle = handles.sourceHandle;
+                if (handles.targetHandle) edge.targetHandle = handles.targetHandle;
+              }
             }
           }
         }
@@ -950,8 +950,7 @@ const EvolutionEditor: React.FC = () => {
 
       const layoutPayload = {
         rootDigimon: rootDigimonId,
-        nodePositions,
-        edgeHandles,
+        nodes: { ...nodePositions, __edgeHandles: edgeHandles },
       };
 
       if (existingLayoutId) {

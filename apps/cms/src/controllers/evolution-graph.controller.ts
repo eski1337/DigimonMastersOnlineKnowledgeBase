@@ -153,16 +153,36 @@ export function createEvolutionGraphController(payload: Payload) {
             if (layoutResult.docs.length > 0) {
               const layoutDoc = layoutResult.docs[0] as any;
               // The layout stores positions by Digimon ID; convert to slugs
-              const nodePositions = layoutDoc.nodePositions || {};
+              const nodePositions = layoutDoc.nodes || {};
               const slugPositions: Record<string, { x: number; y: number }> = {};
               for (const [id, pos] of Object.entries(nodePositions)) {
+                if (id.startsWith('__')) continue; // skip metadata keys
                 const s = idToSlug.get(id);
                 if (s && pos && typeof (pos as any).x === 'number') {
                   slugPositions[s] = pos as { x: number; y: number };
                 }
               }
               if (Object.keys(slugPositions).length > 0) {
-                layout = { nodes: slugPositions, viewport: layoutDoc.viewport || undefined };
+                // Extract and convert edge handle mappings (keys use Digimon IDs → convert to slugs)
+                const rawHandles = (nodePositions as any).__edgeHandles;
+                let edgeHandles: Record<string, { sourceHandle?: string; targetHandle?: string }> | undefined;
+                if (rawHandles && typeof rawHandles === 'object') {
+                  edgeHandles = {};
+                  for (const [editorEdgeId, handles] of Object.entries(rawHandles)) {
+                    // Editor edge ID format: "e-{srcId}-{tgtId}-{sHandle}-{tHandle}"
+                    const parts = editorEdgeId.split('-');
+                    if (parts.length >= 3) {
+                      const srcId = parts[1];
+                      const tgtId = parts[2];
+                      const srcSlug = idToSlug.get(srcId);
+                      const tgtSlug = idToSlug.get(tgtId);
+                      if (srcSlug && tgtSlug) {
+                        edgeHandles[`${srcSlug}->${tgtSlug}`] = handles as any;
+                      }
+                    }
+                  }
+                }
+                layout = { nodes: slugPositions, viewport: layoutDoc.viewport || undefined, edgeHandles };
               }
             }
           } catch (err: any) {

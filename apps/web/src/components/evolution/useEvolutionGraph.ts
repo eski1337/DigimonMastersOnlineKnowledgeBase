@@ -24,6 +24,7 @@ export interface EvolutionEdge {
 export interface EvolutionLayout {
   nodes: Record<string, { x: number; y: number }>;
   viewport?: { x: number; y: number; zoom: number };
+  edgeHandles?: Record<string, { sourceHandle?: string; targetHandle?: string }>;
 }
 
 export interface EvolutionGraphData {

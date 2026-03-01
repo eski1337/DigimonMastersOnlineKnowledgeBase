@@ -28,6 +28,9 @@ function validateNodes(value: unknown): true | string {
       return `Invalid node key: "${key}"`;
     }
 
+    // Allow metadata keys (e.g. __edgeHandles) without position validation
+    if (key.startsWith('__')) continue;
+
     if (pos === null || typeof pos !== 'object' || Array.isArray(pos)) {
       return `Node "${key}" must be an object with x and y properties`;
     }

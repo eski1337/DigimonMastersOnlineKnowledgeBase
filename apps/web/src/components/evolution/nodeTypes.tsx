@@ -150,6 +150,7 @@ function DigimonNodeInner({ data }: NodeProps) {
       <Handle
         type="target"
         position={Position.Left}
+        id="left"
         style={{
           width: 6,
           height: 6,
@@ -161,12 +162,37 @@ function DigimonNodeInner({ data }: NodeProps) {
       <Handle
         type="source"
         position={Position.Right}
+        id="right"
         style={{
           width: 6,
           height: 6,
           background: borderColor,
           border: '1.5px solid rgba(17,24,39,0.8)',
           right: -4,
+        }}
+      />
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="top"
+        style={{
+          width: 6,
+          height: 6,
+          background: borderColor,
+          border: '1.5px solid rgba(17,24,39,0.8)',
+          top: -4,
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="bottom"
+        style={{
+          width: 6,
+          height: 6,
+          background: borderColor,
+          border: '1.5px solid rgba(17,24,39,0.8)',
+          bottom: -4,
         }}
       />
     </div>

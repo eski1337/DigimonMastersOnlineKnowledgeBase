@@ -74,6 +74,8 @@ import ServerHealthDashboard from './views/ServerHealth/index';
 import ServerHealthNavLink from './views/ServerHealth/NavLink';
 import AdminBackupsPage from './views/Backups/index';
 import BackupsNavLink from './views/Backups/NavLink';
+import EvolutionEditor from './views/EvolutionEditor/index';
+import EvolutionEditorNavLink from './views/EvolutionEditor/NavLink';
 
 export default buildConfig({
   rateLimit: {
@@ -116,8 +118,12 @@ export default buildConfig({
           Component: AdminBackupsPage,
           path: '/backups',
         },
+        'evolution-editor': {
+          Component: EvolutionEditor,
+          path: '/evolution-editor',
+        },
       },
-      afterNavLinks: [KanbanNavLink, RegionEditorNavLink, LogViewerNavLink, ServerHealthNavLink, BackupsNavLink],
+      afterNavLinks: [KanbanNavLink, RegionEditorNavLink, LogViewerNavLink, ServerHealthNavLink, BackupsNavLink, EvolutionEditorNavLink],
     },
   },
   i18n: {

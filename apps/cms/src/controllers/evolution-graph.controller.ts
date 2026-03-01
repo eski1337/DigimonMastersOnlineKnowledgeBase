@@ -1,26 +1,23 @@
 /**
  * Evolution Graph Controller
  *
- * Serves the read-only evolution graph data for the React Flow viewer.
- * Uses the existing digivolution data from the Digimon collection (BFS),
- * and optionally merges saved layout from evolution-graph-layouts.
+ * Serves the evolution graph data for the React Flow viewer on profile pages.
+ * Uses the evolution-edges + evolution-lines collections (editor data).
  *
- * GET /api/evolution-graph?digimon={slug}&depth={1-5}
+ * Strategy:
+ * 1. Find the Digimon by slug
+ * 2. Find which evolution-line(s) include this Digimon
+ * 3. Load all evolution-edges whose source OR target is in that line
+ * 4. Load saved layout from evolution-graph-layouts (by line's rootDigimon)
+ * 5. Return nodes + edges + layout
  *
- * Response:
- * {
- *   nodes: [{ id, label, slug, icon, level }],
- *   edges: [{ id, source, target, evolutionType, requiredLevel, requiredItem }],
- *   layout?: { nodes: { [id]: { x, y } }, viewport?: { x, y, zoom } }
- * }
+ * GET /api/evolution-graph?digimon={slug}
  */
 import type { Request, Response } from 'express';
 import { createLogger } from '../services/logger';
 import type { Payload } from 'payload';
 
 const log = createLogger('evolution-graph');
-
-const MAX_DEPTH = 5;
 
 export function createEvolutionGraphController(payload: Payload) {
   return {
@@ -32,174 +29,149 @@ export function createEvolutionGraphController(payload: Payload) {
           return;
         }
 
-        const depth = Math.min(Math.max(parseInt(req.query.depth as string) || MAX_DEPTH, 1), MAX_DEPTH);
-
-        // ── Load all Digimon (cached per-request via Payload) ────────
-        const allDigimon = await findAllDigimon(payload);
-
-        // Build lookup indexes
-        const bySlug = new Map<string, any>();
-        const byName = new Map<string, any>();
-        const reverseFrom = new Map<string, any[]>(); // name → Digimon that digivolvesFrom that name
-        const reverseTo = new Map<string, any[]>();   // name → Digimon that digivolvesTo that name
-
-        for (const d of allDigimon) {
-          bySlug.set(d.slug, d);
-          byName.set(d.name, d);
-          for (const evo of (d.digivolutions?.digivolvesFrom || [])) {
-            if (!evo.name) continue;
-            if (!reverseFrom.has(evo.name)) reverseFrom.set(evo.name, []);
-            reverseFrom.get(evo.name)!.push(d);
-          }
-          for (const evo of (d.digivolutions?.digivolvesTo || [])) {
-            if (!evo.name) continue;
-            if (!reverseTo.has(evo.name)) reverseTo.set(evo.name, []);
-            reverseTo.get(evo.name)!.push(d);
-          }
-        }
-
-        const target = bySlug.get(slug);
+        // 1. Find the Digimon
+        const digimonResult = await payload.find({
+          collection: 'digimon',
+          where: { slug: { equals: slug } },
+          limit: 1,
+          depth: 0,
+        });
+        const target = digimonResult.docs[0] as any;
         if (!target) {
           res.status(404).json({ error: 'Digimon not found' });
           return;
         }
 
-        // ── BFS / DFS to collect graph ───────────────────────────────
-        const nodeMap = new Map<string, GraphNode>();
-        const edgeMap = new Map<string, GraphEdge>();
-        const visited = new Set<string>();
-        let edgeCounter = 0;
+        // 2. Find evolution-line(s) that include this Digimon
+        const lineResult = await payload.find({
+          collection: 'evolution-lines',
+          where: { digimonInLine: { contains: target.id } },
+          limit: 10,
+          depth: 0,
+        });
 
-        function getIcon(doc: any): string | undefined {
-          if (doc.icon) {
-            if (typeof doc.icon === 'object' && doc.icon.url) return doc.icon.url;
-            if (typeof doc.icon === 'string') return doc.icon;
-          }
-          return undefined;
+        if (lineResult.docs.length === 0) {
+          // No line found — return empty graph
+          res.json({ nodes: [], edges: [], layout: null });
+          return;
         }
 
-        function addNode(doc: any) {
-          if (!nodeMap.has(doc.slug)) {
-            nodeMap.set(doc.slug, {
-              id: doc.slug,
-              label: doc.name,
-              slug: doc.slug,
-              icon: getIcon(doc),
-              level: doc.form || undefined,
-            });
-          }
-        }
+        // Use the first matching line (most common case)
+        const line = lineResult.docs[0] as any;
+        const digimonIds: string[] = (line.digimonInLine || []).map((ref: any) =>
+          typeof ref === 'string' ? ref : ref?.id,
+        ).filter(Boolean);
 
-        function addEdge(source: string, tgt: string, evolutionType: string, requiredLevel?: number | null, requiredItem?: string | null) {
-          const key = `${source}->${tgt}`;
-          if (!edgeMap.has(key)) {
-            edgeCounter++;
-            edgeMap.set(key, {
-              id: `e${edgeCounter}`,
-              source,
-              target: tgt,
-              evolutionType,
-              requiredLevel: requiredLevel || null,
-              requiredItem: requiredItem || null,
-            });
-          }
-        }
-
-        function detectEvolutionType(parentDoc: any, childDoc: any, evo: any): string {
-          // Check jogress
-          if (parentDoc?.digivolutions?.jogress?.length > 0) {
-            const isJogress = parentDoc.digivolutions.jogress.some(
-              (j: any) => j.resultName === childDoc.name || j.partnerName === childDoc.name,
-            );
-            if (isJogress) return 'jogress';
-          }
-          // Check child's name for X-Antibody pattern
-          if (childDoc.name?.includes(' X') && !parentDoc.name?.includes(' X')) return 'x-antibody';
-          // Check variant forms
-          if (childDoc.form === 'Burst Mode') return 'mode-change';
-          if (childDoc.form === 'Armor') return 'digi-egg';
-          // Default
-          return 'normal';
-        }
-
-        function buildTree(doc: any, currentDepth: number, direction: 'forward' | 'backward' | 'both') {
-          if (currentDepth > depth || visited.has(doc.slug)) return;
-          visited.add(doc.slug);
-          addNode(doc);
-
-          if (direction === 'forward' || direction === 'both') {
-            for (const evo of (doc.digivolutions?.digivolvesTo || [])) {
-              if (!evo.name) continue;
-              const t = byName.get(evo.name);
-              if (t) {
-                addNode(t);
-                const type = detectEvolutionType(doc, t, evo);
-                addEdge(doc.slug, t.slug, type, evo.requiredLevel, evo.requiredItem);
-                buildTree(t, currentDepth + 1, 'forward');
-              }
-            }
-            // Also check reverse index (other Digimon that list this one as digivolvesFrom)
-            for (const child of (reverseFrom.get(doc.name) || [])) {
-              if (child.slug === doc.slug) continue;
-              addNode(child);
-              const parentEvo = doc.digivolutions?.digivolvesTo?.find((e: any) => e.name === child.name);
-              const type = detectEvolutionType(doc, child, parentEvo);
-              addEdge(doc.slug, child.slug, type, parentEvo?.requiredLevel, parentEvo?.requiredItem);
-              buildTree(child, currentDepth + 1, 'forward');
-            }
-          }
-
-          if (direction === 'backward' || direction === 'both') {
-            for (const evo of (doc.digivolutions?.digivolvesFrom || [])) {
-              if (!evo.name) continue;
-              const s = byName.get(evo.name);
-              if (s) {
-                addNode(s);
-                const srcEvo = s.digivolutions?.digivolvesTo?.find((e: any) => e.name === doc.name);
-                const type = detectEvolutionType(s, doc, srcEvo);
-                addEdge(s.slug, doc.slug, type, srcEvo?.requiredLevel, srcEvo?.requiredItem);
-                buildTree(s, currentDepth + 1, 'backward');
-              }
-            }
-            for (const parent of (reverseTo.get(doc.name) || [])) {
-              if (parent.slug === doc.slug) continue;
-              addNode(parent);
-              const pEvo = parent.digivolutions?.digivolvesTo?.find((e: any) => e.name === doc.name);
-              const type = detectEvolutionType(parent, doc, pEvo);
-              addEdge(parent.slug, doc.slug, type, pEvo?.requiredLevel, pEvo?.requiredItem);
-              buildTree(parent, currentDepth + 1, 'backward');
-            }
-          }
-        }
-
-        buildTree(target, 0, 'both');
-
-        // ── Look up saved layout ─────────────────────────────────────
-        let layout = null;
-        try {
-          const layoutResult = await payload.find({
-            collection: 'evolution-graph-layouts',
-            where: { rootDigimon: { equals: target.id } },
-            limit: 1,
+        // 3. Load all Digimon docs for the line (for node data)
+        const digimonById = new Map<string, any>();
+        for (let i = 0; i < digimonIds.length; i += 50) {
+          const batch = digimonIds.slice(i, i + 50);
+          const result = await payload.find({
+            collection: 'digimon',
+            where: { id: { in: batch } },
+            limit: 50,
             depth: 0,
           });
-          if (layoutResult.docs.length > 0) {
-            const doc = layoutResult.docs[0] as any;
-            layout = {
-              nodes: doc.nodes || {},
-              viewport: doc.viewport || undefined,
-            };
-          }
-        } catch (err: any) {
-          log.warn({ error: err.message }, 'Failed to fetch layout, falling back to auto-layout');
+          for (const d of result.docs) digimonById.set((d as any).id, d);
         }
 
-        // ── Respond ──────────────────────────────────────────────────
-        res.json({
-          nodes: Array.from(nodeMap.values()),
-          edges: Array.from(edgeMap.values()),
-          layout,
-        });
+        // 4. Load all evolution-edges for these Digimon
+        const allEdges: any[] = [];
+        const digimonIdSet = new Set(digimonIds);
+
+        for (let i = 0; i < digimonIds.length; i += 50) {
+          const batch = digimonIds.slice(i, i + 50);
+          const result = await payload.find({
+            collection: 'evolution-edges',
+            where: { source: { in: batch } },
+            limit: 200,
+            depth: 0,
+          });
+          for (const e of result.docs) {
+            const tgtId = typeof (e as any).target === 'string' ? (e as any).target : (e as any).target?.id;
+            if (digimonIdSet.has(tgtId)) {
+              allEdges.push(e);
+            }
+          }
+        }
+
+        // 5. Build nodes
+        const nodes: GraphNode[] = [];
+        for (const digId of digimonIds) {
+          const doc = digimonById.get(digId);
+          if (!doc) continue;
+          nodes.push({
+            id: doc.slug,
+            label: doc.name,
+            slug: doc.slug,
+            icon: getIcon(doc),
+            level: doc.form || undefined,
+          });
+        }
+
+        // 6. Build edges (map Digimon IDs → slugs)
+        const idToSlug = new Map<string, string>();
+        for (const [id, doc] of digimonById) idToSlug.set(id, (doc as any).slug);
+
+        const edges: GraphEdge[] = [];
+        const seenEdges = new Set<string>();
+        let edgeCounter = 0;
+
+        for (const e of allEdges) {
+          const srcId = typeof e.source === 'string' ? e.source : e.source?.id;
+          const tgtId = typeof e.target === 'string' ? e.target : e.target?.id;
+          const srcSlug = idToSlug.get(srcId);
+          const tgtSlug = idToSlug.get(tgtId);
+          if (!srcSlug || !tgtSlug) continue;
+
+          const key = `${srcSlug}->${tgtSlug}`;
+          if (seenEdges.has(key)) continue;
+          seenEdges.add(key);
+          edgeCounter++;
+
+          edges.push({
+            id: `e${edgeCounter}`,
+            source: srcSlug,
+            target: tgtSlug,
+            evolutionType: e.evolutionType || 'normal',
+            requiredLevel: e.requiredLevel || null,
+            requiredItem: e.requiredItem || null,
+          });
+        }
+
+        // 7. Load saved layout (by line's rootDigimon)
+        let layout = null;
+        const rootId = typeof line.rootDigimon === 'string' ? line.rootDigimon : line.rootDigimon?.id;
+        if (rootId) {
+          try {
+            const layoutResult = await payload.find({
+              collection: 'evolution-graph-layouts',
+              where: { rootDigimon: { equals: rootId } },
+              limit: 1,
+              depth: 0,
+            });
+            if (layoutResult.docs.length > 0) {
+              const layoutDoc = layoutResult.docs[0] as any;
+              // The layout stores positions by Digimon ID; convert to slugs
+              const nodePositions = layoutDoc.nodePositions || {};
+              const slugPositions: Record<string, { x: number; y: number }> = {};
+              for (const [id, pos] of Object.entries(nodePositions)) {
+                const s = idToSlug.get(id);
+                if (s && pos && typeof (pos as any).x === 'number') {
+                  slugPositions[s] = pos as { x: number; y: number };
+                }
+              }
+              if (Object.keys(slugPositions).length > 0) {
+                layout = { nodes: slugPositions, viewport: layoutDoc.viewport || undefined };
+              }
+            }
+          } catch (err: any) {
+            log.warn({ error: err.message }, 'Failed to fetch layout');
+          }
+        }
+
+        // 8. Respond
+        res.json({ nodes, edges, layout });
       } catch (error: any) {
         log.error({ error: error.message, stack: error.stack }, 'Evolution graph error');
         res.status(500).json({ error: 'Failed to build evolution graph' });
@@ -227,15 +199,16 @@ interface GraphEdge {
   requiredItem?: string | null;
 }
 
-/** Paginate through all Digimon documents. */
-async function findAllDigimon(payload: Payload): Promise<any[]> {
-  const all: any[] = [];
-  let page = 1;
-  while (true) {
-    const batch = await payload.find({ collection: 'digimon', limit: 100, page, depth: 1 });
-    all.push(...batch.docs);
-    if (!batch.hasNextPage) break;
-    page++;
+function getIcon(doc: any): string | undefined {
+  if (doc.icon) {
+    if (typeof doc.icon === 'object' && doc.icon.url) return doc.icon.url;
+    if (typeof doc.icon === 'string') return doc.icon;
   }
-  return all;
+  // Try mainImage thumbnail as fallback
+  if (doc.mainImage) {
+    const img = typeof doc.mainImage === 'object' ? doc.mainImage : null;
+    if (img?.sizes?.thumbnail?.url) return img.sizes.thumbnail.url;
+    if (img?.url) return img.url;
+  }
+  return undefined;
 }

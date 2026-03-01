@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import { checkRateLimit, getRateLimitKey, rateLimitResponse, RateLimitConfig } from './rate-limit';
+import { checkRateLimit, getClientIdentifier, type RateLimitConfig } from './rate-limiter';
 
 export interface ApiError {
   error: string;
@@ -21,18 +21,31 @@ export function withErrorHandler(
     try {
       // Apply rate limiting if configured
       if (rateLimitConfig) {
-        const key = getRateLimitKey(req);
-        const { allowed, remaining, resetTime } = checkRateLimit(key, rateLimitConfig);
+        const clientId = getClientIdentifier(req);
+        const pathname = req.nextUrl.pathname;
+        const key = `${clientId}:${pathname}`;
+        const result = await checkRateLimit(key, rateLimitConfig);
         
-        if (!allowed) {
-          return rateLimitResponse(resetTime);
+        if (!result.success) {
+          const retryAfter = Math.ceil((result.reset - Date.now()) / 1000);
+          return NextResponse.json(
+            { error: 'Too many requests', retryAfter },
+            {
+              status: 429,
+              headers: {
+                'Retry-After': Math.max(retryAfter, 1).toString(),
+                'X-RateLimit-Limit': result.limit.toString(),
+                'X-RateLimit-Remaining': '0',
+                'X-RateLimit-Reset': new Date(result.reset).toISOString(),
+              },
+            }
+          );
         }
         
-        // Add rate limit headers to all responses
         const response = await handler(req);
         response.headers.set('X-RateLimit-Limit', rateLimitConfig.maxRequests.toString());
-        response.headers.set('X-RateLimit-Remaining', remaining.toString());
-        response.headers.set('X-RateLimit-Reset', new Date(resetTime).toISOString());
+        response.headers.set('X-RateLimit-Remaining', result.remaining.toString());
+        response.headers.set('X-RateLimit-Reset', new Date(result.reset).toISOString());
         return response;
       }
       

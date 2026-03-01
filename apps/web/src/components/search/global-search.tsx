@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import Image from 'next/image';
+import { CmsImage } from '@/components/ui/cms-image';
 
 interface SearchResult {
-  type: 'digimon' | 'guide' | 'quest' | 'map' | 'tool';
+  type: 'digimon' | 'guide' | 'quest' | 'map' | 'tool' | 'user';
   id: string;
   title: string;
   slug: string;
@@ -100,6 +100,8 @@ export function GlobalSearch() {
         return `/maps/${result.slug}`;
       case 'tool':
         return `/tools/${result.slug}`;
+      case 'user':
+        return `/user/${result.slug}`;
       default:
         return '/';
     }
@@ -117,6 +119,8 @@ export function GlobalSearch() {
         return 'bg-gruvbox-purple text-black';
       case 'tool':
         return 'bg-gruvbox-orange text-black';
+      case 'user':
+        return 'bg-emerald-600 text-white';
       default:
         return 'bg-gray-500 text-white';
     }
@@ -158,11 +162,13 @@ export function GlobalSearch() {
                   <div className="flex items-start gap-3 p-2 rounded hover:bg-muted transition-colors">
                     {result.image && (
                       <div className="relative w-12 h-12 flex-shrink-0 bg-muted rounded overflow-hidden">
-                        <Image
+                        <CmsImage
                           src={result.image}
                           alt={result.title}
                           fill
                           className="object-contain"
+                          enableRetry={false}
+                          showLoadingShimmer={false}
                         />
                       </div>
                     )}

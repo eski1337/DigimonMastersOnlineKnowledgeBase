@@ -10,7 +10,7 @@ try:
     s = smtplib.SMTP('127.0.0.1', 587, timeout=10)
     s.ehlo()
     s.starttls()
-    s.login('noreply@dmokb.info', 'NoReplyDMOKB2026!')
+    s.login('noreply@dmokb.info', '${NOREPLY_PASSWORD}')
     
     msg = MIMEText('This is a test email from DMO KB to verify external relay works.')
     msg['Subject'] = 'DMO KB - External Relay Test'
@@ -50,7 +50,7 @@ echo "=== 4. Check Digimon list in admin ==="
 # Login and check if Digimon list loads in admin
 TOKEN=$(curl -s -X POST http://localhost:3001/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}' | python3 -c "import json,sys;print(json.load(sys.stdin).get('token',''))" 2>/dev/null)
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}' | python3 -c "import json,sys;print(json.load(sys.stdin).get('token',''))" 2>/dev/null)
 
 echo -n "  Digimon list (page 1): "
 curl -s -H "Authorization: JWT $TOKEN" "http://localhost:3001/api/digimon?limit=5&sort=-createdAt" | python3 -c "

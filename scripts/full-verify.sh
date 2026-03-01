@@ -29,7 +29,7 @@ echo ""
 echo "=== 5. CMS login (eski@dmokb.info) ==="
 LOGIN=$(curl -s -X POST http://localhost:3001/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}')
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}')
 echo "  Token: $(echo $LOGIN | grep -o '"token":"[^"]*"' | head -c 30)..."
 echo "  Role: $(echo $LOGIN | grep -o '"role":"[^"]*"')"
 
@@ -48,7 +48,7 @@ echo ""
 echo "=== 8. SOGo Webmail ==="
 curl -sk -c /tmp/mc-verify -b /tmp/mc-verify 'https://mail.dmokb.info/' -o /dev/null
 curl -sk -c /tmp/mc-verify -b /tmp/mc-verify -X POST 'https://mail.dmokb.info/' \
-  -d 'login_user=eski%40dmokb.info&pass=EskiDMOKB2026%21' -o /dev/null
+  -d "login_user=eski%40dmokb.info&pass=${CMS_ADMIN_PASSWORD}" -o /dev/null
 SOGO=$(curl -sk -c /tmp/mc-verify -b /tmp/mc-verify 'https://mail.dmokb.info/SOGo/so/' -o /dev/null -w '%{http_code}')
 echo "  SOGo after login: $SOGO"
 rm -f /tmp/mc-verify

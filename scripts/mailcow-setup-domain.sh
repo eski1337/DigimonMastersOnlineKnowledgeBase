@@ -7,7 +7,7 @@ MAILCOW_URL="http://127.0.0.1:8080"
 echo "Adding domain dmokb.info..."
 curl -s -X POST "$MAILCOW_URL/api/v1/add/domain" \
   -H "Content-Type: application/json" \
-  -u "admin:moohoo" \
+  -u "admin:${MAILCOW_ADMIN_PASSWORD}" \
   -d '{
     "domain": "dmokb.info",
     "description": "DMO Knowledge Base",
@@ -27,13 +27,13 @@ echo ""
 echo "Creating mailbox eski@dmokb.info..."
 curl -s -X POST "$MAILCOW_URL/api/v1/add/mailbox" \
   -H "Content-Type: application/json" \
-  -u "admin:moohoo" \
+  -u "admin:${MAILCOW_ADMIN_PASSWORD}" \
   -d '{
     "local_part": "eski",
     "domain": "dmokb.info",
     "name": "Eski",
-    "password": "EskiDMOKB2026!",
-    "password2": "EskiDMOKB2026!",
+    "password": "${CMS_ADMIN_PASSWORD}",
+    "password2": "${CMS_ADMIN_PASSWORD}",
     "quota": 4096,
     "active": 1,
     "force_pw_update": 0,
@@ -46,13 +46,13 @@ echo ""
 echo "Creating mailbox noreply@dmokb.info..."
 curl -s -X POST "$MAILCOW_URL/api/v1/add/mailbox" \
   -H "Content-Type: application/json" \
-  -u "admin:moohoo" \
+  -u "admin:${MAILCOW_ADMIN_PASSWORD}" \
   -d '{
     "local_part": "noreply",
     "domain": "dmokb.info",
     "name": "No Reply",
-    "password": "NoReplyDMOKB2026!",
-    "password2": "NoReplyDMOKB2026!",
+    "password": "${NOREPLY_PASSWORD}",
+    "password2": "${NOREPLY_PASSWORD}",
     "quota": 1024,
     "active": 1,
     "force_pw_update": 0
@@ -61,6 +61,6 @@ curl -s -X POST "$MAILCOW_URL/api/v1/add/mailbox" \
 echo ""
 echo "=== Setup Complete ==="
 echo "Login: https://mail.dmokb.info"
-echo "Admin: admin / moohoo (CHANGE THIS!)"
-echo "Mailbox: eski@dmokb.info / EskiDMOKB2026!"
-echo "System: noreply@dmokb.info / NoReplyDMOKB2026!"
+echo "Admin: admin / ${MAILCOW_ADMIN_PASSWORD} (CHANGE THIS!)"
+echo "Mailbox: eski@dmokb.info / ${CMS_ADMIN_PASSWORD}"
+echo "System: noreply@dmokb.info / ${NOREPLY_PASSWORD}"

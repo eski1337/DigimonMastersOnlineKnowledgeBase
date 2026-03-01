@@ -103,7 +103,7 @@ sudo docker compose logs sogo-mailcow --tail 5 2>/dev/null
 echo ""
 echo "=== Testing webmail ==="
 curl -sk -c /tmp/sogo-test -b /tmp/sogo-test 'https://mail.dmokb.info/' -o /dev/null
-curl -sk -c /tmp/sogo-test -b /tmp/sogo-test -X POST 'https://mail.dmokb.info/' -d 'login_user=eski%40dmokb.info&pass=EskiDMOKB2026%21' -o /dev/null
+curl -sk -c /tmp/sogo-test -b /tmp/sogo-test -X POST 'https://mail.dmokb.info/' -d "login_user=eski%40dmokb.info&pass=${CMS_ADMIN_PASSWORD}" -o /dev/null
 curl -sk -c /tmp/sogo-test -b /tmp/sogo-test 'https://mail.dmokb.info/SOGo/so/' -o /dev/null -w '%{http_code}'
 echo " webmail-status"
 rm -f /tmp/sogo-test

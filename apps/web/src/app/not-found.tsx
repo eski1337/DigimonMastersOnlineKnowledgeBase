@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Home } from 'lucide-react';
+import { Home } from 'lucide-react';
+import { BackButton } from '@/components/common/back-button';
 
 export default function NotFound() {
   return (
@@ -12,12 +13,7 @@ export default function NotFound() {
           The page you're looking for doesn't exist or has been moved to another location.
         </p>
         <div className="flex gap-4 justify-center">
-          <Button asChild variant="outline">
-            <Link href="javascript:history.back()">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Go Back
-            </Link>
-          </Button>
+          <BackButton />
           <Button asChild>
             <Link href="/">
               <Home className="mr-2 h-4 w-4" />

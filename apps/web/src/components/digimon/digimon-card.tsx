@@ -1,8 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { CmsImage } from '@/components/ui/cms-image';
 import type { Digimon } from '@dmo-kb/shared';
+import styles from './digimon-card.module.css';
 
 interface DigimonCardProps {
   digimon: Digimon;
@@ -40,11 +44,19 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
     return colors[attribute] || 'bg-gray-500/20 text-gray-400 border-gray-500/50';
   };
 
-  // Get image URL - prefer mainImage, fallback to icon, then placeholder
-  let imageUrl = typeof d.mainImage === 'string' 
-    ? d.mainImage 
-    : d.mainImage?.url || 
-      (typeof d.icon === 'string' ? d.icon : d.icon?.url);
+  // Get image URL - use original main image URL.
+  // NOTE: Payload "sizes.card" can be square-cropped depending on collection config,
+  // which causes visibly cut-off Digimon in the grid.
+  let imageUrl: string | undefined;
+  if (typeof d.mainImage === 'object' && d.mainImage) {
+    imageUrl = d.mainImage.url;
+  } else if (typeof d.mainImage === 'string' && d.mainImage.startsWith('http')) {
+    imageUrl = d.mainImage;
+  }
+  // Fallback to icon
+  if (!imageUrl) {
+    imageUrl = typeof d.icon === 'object' && d.icon ? d.icon.url : undefined;
+  }
   
   // Use placeholder if no image or if it's a wrong icon
   const shouldUsePlaceholder = !imageUrl || 
@@ -58,6 +70,11 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
   if (shouldUsePlaceholder) {
     imageUrl = '/icons/Placeholder/digiplaceholder.png';
   }
+
+  const imageWidth =
+    typeof d.mainImage === 'object' && d.mainImage?.width ? d.mainImage.width : 1024;
+  const imageHeight =
+    typeof d.mainImage === 'object' && d.mainImage?.height ? d.mainImage.height : 1024;
 
   // Map element names to icon paths
   const getElementIconPath = (element: string) => {
@@ -101,21 +118,26 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
   };
 
   return (
-    <Link href={`/digimon/${d.slug}`}>
-      <Card className="card-hover overflow-hidden group h-full flex flex-col">
+    <Link href={`/digimon/${d.slug}`} prefetch={false}>
+      <Card className="overflow-hidden group h-full flex flex-col transition-shadow duration-200 hover:shadow-lg">
         <CardHeader className="p-0">
-          <div className="relative aspect-square bg-gradient-to-br from-[#1d2021] via-[#282828] to-[#32302f]">
+          <div className={styles.mediaStage}>
             {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={d.name}
-                fill
-                className="object-contain p-4 group-hover:scale-110 transition-transform duration-300"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                loading={priority ? 'eager' : 'lazy'}
-                priority={priority}
-                quality={75}
-              />
+              <div className={styles.mediaInner}>
+                <CmsImage
+                  src={imageUrl}
+                  alt={d.name}
+                  width={imageWidth}
+                  height={imageHeight}
+                  className={styles.digimonImage}
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 250px"
+                  loading={priority ? 'eager' : 'lazy'}
+                  priority={priority}
+                  quality={75}
+                  showLoadingShimmer={false}
+                  fallbackText="No Image"
+                />
+              </div>
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">
                 <div className="text-center">
@@ -125,12 +147,12 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
               </div>
             )}
             {d.rank && (
-              <div className="absolute top-2 right-2">
+              <div className="absolute top-2 right-2 z-10">
                 <Image 
                   src={getRankIconPath(d.rank)} 
                   alt={d.rank}
-                  width={48}
-                  height={48}
+                  width={36}
+                  height={36}
                   className="inline-block drop-shadow-lg"
                   unoptimized
                 />

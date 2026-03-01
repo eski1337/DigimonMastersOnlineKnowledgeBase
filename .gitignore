@@ -75,3 +75,6 @@ MDs/
 
 # Deployment
 .deployment/
+
+# Backups (local backup storage)
+/backups/

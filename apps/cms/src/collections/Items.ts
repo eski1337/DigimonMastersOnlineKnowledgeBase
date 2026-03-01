@@ -8,6 +8,7 @@ export const Items: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
+    group: 'Game Data',
     defaultColumns: ['name', 'category', 'icon'],
   },
   access: {

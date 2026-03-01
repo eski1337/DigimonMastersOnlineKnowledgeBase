@@ -85,7 +85,7 @@ function fetch(url, opts = {}) {
     const r = await fetch('http://localhost:3001/api/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'lukas.bohn@icloud.com', password: 'ilovecf123' }),
+      body: JSON.stringify({ email: process.env.CMS_ADMIN_EMAIL, password: process.env.CMS_ADMIN_PASSWORD }),
     });
     check('CMS Owner Login', r.status === 200, `HTTP ${r.status}`);
   } catch (e) { check('CMS Owner Login', false, e.message); }

@@ -4,8 +4,8 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   PAYLOAD_SECRET: z.string().min(32, 'PAYLOAD_SECRET must be at least 32 characters'),
-  NEXT_PUBLIC_CMS_URL: z.string().url().optional().default('http://localhost:3001'),
-  NEXT_PUBLIC_APP_URL: z.string().url().optional().default('http://localhost:3000'),
+  NEXT_PUBLIC_CMS_URL: z.string().url().optional().default('https://cms.dmokb.info'),
+  NEXT_PUBLIC_APP_URL: z.string().url().optional().default('https://dmokb.info'),
 });
 
 export type Env = z.infer<typeof envSchema>;

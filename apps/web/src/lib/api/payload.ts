@@ -3,7 +3,7 @@
  * Connect Next.js to Payload CMS backend
  */
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
 interface PayloadResponse<T> {
   docs: T[];

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { DigimonCard } from '@/components/digimon/digimon-card';
 import { DigimonFilters } from '@/components/digimon/digimon-filters';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,10 +9,13 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { DigimonFilters as Filters } from '@dmo-kb/shared';
 
+const ITEMS_PER_PAGE = 36;
+
 export default function DigimonPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   
-  // Parse initial filters from URL search params
+  // Parse filters from URL search params
   const initialFilters = useMemo<Filters>(() => {
     const f: Filters = {};
     const attribute = searchParams.get('attribute');
@@ -34,115 +37,78 @@ export default function DigimonPage() {
 
   const [filters, setFilters] = useState<Filters>(initialFilters);
   
-  // Sync filters when URL params change (e.g. navigating from detail page icon)
   useEffect(() => {
     setFilters(initialFilters);
   }, [initialFilters]);
-  const [allDigimon, setAllDigimon] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 36;
 
-  // Fetch Digimon from CMS (fetch all at once for client-side filtering)
+  const [digimon, setDigimon] = useState<any[]>([]);
+  const [totalDocs, setTotalDocs] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
+  // Build query string from filters + page
+  const buildQuery = useCallback((f: Filters, page: number) => {
+    const params = new URLSearchParams();
+    params.set('limit', ITEMS_PER_PAGE.toString());
+    params.set('page', page.toString());
+    if (f.search) params.set('search', f.search);
+    if (f.element?.length) f.element.forEach(e => params.append('element', e));
+    if (f.attribute?.length) f.attribute.forEach(a => params.append('attribute', a));
+    if (f.rank?.length) f.rank.forEach(r => params.append('rank', r));
+    if (f.form?.length) f.form.forEach(fo => params.append('form', fo));
+    if (f.family?.length) f.family.forEach(fa => params.append('family', fa));
+    if (f.attackerType?.length) f.attackerType.forEach(at => params.append('attackerType', at));
+    return params.toString();
+  }, []);
+
+  // Fetch current page from API with server-side filters
   useEffect(() => {
+    let cancelled = false;
     async function fetchDigimon() {
       try {
         setIsLoading(true);
-        // Fetch all Digimon (max 1000)
-        const response = await fetch('/api/digimon?limit=1000');
-        if (response.ok) {
+        const qs = buildQuery(filters, currentPage);
+        const response = await fetch(`/api/digimon?${qs}`);
+        if (response.ok && !cancelled) {
           const data = await response.json();
-          setAllDigimon(data.docs || []);
+          setDigimon(data.docs || []);
+          setTotalDocs(data.totalDocs || 0);
+          setTotalPages(data.totalPages || 1);
         }
       } catch (error) {
         console.error('Failed to fetch Digimon:', error);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     }
     fetchDigimon();
-  }, []);
+    return () => { cancelled = true; };
+  }, [filters, currentPage, buildQuery]);
 
-  // Client-side filtering for instant results
-  const filteredDigimon = useMemo(() => {
-    let result = [...allDigimon];
-
-    // Search filter - match name, type, or form
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      result = result.filter(d => 
-        d.name?.toLowerCase().includes(searchLower) ||
-        d.type?.toLowerCase().includes(searchLower) ||
-        d.form?.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // Element filter
-    if (filters.element && filters.element.length > 0) {
-      result = result.filter(d => 
-        filters.element?.includes(d.element)
-      );
-    }
-
-    // Attribute filter
-    if (filters.attribute && filters.attribute.length > 0) {
-      result = result.filter(d => 
-        filters.attribute?.includes(d.attribute)
-      );
-    }
-
-    // Rank filter
-    if (filters.rank && filters.rank.length > 0) {
-      result = result.filter(d => 
-        filters.rank?.includes(d.rank)
-      );
-    }
-
-    // Family filter
-    if (filters.family && filters.family.length > 0) {
-      result = result.filter(d => {
-        if (!d.families || !Array.isArray(d.families)) return false;
-        return filters.family?.some(f => d.families.includes(f));
-      });
-    }
-
-    // Form filter
-    if (filters.form && filters.form.length > 0) {
-      result = result.filter(d => 
-        filters.form?.includes(d.form)
-      );
-    }
-
-    // Attacker Type filter
-    if (filters.attackerType && filters.attackerType.length > 0) {
-      result = result.filter(d => 
-        filters.attackerType?.includes(d.attackerType)
-      );
-    }
-
-    // Sort alphabetically by name (A-Z)
-    result.sort((a, b) => {
-      const nameA = a.name?.toLowerCase() || '';
-      const nameB = b.name?.toLowerCase() || '';
-      return nameA.localeCompare(nameB);
-    });
-
-    return result;
-  }, [allDigimon, filters]);
+  // Navigate to page via URL
+  const goToPage = useCallback((page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    router.push(`/digimon?${params.toString()}`, { scroll: false });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [searchParams, router]);
 
   // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filters]);
+  const handleFiltersChange = useCallback((newFilters: Filters) => {
+    setFilters(newFilters);
+    const params = new URLSearchParams();
+    if (newFilters.search) params.set('search', newFilters.search);
+    if (newFilters.element?.length) params.set('element', newFilters.element.join(','));
+    if (newFilters.attribute?.length) params.set('attribute', newFilters.attribute.join(','));
+    if (newFilters.rank?.length) params.set('rank', newFilters.rank.join(','));
+    if (newFilters.form?.length) params.set('form', newFilters.form.join(','));
+    if (newFilters.family?.length) params.set('family', newFilters.family.join(','));
+    if (newFilters.attackerType?.length) params.set('attackerType', newFilters.attackerType.join(','));
+    params.set('page', '1');
+    router.push(`/digimon?${params.toString()}`, { scroll: false });
+  }, [router]);
 
-  // Paginate filtered results
-  const paginatedDigimon = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredDigimon.slice(startIndex, endIndex);
-  }, [filteredDigimon, currentPage]);
-
-  const totalPages = Math.ceil(filteredDigimon.length / ITEMS_PER_PAGE);
   const hasNextPage = currentPage < totalPages;
   const hasPrevPage = currentPage > 1;
 
@@ -154,7 +120,7 @@ export default function DigimonPage() {
             <h1 className="text-4xl font-bold">Digimon Database</h1>
             {!isLoading && (
               <span className="text-lg text-muted-foreground font-medium">
-                ({allDigimon.length} total)
+                ({totalDocs} total)
               </span>
             )}
           </div>
@@ -166,8 +132,8 @@ export default function DigimonPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <aside className="lg:col-span-1">
-          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
-            <DigimonFilters filters={filters} onFiltersChange={setFilters} />
+          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto px-1 pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+            <DigimonFilters filters={filters} onFiltersChange={handleFiltersChange} />
           </div>
         </aside>
 
@@ -182,11 +148,11 @@ export default function DigimonPage() {
                 </div>
               ))}
             </div>
-          ) : paginatedDigimon.length > 0 ? (
+          ) : digimon.length > 0 ? (
             <>
               <div className="mb-4 flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">
-                  Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredDigimon.length)} of {filteredDigimon.length} Digimon
+                  Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, totalDocs)} of {totalDocs} Digimon
                 </div>
                 {totalPages > 1 && (
                   <div className="text-sm text-muted-foreground">
@@ -195,7 +161,7 @@ export default function DigimonPage() {
                 )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {paginatedDigimon.map((d, index) => (
+                {digimon.map((d: any, index: number) => (
                   <DigimonCard 
                     key={d.id} 
                     digimon={d}
@@ -208,7 +174,7 @@ export default function DigimonPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    onClick={() => goToPage(Math.max(1, currentPage - 1))}
                     disabled={!hasPrevPage}
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" />
@@ -232,7 +198,7 @@ export default function DigimonPage() {
                           <Button
                             variant={currentPage === page ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                            onClick={() => goToPage(page)}
                             className="min-w-[2.5rem]"
                           >
                             {page}
@@ -243,7 +209,7 @@ export default function DigimonPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
                     disabled={!hasNextPage}
                   >
                     Next

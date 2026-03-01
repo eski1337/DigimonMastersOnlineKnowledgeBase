@@ -12,7 +12,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import type { PayloadMedia } from '@/types/digimon';
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
 async function getDigimon(slug: string) {
   try {
@@ -135,6 +135,13 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
 
   return (
     <div className="container py-8 max-w-7xl">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+        <Link href="/digimon" className="hover:text-foreground transition-colors">Digimon</Link>
+        <span>/</span>
+        <span className="text-foreground font-medium">{d.name}</span>
+      </nav>
+
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8">
         {/* Main Content */}
         <div className="space-y-8">
@@ -143,11 +150,24 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
             <h1 className={`text-5xl font-bold bg-gradient-to-r ${getRankColor(d.rank)} bg-clip-text text-transparent`}>
               {d.name}
             </h1>
-            <DigivolutionTreeButton slug={params.slug} />
+            <div className="flex items-center gap-2">
+              {session?.user?.role && ['editor', 'admin', 'owner'].includes(session.user.role as string) && (
+                <a
+                  href={`https://cms.dmokb.info/admin/collections/digimon/${d.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/30 hover:bg-orange-500/25 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                  Edit
+                </a>
+              )}
+              <DigivolutionTreeButton slug={params.slug} />
+            </div>
           </div>
 
           {/* Introduction - Always show */}
-          <Card className="bg-gradient-to-br from-[#1d2021] to-[#282828] border-orange-500/30">
+          <Card className="bg-card border-orange-500/30">
             <CardHeader>
               <CardTitle className="text-xl text-orange-400">About</CardTitle>
             </CardHeader>
@@ -160,7 +180,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Base Stats - Always show */}
-        <Card className="bg-gradient-to-br from-[#1d2021] to-[#282828] border-orange-500/30">
+        <Card className="bg-card border-orange-500/30">
           <CardHeader>
             <CardTitle className="text-xl text-orange-400">Base Stats</CardTitle>
           </CardHeader>
@@ -203,7 +223,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
         </Card>
 
         {/* Max Stats - Always show */}
-        <Card className="bg-gradient-to-br from-[#1d2021] to-[#282828] border-purple-500/30">
+        <Card className="bg-card border-purple-500/30">
           <CardHeader>
             <CardTitle className="text-xl text-purple-400">Max Stats (Lv 140, 100% Size)</CardTitle>
           </CardHeader>
@@ -261,7 +281,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
       {d.skills && d.skills.length > 0 ? (
         <SkillsSection skills={d.skills} />
       ) : (
-        <Card className="bg-gradient-to-br from-[#1d2021] to-[#282828] border-blue-500/30">
+        <Card className="bg-card border-blue-500/30">
           <CardHeader>
             <CardTitle className="text-xl text-blue-400">Skills & Abilities</CardTitle>
           </CardHeader>
@@ -278,7 +298,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
         {/* Sticky Infobox Sidebar */}
         <div>
           <div className="sticky top-20">
-            <Card className="overflow-hidden bg-gradient-to-br from-[#1d2021] to-[#282828]">
+            <Card className="overflow-hidden bg-card">
               {/* Title Bar */}
               <div className="bg-gradient-to-r from-orange-600 to-orange-500 px-4 py-3">
                 <h2 className="text-xl font-bold text-white">{d.name}</h2>
@@ -287,7 +307,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
               </div>
 
               {/* Image */}
-              <div className="relative aspect-square bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] overflow-hidden">
+              <div className="relative aspect-square bg-muted overflow-hidden">
                 {imageUrl ? (
                   <ImageModal imageUrl={imageUrl} alt={d.name} />
                 ) : (
@@ -320,7 +340,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                           />
                         </Link>
                       ) : (
-                        <span className="text-white text-xs">-</span>
+                        <span className="text-foreground text-xs">-</span>
                       )}
                     </div>
                   </div>
@@ -331,10 +351,10 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     <div className="flex items-center justify-center flex-1">
                       {d.form ? (
                         <Link href={`/digimon?form=${encodeURIComponent(d.form)}`} title={`View all ${d.form} Digimon`}>
-                          <span className="font-semibold text-white text-sm text-center hover:text-orange-300 transition-colors cursor-pointer">{d.form}</span>
+                          <span className="font-semibold text-foreground text-sm text-center hover:text-orange-300 transition-colors cursor-pointer">{d.form}</span>
                         </Link>
                       ) : (
-                        <span className="font-semibold text-white text-sm text-center">-</span>
+                        <span className="font-semibold text-foreground text-sm text-center">-</span>
                       )}
                     </div>
                   </div>
@@ -356,7 +376,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                           />
                         </Link>
                       ) : (
-                        <span className="text-white text-xs">-</span>
+                        <span className="text-foreground text-xs">-</span>
                       )}
                     </div>
                   </div>
@@ -378,7 +398,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                           />
                         </Link>
                       ) : (
-                        <span className="text-white text-xs">-</span>
+                        <span className="text-foreground text-xs">-</span>
                       )}
                     </div>
                   </div>
@@ -388,7 +408,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[100px]">
                     <span className="font-semibold text-orange-400 text-xs mb-2">Type:</span>
                     <div className="flex items-center justify-center flex-1">
-                      <span className="font-semibold text-white text-xs text-center">{d.type || '-'}</span>
+                      <span className="font-semibold text-foreground text-xs text-center">{d.type || '-'}</span>
                     </div>
                   </div>
 
@@ -409,7 +429,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                           />
                         </Link>
                       ) : (
-                        <span className="text-white text-xs">-</span>
+                        <span className="text-foreground text-xs">-</span>
                       )}
                     </div>
                   </div>
@@ -434,7 +454,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                             </Link>
                           ))
                         ) : (
-                          <span className="font-semibold text-xs text-white">-</span>
+                          <span className="font-semibold text-xs text-foreground">-</span>
                         )}
                       </div>
                     </div>
@@ -444,13 +464,13 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   {/* Level needed */}
                   <div className="flex flex-col items-center justify-center py-3 border-b border-muted/20 min-h-[80px]">
                     <span className="font-semibold text-orange-400 text-xs mb-2">Level needed:</span>
-                    <span className="font-semibold text-white text-sm">{d.defaultLevel || d.unlockRequirements?.unlockedAtLevel || '-'}</span>
+                    <span className="font-semibold text-foreground text-sm">{d.defaultLevel || d.unlockRequirements?.unlockedAtLevel || '-'}</span>
                   </div>
 
                   {/* Requires */}
                   <div className="flex flex-col items-center justify-center py-3 border-b border-muted/20 min-h-[80px]">
                     <span className="font-semibold text-orange-400 text-xs mb-2">Requires:</span>
-                    <span className="font-semibold text-white text-sm text-center">{d.unlockRequirements?.requiredToEvolve || '-'}</span>
+                    <span className="font-semibold text-foreground text-sm text-center">{d.unlockRequirements?.requiredToEvolve || '-'}</span>
                   </div>
 
                   {/* Item needed - Span 2 cols */}
@@ -459,10 +479,10 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     <div className="flex items-center gap-2 flex-wrap justify-center">
                       {(d.unlockItems?.length > 0 || d.unlockedWithItem || d.unlockRequirements?.unlockedWithItem) ? (
                         (d.unlockItems || [d.unlockedWithItem || d.unlockRequirements?.unlockedWithItem]).filter(Boolean).map((item: string, idx: number) => (
-                          <span key={idx} className="font-semibold text-sm text-white">{item}</span>
+                          <span key={idx} className="font-semibold text-sm text-foreground">{item}</span>
                         ))
                       ) : (
-                        <span className="font-semibold text-sm text-white">-</span>
+                        <span className="font-semibold text-sm text-foreground">-</span>
                       )}
                     </div>
                   </div>
@@ -476,11 +496,11 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                       {d.digivolutions?.digivolvesFrom && d.digivolutions.digivolvesFrom.length > 0 ? (
                         d.digivolutions.digivolvesFrom.slice(0, 2).map((prev: any, idx: number) => (
                           <Link key={idx} href={`/digimon/${prev.slug || prev.name?.toLowerCase().replace(/\s+/g, '-')}`}>
-                            <span className="font-semibold text-xs text-white hover:text-orange-300">{prev.name}</span>
+                            <span className="font-semibold text-xs text-foreground hover:text-orange-300">{prev.name}</span>
                           </Link>
                         ))
                       ) : (
-                        <span className="font-semibold text-xs text-white">-</span>
+                        <span className="font-semibold text-xs text-foreground">-</span>
                       )}
                     </div>
                   </div>
@@ -492,11 +512,11 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                       {d.digivolutions?.digivolvesTo && d.digivolutions.digivolvesTo.length > 0 ? (
                         d.digivolutions.digivolvesTo.slice(0, 2).map((next: any, idx: number) => (
                           <Link key={idx} href={`/digimon/${next.slug || next.name?.toLowerCase().replace(/\s+/g, '-')}`}>
-                            <span className="font-semibold text-xs text-white hover:text-orange-300">{next.name}</span>
+                            <span className="font-semibold text-xs text-foreground hover:text-orange-300">{next.name}</span>
                           </Link>
                         ))
                       ) : (
-                        <span className="font-semibold text-xs text-white">-</span>
+                        <span className="font-semibold text-xs text-foreground">-</span>
                       )}
                     </div>
                   </div>
@@ -506,7 +526,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     {/* Can be ridden */}
                     <div className={`flex items-center justify-between py-2 px-2 rounded ${(d.canBeRidden || d.rideability?.canBeRidden) ? 'bg-lime-400/90' : 'bg-muted/10'}`}>
                       <span className={`font-semibold text-xs ${(d.canBeRidden || d.rideability?.canBeRidden) ? 'text-black' : 'text-orange-400'}`}>Can be ridden:</span>
-                      <span className={`font-semibold text-lg ${(d.canBeRidden || d.rideability?.canBeRidden) ? 'text-black' : 'text-white'}`}>
+                      <span className={`font-semibold text-lg ${(d.canBeRidden || d.rideability?.canBeRidden) ? 'text-black' : 'text-foreground'}`}>
                         {(d.canBeRidden || d.rideability?.canBeRidden) ? '✓' : '✗'}
                       </span>
                     </div>
@@ -514,7 +534,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     {/* Can be hatched */}
                     <div className={`flex items-center justify-between py-2 px-2 rounded ${(d.canBeHatched || d.availability?.canBeHatched) ? 'bg-lime-400/90' : 'bg-muted/10'}`}>
                       <span className={`font-semibold text-xs ${(d.canBeHatched || d.availability?.canBeHatched) ? 'text-black' : 'text-orange-400'}`}>Can be hatched:</span>
-                      <span className={`font-semibold text-lg ${(d.canBeHatched || d.availability?.canBeHatched) ? 'text-black' : 'text-white'}`}>
+                      <span className={`font-semibold text-lg ${(d.canBeHatched || d.availability?.canBeHatched) ? 'text-black' : 'text-foreground'}`}>
                         {(d.canBeHatched || d.availability?.canBeHatched) ? '✓' : '✗'}
                       </span>
                     </div>
@@ -522,7 +542,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     {/* Available */}
                     <div className={`flex items-center justify-between py-2 px-2 rounded ${(d.available || d.availability?.available) ? 'bg-lime-400/90' : 'bg-muted/10'}`}>
                       <span className={`font-semibold text-xs ${(d.available || d.availability?.available) ? 'text-black' : 'text-orange-400'}`}>Available:</span>
-                      <span className={`font-semibold text-lg ${(d.available || d.availability?.available) ? 'text-black' : 'text-white'}`}>
+                      <span className={`font-semibold text-lg ${(d.available || d.availability?.available) ? 'text-black' : 'text-foreground'}`}>
                         {(d.available || d.availability?.available) ? '✓' : '✗'}
                       </span>
                     </div>

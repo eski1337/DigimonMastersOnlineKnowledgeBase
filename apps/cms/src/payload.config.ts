@@ -17,15 +17,38 @@ import Events from './collections/Events';
 import Media from './collections/Media';
 import Tasks from './collections/Tasks';
 import TaskComments from './collections/TaskComments';
+import AuditLogs from './collections/AuditLogs';
+import ProfileComments from './collections/ProfileComments';
+import Conversations from './collections/Conversations';
+import Messages from './collections/Messages';
+import Notifications from './collections/Notifications';
+import UserBlocks from './collections/UserBlocks';
+import Reports from './collections/Reports';
+import { withAuditHooks } from './lib/audit/hooks';
 import KanbanView from './views/Kanban/index';
 import KanbanNavLink from './views/Kanban/NavLink';
+import RegionEditor from './views/RegionEditor/index';
+import RegionEditorNavLink from './views/RegionEditor/NavLink';
+import Dashboard from './views/Dashboard/index';
+import BeforeLogin from './components/BeforeLogin';
+import PageJumpProvider from './components/PageJumpProvider';
 import resendVerification from './endpoints/resendVerification';
 import updateDigimonSkills from './endpoints/update-digimon-skills';
+import { getLogsEndpoint, clearLogsEndpoint } from './endpoints/logs';
+import LogViewer from './views/LogViewer/index';
+import LogViewerNavLink from './views/LogViewer/NavLink';
+import ServerHealthDashboard from './views/ServerHealth/index';
+import ServerHealthNavLink from './views/ServerHealth/NavLink';
+import AdminBackupsPage from './views/Backups/index';
+import BackupsNavLink from './views/Backups/NavLink';
 
 export default buildConfig({
-  serverURL: process.env.NODE_ENV === 'production'
-    ? 'https://cms.dmokb.info'
-    : (process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001'),
+  rateLimit: {
+    window: 15 * 60 * 1000, // 15 minutes
+    max: 2000, // generous limit
+    trustProxy: true,
+  },
+  serverURL: process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info',
   admin: {
     user: Users.slug,
     bundler: webpackBundler(),
@@ -36,17 +59,57 @@ export default buildConfig({
     },
     css: path.resolve(__dirname, 'styles/custom.css'),
     components: {
+      beforeLogin: [BeforeLogin],
+      beforeDashboard: [Dashboard],
+      providers: [PageJumpProvider],
       views: {
         kanban: {
           Component: KanbanView,
           path: '/kanban',
         },
+        'region-editor': {
+          Component: RegionEditor,
+          path: '/region-editor',
+        },
+        'log-viewer': {
+          Component: LogViewer,
+          path: '/log-viewer',
+        },
+        'server-health': {
+          Component: ServerHealthDashboard,
+          path: '/server-health',
+        },
+        backups: {
+          Component: AdminBackupsPage,
+          path: '/backups',
+        },
       },
-      afterNavLinks: [KanbanNavLink],
+      afterNavLinks: [KanbanNavLink, RegionEditorNavLink, LogViewerNavLink, ServerHealthNavLink, BackupsNavLink],
     },
   },
   editor: slateEditor({}),
-  collections: [Users, Digimon, EvolutionLines, Items, Maps, Quests, Guides, Tools, PatchNotes, Events, Media, Tasks, TaskComments],
+  collections: [
+    withAuditHooks(Users),
+    withAuditHooks(Digimon),
+    withAuditHooks(EvolutionLines),
+    withAuditHooks(Items),
+    withAuditHooks(Maps),
+    withAuditHooks(Quests),
+    withAuditHooks(Guides),
+    withAuditHooks(Tools),
+    withAuditHooks(PatchNotes),
+    withAuditHooks(Events),
+    withAuditHooks(Media),
+    withAuditHooks(Tasks),
+    withAuditHooks(TaskComments),
+    withAuditHooks(ProfileComments),
+    withAuditHooks(Conversations),
+    withAuditHooks(Messages),
+    Notifications, // Not audited — high-volume, ephemeral
+    withAuditHooks(UserBlocks),
+    withAuditHooks(Reports),
+    AuditLogs, // Not wrapped — must not audit itself
+  ],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
   },
@@ -63,12 +126,14 @@ export default buildConfig({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || '587'),
       secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
+      ...(process.env.SMTP_USER ? {
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      } : {}),
       tls: {
-        rejectUnauthorized: false,
+        rejectUnauthorized: process.env.NODE_ENV === 'production',
       },
     },
   } : {
@@ -76,14 +141,14 @@ export default buildConfig({
     fromAddress: process.env.EMAIL_FROM || 'noreply@dmokb.local',
     logMockCredentials: true,
   },
-  endpoints: [resendVerification, updateDigimonSkills],
+  endpoints: [resendVerification, updateDigimonSkills, getLogsEndpoint, clearLogsEndpoint],
   cors: [
-    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info',
     'https://dmokb.info',
     'https://cms.dmokb.info',
   ],
   csrf: [
-    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info',
     'https://dmokb.info',
     'https://cms.dmokb.info',
   ],

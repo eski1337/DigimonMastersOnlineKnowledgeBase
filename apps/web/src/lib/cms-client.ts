@@ -5,7 +5,7 @@
 
 import type { PayloadResponse } from '@/types/payload-responses';
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
 export interface CMSQueryParams {
   where?: Record<string, unknown>;

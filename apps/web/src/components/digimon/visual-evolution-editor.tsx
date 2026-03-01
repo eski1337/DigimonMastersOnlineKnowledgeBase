@@ -79,7 +79,7 @@ export function VisualEvolutionEditor({
   const loadCurrentEvolutionData = async () => {
     setIsLoading(true);
     try {
-      const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+      const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
       
       // First, check if this Digimon has an evolution line assigned
       const digimonResponse = await fetch(`${CMS_URL}/api/digimon/${digimonId}?depth=1`);
@@ -321,7 +321,7 @@ export function VisualEvolutionEditor({
     }
 
     try {
-      const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+      const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
       const response = await fetch(
         `${CMS_URL}/api/digimon?where[name][like]=${encodeURIComponent(query)}&limit=20`
       );
@@ -340,7 +340,7 @@ export function VisualEvolutionEditor({
   };
 
   const addNode = async (digimon: DigimonSearchResult) => {
-    const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+    const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
     
     // Extract icon URL with proper handling
     let iconUrl: string | undefined;
@@ -584,7 +584,7 @@ export function VisualEvolutionEditor({
       };
 
       // Check if current Digimon already has an evolution line
-      const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+      const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
       const digimonResponse = await fetch(`${CMS_URL}/api/digimon/${digimonId}`);
       const digimonData = await digimonResponse.json();
       

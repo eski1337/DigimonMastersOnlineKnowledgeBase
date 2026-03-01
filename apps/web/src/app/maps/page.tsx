@@ -1,58 +1,44 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { MapPin } from 'lucide-react';
-import Link from 'next/link';
+import type { Metadata } from 'next';
+import { MapsExplorer } from '@/components/maps/maps-explorer';
 
-const mockMaps = [
-  {
-    id: '1',
-    slug: 'file-city',
-    name: 'File City',
-    region: 'Server Continent',
-    levelRange: '1-10',
-    description: 'The starting city for all Tamers.',
-  },
-  {
-    id: '2',
-    slug: 'gate-of-the-four-guardians',
-    name: 'Gate of the Four Guardians',
-    region: 'Server Continent',
-    levelRange: '10-20',
-    description: 'A gateway protected by four legendary guardians.',
-  },
-];
+export const metadata: Metadata = {
+  title: 'Maps & Areas - DMO KB',
+  description: 'Explore all locations in the Real World and Digital World of Digimon Masters Online.',
+};
 
-export default function MapsPage() {
-  return (
-    <div className="container py-8">
-      <div className="flex flex-col gap-6 mb-8">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">Maps</h1>
-          <p className="text-muted-foreground">
-            Explore all locations in the Digital World with detailed information.
-          </p>
-        </div>
-      </div>
+const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockMaps.map(map => (
-          <Link key={map.id} href={`/maps/${map.slug}`}>
-            <Card className="card-hover h-full">
-              <CardHeader>
-                <MapPin className="h-10 w-10 text-primary mb-3" />
-                <CardTitle>{map.name}</CardTitle>
-                <CardDescription>{map.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline">{map.region}</Badge>
-                  <Badge variant="secondary">Level {map.levelRange}</Badge>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
+interface CMSMap {
+  id: string;
+  name: string;
+  slug: string;
+  world?: string;
+  area?: string;
+  mapType?: string;
+  levelRange?: string;
+  description?: string;
+  sortOrder?: number;
+  hexCol?: number | null;
+  hexRow?: number | null;
+  image?: { url: string } | null;
+  published?: boolean;
+}
+
+async function getMaps(): Promise<CMSMap[]> {
+  try {
+    const res = await fetch(
+      `${CMS_URL}/api/maps?where[published][equals]=true&sort=sortOrder&limit=200&depth=1`,
+      { next: { revalidate: 60 } },
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.docs || [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function MapsPage() {
+  const maps = await getMaps();
+  return <MapsExplorer maps={maps} />;
 }

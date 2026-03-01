@@ -5,6 +5,7 @@ const Quests: CollectionConfig = {
   slug: 'quests',
   admin: {
     useAsTitle: 'title',
+    group: 'Content',
   },
   access: {
     read: () => true,

@@ -1,20 +1,36 @@
 import { CollectionConfig } from 'payload/types';
-import { 
-  DIGIMON_ELEMENTS, 
-  DIGIMON_ATTRIBUTES, 
-  DIGIMON_RANKS, 
+import {
+  DIGIMON_ELEMENTS,
+  DIGIMON_ATTRIBUTES,
+  DIGIMON_RANKS,
   DIGIMON_FAMILIES,
   DIGIMON_FORMS,
-  DIGIMON_ATTACKER_TYPES 
+  DIGIMON_ATTACKER_TYPES,
 } from '@dmo-kb/shared';
 import ImportButton from '../components/ImportButton';
 
+/* ── Reusable stat row (4 per row via 25% width) ─────────────────── */
+const statFields = (prefix?: string) => [
+  { name: 'hp', label: 'HP', type: 'number' as const, admin: { width: '25%' } },
+  { name: 'at', label: 'AT', type: 'number' as const, admin: { width: '25%' } },
+  { name: 'de', label: 'DE', type: 'number' as const, admin: { width: '25%' } },
+  { name: 'as', label: 'AS', type: 'number' as const, admin: { width: '25%' } },
+  { name: 'ds', label: 'DS', type: 'number' as const, admin: { width: '25%' } },
+  { name: 'ct', label: 'CT', type: 'number' as const, admin: { width: '25%' } },
+  { name: 'ht', label: 'HT', type: 'number' as const, admin: { width: '25%' } },
+  { name: 'ev', label: 'EV', type: 'number' as const, admin: { width: '25%' } },
+];
+
 const Digimon: CollectionConfig = {
   slug: 'digimon',
+  labels: {
+    singular: 'Digimon',
+    plural: 'Digimon',
+  },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'form', 'rank', 'element', 'attribute', 'published'],
-    group: 'Content',
+    group: 'Game Data',
     components: {
       BeforeListTable: [ImportButton],
     },
@@ -35,10 +51,27 @@ const Digimon: CollectionConfig = {
     },
   },
   fields: [
+    /* ═══════════════════════════════════════════════════════════════
+       PUBLISHED TOGGLE — always visible at the very top
+       ═══════════════════════════════════════════════════════════════ */
+    {
+      name: 'published',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'Toggle to make this Digimon visible on the website',
+      },
+    },
+
+    /* ═══════════════════════════════════════════════════════════════
+       IDENTITY — name + slug always visible above tabs
+       ═══════════════════════════════════════════════════════════════ */
     {
       name: 'name',
       type: 'text',
       required: true,
+      admin: { width: '50%' },
     },
     {
       name: 'slug',
@@ -46,510 +79,379 @@ const Digimon: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
+        width: '50%',
         description: 'URL-friendly identifier',
       },
     },
+
+    /* ═══════════════════════════════════════════════════════════════
+       TABS — all remaining fields organised into logical groups
+       ═══════════════════════════════════════════════════════════════ */
     {
-      name: 'names',
-      label: 'Localized Names',
-      type: 'group',
-      admin: {
-        description: 'Digimon names in different languages',
-      },
-      fields: [
+      type: 'tabs',
+      tabs: [
+        /* ── Tab 1: Core Info ──────────────────────────────────── */
         {
-          name: 'japanese',
-          label: 'Japanese (日本語)',
-          type: 'text',
-          admin: {
-            description: 'Japanese name',
-          },
-        },
-        {
-          name: 'katakana',
-          label: 'Japanese Katakana (カタカナ)',
-          type: 'text',
-          admin: {
-            description: 'Katakana representation',
-          },
-        },
-        {
-          name: 'korean',
-          label: 'Korean (한국어)',
-          type: 'text',
-          admin: {
-            description: 'Korean name',
-          },
-        },
-        {
-          name: 'chinese',
-          label: 'Chinese (中文)',
-          type: 'text',
-          admin: {
-            description: 'Hong Kong/Traditional Chinese name',
-          },
-        },
-        {
-          name: 'thai',
-          label: 'Thai (ไทย)',
-          type: 'text',
-          admin: {
-            description: 'Thai name',
-          },
-        },
-      ],
-    },
-    {
-      name: 'introduction',
-      label: 'Introduction',
-      type: 'textarea',
-      admin: {
-        description: 'Brief introduction or lore about this Digimon',
-      },
-    },
-    {
-      name: 'form',
-      label: 'Form/Stage',
-      type: 'select',
-      required: true,
-      options: DIGIMON_FORMS.map((form: string) => ({ label: form, value: form })),
-      admin: {
-        description: 'Evolution stage (e.g., Rookie, Champion, Ultimate)',
-      },
-    },
-    {
-      name: 'rank',
-      label: 'Rank',
-      type: 'select',
-      required: false,
-      options: DIGIMON_RANKS.map((rank: string) => ({ label: rank, value: rank })),
-      admin: {
-        description: 'Power tier (N, A, S, SS, SSS, U) - Leave empty if no rank',
-      },
-    },
-    {
-      name: 'type',
-      label: 'Type',
-      type: 'text',
-      admin: {
-        description: 'Digimon classification (e.g., Holy Knight, Dragon, Beast, Bird, etc.)',
-      },
-    },
-    {
-      name: 'attackerType',
-      label: 'Attacker Type',
-      type: 'select',
-      options: DIGIMON_ATTACKER_TYPES.map((type: string) => ({ label: type, value: type })),
-      admin: {
-        description: 'Combat role (QA, SA, NA, DE)',
-      },
-    },
-    {
-      name: 'icon',
-      label: 'Icon',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description: 'Small icon image (e.g., Falcomon_Icon.png from DMO Wiki)',
-      },
-    },
-    {
-      name: 'mainImage',
-      label: 'Main Image',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description: 'Main Digimon image/sprite',
-      },
-    },
-    {
-      name: 'images',
-      type: 'array',
-      label: 'Additional Images',
-      admin: {
-        description: 'Additional images or variants',
-      },
-      fields: [
-        {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-        },
-      ],
-    },
-    {
-      name: 'attribute',
-      type: 'select',
-      required: true,
-      options: DIGIMON_ATTRIBUTES.map((attr: string) => ({ label: attr, value: attr })),
-    },
-    {
-      name: 'element',
-      type: 'select',
-      required: true,
-      options: DIGIMON_ELEMENTS.map((elem: string) => ({ label: elem, value: elem })),
-    },
-    {
-      name: 'families',
-      type: 'select',
-      hasMany: true,
-      options: DIGIMON_FAMILIES.map((fam: string) => ({ label: fam, value: fam })),
-    },
-    {
-      name: 'variants',
-      label: 'Variants/Alternative Forms',
-      type: 'array',
-      admin: {
-        description: 'Different appearances or seasonal variants of this Digimon',
-      },
-      fields: [
-        { name: 'name', type: 'text', required: true },
-        { name: 'description', type: 'textarea' },
-        { name: 'image', type: 'upload', relationTo: 'media' },
-      ],
-    },
-    {
-      name: 'digivolutions',
-      label: 'Digivolution Chains',
-      type: 'group',
-      fields: [
-        {
-          name: 'digivolvesFrom',
-          label: 'Digivolves From',
-          type: 'array',
-          admin: {
-            description: 'Previous evolution stages (e.g., Agumon digivolves from Koromon)',
-          },
+          label: 'Core',
           fields: [
             {
-              name: 'name',
-              label: 'Digimon Name',
-              type: 'text',
-              required: true,
-              admin: {
-                description: 'Name of the Digimon (will be linked automatically when available)',
-              },
+              type: 'row',
+              fields: [
+                {
+                  name: 'form',
+                  label: 'Form / Stage',
+                  type: 'select',
+                  required: true,
+                  options: DIGIMON_FORMS.map((f: string) => ({ label: f, value: f })),
+                  admin: { width: '25%', description: 'Rookie, Champion, Ultimate …' },
+                },
+                {
+                  name: 'rank',
+                  type: 'select',
+                  options: DIGIMON_RANKS.map((r: string) => ({ label: r, value: r })),
+                  admin: { width: '25%', description: 'N / A / S / SS / SSS / U' },
+                },
+                {
+                  name: 'attribute',
+                  type: 'select',
+                  required: true,
+                  options: DIGIMON_ATTRIBUTES.map((a: string) => ({ label: a, value: a })),
+                  admin: { width: '25%' },
+                },
+                {
+                  name: 'element',
+                  type: 'select',
+                  required: true,
+                  options: DIGIMON_ELEMENTS.map((e: string) => ({ label: e, value: e })),
+                  admin: { width: '25%' },
+                },
+              ],
             },
             {
-              name: 'requirements',
+              type: 'row',
+              fields: [
+                {
+                  name: 'type',
+                  label: 'Type',
+                  type: 'text',
+                  admin: { width: '33%', description: 'Holy Knight, Dragon, Beast …' },
+                },
+                {
+                  name: 'attackerType',
+                  label: 'Attacker Type',
+                  type: 'select',
+                  options: DIGIMON_ATTACKER_TYPES.map((t: string) => ({ label: t, value: t })),
+                  admin: { width: '33%', description: 'QA / SA / NA / DE' },
+                },
+                {
+                  name: 'families',
+                  type: 'select',
+                  hasMany: true,
+                  options: DIGIMON_FAMILIES.map((f: string) => ({ label: f, value: f })),
+                  admin: { width: '34%' },
+                },
+              ],
+            },
+            {
+              name: 'introduction',
+              label: 'Introduction',
               type: 'textarea',
-              admin: {
-                description: 'Level, stats, or item requirements',
-              },
+              admin: { description: 'Brief introduction or lore about this Digimon' },
             },
           ],
         },
+
+        /* ── Tab 2: Media ──────────────────────────────────────── */
         {
-          name: 'digivolvesTo',
-          label: 'Digivolves To',
-          type: 'array',
-          admin: {
-            description: 'Next evolution stages (e.g., Agumon digivolves to Greymon)',
-          },
+          label: 'Media',
           fields: [
             {
-              name: 'name',
-              label: 'Digimon Name',
-              type: 'text',
-              required: true,
-              admin: {
-                description: 'Name of the Digimon (will be linked automatically when available)',
-              },
+              type: 'row',
+              fields: [
+                {
+                  name: 'icon',
+                  label: 'Icon',
+                  type: 'upload',
+                  relationTo: 'media',
+                  admin: { width: '50%', description: 'Small icon (e.g. Falcomon_Icon.png)' },
+                },
+                {
+                  name: 'mainImage',
+                  label: 'Main Image',
+                  type: 'upload',
+                  relationTo: 'media',
+                  admin: { width: '50%', description: 'Main sprite / artwork' },
+                },
+              ],
             },
             {
-              name: 'requiredLevel',
-              label: 'Required Level',
+              name: 'images',
+              type: 'array',
+              label: 'Additional Images',
+              admin: { description: 'Extra images or variant artwork' },
+              fields: [
+                { name: 'image', type: 'upload', relationTo: 'media' },
+              ],
+            },
+          ],
+        },
+
+        /* ── Tab 3: Localization ───────────────────────────────── */
+        {
+          label: 'Names',
+          fields: [
+            {
+              name: 'names',
+              label: 'Localized Names',
+              type: 'group',
+              admin: { description: 'Translations of this Digimon\'s name' },
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'japanese', label: 'Japanese (日本語)', type: 'text', admin: { width: '50%' } },
+                    { name: 'katakana', label: 'Katakana (カタカナ)', type: 'text', admin: { width: '50%' } },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'korean', label: 'Korean (한국어)', type: 'text', admin: { width: '33%' } },
+                    { name: 'chinese', label: 'Chinese (中文)', type: 'text', admin: { width: '33%' } },
+                    { name: 'thai', label: 'Thai (ไทย)', type: 'text', admin: { width: '34%' } },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+
+        /* ── Tab 4: Stats ──────────────────────────────────────── */
+        {
+          label: 'Stats',
+          fields: [
+            {
+              name: 'stats',
+              label: 'Base Stats',
+              type: 'group',
+              admin: { description: 'Starting values' },
+              fields: statFields(),
+            },
+            {
+              name: 'maxStats',
+              label: 'Max Stats (100% Size, Lv 140)',
+              type: 'group',
+              admin: { description: 'Maximum values at 100% size and level 140' },
+              fields: statFields(),
+            },
+            {
+              name: 'sizePct',
+              label: 'Size %',
               type: 'number',
-              admin: {
-                description: 'Level required to digivolve (e.g., 11, 25, 41)',
-              },
-            },
-            {
-              name: 'requiredItem',
-              label: 'Required Item',
-              type: 'text',
-              admin: {
-                description: 'Item needed for this evolution (e.g., "Atho, René, Por")',
-              },
+              admin: { width: '25%', description: '100 = normal size' },
             },
           ],
         },
+
+        /* ── Tab 5: Skills ─────────────────────────────────────── */
         {
-          name: 'jogress',
-          label: 'Jogress/DNA Digivolutions',
-          type: 'array',
-          admin: {
-            description: 'DNA Digivolution partners',
-          },
+          label: 'Skills',
           fields: [
             {
-              name: 'partner',
-              type: 'relationship',
-              relationTo: 'digimon',
-              required: true,
+              name: 'skills',
+              type: 'array',
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'name', type: 'text', required: true, admin: { width: '40%' } },
+                    {
+                      name: 'type',
+                      type: 'select',
+                      options: [
+                        { label: 'Attack', value: 'Attack' },
+                        { label: 'Support', value: 'Support' },
+                        { label: 'Passive', value: 'Passive' },
+                      ],
+                      admin: { width: '30%' },
+                    },
+                    { name: 'element', label: 'Attribute', type: 'text', admin: { width: '30%' } },
+                  ],
+                },
+                {
+                  name: 'icon',
+                  label: 'Skill Icon',
+                  type: 'upload',
+                  relationTo: 'media',
+                  admin: { description: 'Skill icon from DMO Wiki' },
+                },
+                { name: 'description', type: 'textarea' },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'cooldown', label: 'Cooldown (s)', type: 'number', admin: { width: '25%' } },
+                    { name: 'dsConsumption', label: 'DS Cost', type: 'number', admin: { width: '25%' } },
+                    { name: 'skillPointsPerUpgrade', label: 'SP / Upgrade', type: 'number', admin: { width: '25%' } },
+                    { name: 'animationTime', label: 'Anim Time (s)', type: 'number', admin: { width: '25%' } },
+                  ],
+                },
+                {
+                  name: 'damagePerLevel',
+                  label: 'Damage per Level (1-25)',
+                  type: 'textarea',
+                  admin: { description: 'Damage values for each skill level' },
+                },
+              ],
+            },
+          ],
+        },
+
+        /* ── Tab 6: Evolution ──────────────────────────────────── */
+        {
+          label: 'Evolution',
+          fields: [
+            {
+              name: 'digivolutions',
+              label: 'Digivolution Chains',
+              type: 'group',
+              fields: [
+                {
+                  name: 'digivolvesFrom',
+                  label: 'Digivolves From',
+                  type: 'array',
+                  admin: { description: 'Previous evolution stages' },
+                  fields: [
+                    { name: 'name', label: 'Digimon Name', type: 'text', required: true },
+                    { name: 'requirements', type: 'textarea', admin: { description: 'Level / stats / items' } },
+                  ],
+                },
+                {
+                  name: 'digivolvesTo',
+                  label: 'Digivolves To',
+                  type: 'array',
+                  admin: { description: 'Next evolution stages' },
+                  fields: [
+                    { name: 'name', label: 'Digimon Name', type: 'text', required: true },
+                    {
+                      type: 'row',
+                      fields: [
+                        { name: 'requiredLevel', label: 'Required Level', type: 'number', admin: { width: '50%' } },
+                        { name: 'requiredItem', label: 'Required Item', type: 'text', admin: { width: '50%' } },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  name: 'jogress',
+                  label: 'Jogress / DNA Digivolution',
+                  type: 'array',
+                  admin: { description: 'DNA Digivolution partners' },
+                  fields: [
+                    {
+                      type: 'row',
+                      fields: [
+                        { name: 'partner', type: 'relationship', relationTo: 'digimon', required: true, admin: { width: '50%' } },
+                        { name: 'result', type: 'relationship', relationTo: 'digimon', required: true, admin: { width: '50%' } },
+                      ],
+                    },
+                    { name: 'requirements', type: 'textarea' },
+                  ],
+                },
+              ],
             },
             {
-              name: 'result',
-              type: 'relationship',
-              relationTo: 'digimon',
-              required: true,
-            },
-            {
-              name: 'requirements',
+              name: 'requiredToEvolve',
+              label: 'Evolution Requirements',
               type: 'textarea',
+              admin: { description: 'Items / stats needed for evolution' },
+            },
+            {
+              name: 'variants',
+              label: 'Variants / Alternative Forms',
+              type: 'array',
+              admin: { description: 'Seasonal variants or alternate appearances' },
+              fields: [
+                { name: 'name', type: 'text', required: true },
+                { name: 'description', type: 'textarea' },
+                { name: 'image', type: 'upload', relationTo: 'media' },
+              ],
+            },
+            {
+              name: 'evolutionLine',
+              type: 'relationship',
+              relationTo: 'evolution-lines',
+              admin: { description: 'Shared evolution line this Digimon belongs to' },
+            },
+            {
+              name: 'visualEvolutionLayout',
+              type: 'json',
+              admin: { description: 'Visual evolution tree layout (JSON)' },
+            },
+          ],
+        },
+
+        /* ── Tab 7: Availability ───────────────────────────────── */
+        {
+          label: 'Availability',
+          fields: [
+            {
+              name: 'obtain',
+              type: 'textarea',
+              admin: { description: 'How to obtain this Digimon' },
+            },
+            {
+              type: 'row',
+              fields: [
+                { name: 'unlockedAtLevel', label: 'Unlock Level', type: 'number', admin: { width: '50%', description: 'Tamer level required' } },
+                { name: 'unlockedWithItem', label: 'Unlock Item', type: 'text', admin: { width: '50%', description: 'e.g. Mercenary Egg' } },
+              ],
+            },
+            {
+              name: 'availability',
+              label: 'Availability Flags',
+              type: 'group',
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'canBeHatched', label: 'Can Be Hatched', type: 'checkbox', defaultValue: false, admin: { width: '33%' } },
+                    { name: 'available', label: 'Currently Available', type: 'checkbox', defaultValue: true, admin: { width: '33%' } },
+                    { name: 'limitedTime', label: 'Limited Time', type: 'checkbox', defaultValue: false, admin: { width: '34%' } },
+                  ],
+                },
+              ],
+            },
+            {
+              name: 'rideability',
+              label: 'Ride System',
+              type: 'group',
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'canBeRidden', label: 'Can Be Ridden', type: 'checkbox', defaultValue: false, admin: { width: '33%' } },
+                    { name: 'rideableWithItem', label: 'Ride Item', type: 'text', admin: { width: '33%' } },
+                    { name: 'rideSpeed', label: 'Ride Speed %', type: 'number', admin: { width: '34%' } },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+
+        /* ── Tab 8: Notes & Sources ────────────────────────────── */
+        {
+          label: 'Notes',
+          fields: [
+            { name: 'notes', type: 'richText' },
+            {
+              name: 'sources',
+              type: 'array',
+              fields: [{ name: 'source', type: 'text' }],
             },
           ],
         },
       ],
-    },
-    {
-      name: 'skills',
-      type: 'array',
-      fields: [
-        { name: 'name', type: 'text', required: true },
-        { 
-          name: 'icon', 
-          label: 'Skill Icon',
-          type: 'upload', 
-          relationTo: 'media',
-          admin: {
-            description: 'Skill icon image from DMO Wiki',
-          },
-        },
-        { name: 'description', type: 'textarea' },
-        {
-          name: 'type',
-          type: 'select',
-          options: [
-            { label: 'Attack', value: 'Attack' },
-            { label: 'Support', value: 'Support' },
-            { label: 'Passive', value: 'Passive' },
-          ],
-        },
-        { 
-          name: 'element', 
-          label: 'Skill Attribute',
-          type: 'text',
-          admin: {
-            description: 'Elemental attribute of the skill',
-          },
-        },
-        { 
-          name: 'cooldown', 
-          label: 'Cooldown (seconds)',
-          type: 'number',
-          admin: {
-            description: 'Skill cooldown time in seconds',
-          },
-        },
-        { 
-          name: 'dsConsumption', 
-          label: 'DS Consumption',
-          type: 'number',
-          admin: {
-            description: 'Digi-Soul points consumed per use',
-          },
-        },
-        { 
-          name: 'skillPointsPerUpgrade', 
-          label: 'Skill Points per Upgrade',
-          type: 'number',
-          admin: {
-            description: 'Skill points required for each level upgrade',
-          },
-        },
-        { 
-          name: 'animationTime', 
-          label: 'Animation Time (seconds)',
-          type: 'number',
-          admin: {
-            description: 'Duration of skill animation in seconds',
-          },
-        },
-        { 
-          name: 'damagePerLevel', 
-          label: 'Damage per Level (1-25)',
-          type: 'textarea',
-          admin: {
-            description: 'Damage values for each skill level from 1 to 25',
-          },
-        },
-      ],
-    },
-    {
-      name: 'stats',
-      label: 'Base Stats',
-      type: 'group',
-      admin: {
-        description: 'Base statistics for this Digimon (starting values)',
-      },
-      fields: [
-        { name: 'hp', label: 'Health Points (HP)', type: 'number' },
-        { name: 'at', label: 'Attack (AT)', type: 'number' },
-        { name: 'de', label: 'Defense (DE)', type: 'number' },
-        { name: 'as', label: 'Attack Speed (AS)', type: 'number' },
-        { name: 'ds', label: 'Digi-Soul (DS)', type: 'number' },
-        { name: 'ct', label: 'Critical Hit (CT)', type: 'number' },
-        { name: 'ht', label: 'Hit Rate (HT)', type: 'number' },
-        { name: 'ev', label: 'Evasion (EV)', type: 'number' },
-      ],
-    },
-    {
-      name: 'maxStats',
-      label: 'Max Stats (100% Size, Level 140)',
-      type: 'group',
-      admin: {
-        description: 'Maximum statistics at 100% Digimon Size and Level 140',
-      },
-      fields: [
-        { name: 'hp', label: 'Health Points (HP)', type: 'number' },
-        { name: 'at', label: 'Attack (AT)', type: 'number' },
-        { name: 'de', label: 'Defense (DE)', type: 'number' },
-        { name: 'as', label: 'Attack Speed (AS)', type: 'number' },
-        { name: 'ds', label: 'Digi-Soul (DS)', type: 'number' },
-        { name: 'ct', label: 'Critical Hit (CT)', type: 'number' },
-        { name: 'ht', label: 'Hit Rate (HT)', type: 'number' },
-        { name: 'ev', label: 'Evasion (EV)', type: 'number' },
-      ],
-    },
-    {
-      name: 'sizePct',
-      type: 'number',
-      admin: {
-        description: 'Size percentage (100 = normal)',
-      },
-    },
-    {
-      name: 'obtain',
-      type: 'textarea',
-      admin: {
-        description: 'How to obtain this Digimon',
-      },
-    },
-    {
-      name: 'unlockedAtLevel',
-      label: 'Unlocked at Level',
-      type: 'number',
-      admin: {
-        description: 'Tamer level required to unlock this Digimon',
-      },
-    },
-    {
-      name: 'unlockedWithItem',
-      label: 'Unlocked with Item',
-      type: 'text',
-      admin: {
-        description: 'Item name required to unlock (e.g., Mercenary Egg)',
-      },
-    },
-    {
-      name: 'requiredToEvolve',
-      label: 'Required to Evolve',
-      type: 'textarea',
-      admin: {
-        description: 'Items, stats, or other requirements needed for evolution',
-      },
-    },
-    {
-      name: 'rideability',
-      label: 'Ride System',
-      type: 'group',
-      admin: {
-        description: 'Riding capability information',
-      },
-      fields: [
-        {
-          name: 'canBeRidden',
-          label: 'Can Be Ridden',
-          type: 'checkbox',
-          defaultValue: false,
-          admin: {
-            description: 'Whether this Digimon can be ridden',
-          },
-        },
-        {
-          name: 'rideableWithItem',
-          label: 'Rideable with Item',
-          type: 'text',
-          admin: {
-            description: 'Item required to make rideable (e.g., Ride Mode item)',
-          },
-        },
-        {
-          name: 'rideSpeed',
-          label: 'Ride Speed',
-          type: 'number',
-          admin: {
-            description: 'Movement speed when riding (percentage)',
-          },
-        },
-      ],
-    },
-    {
-      name: 'availability',
-      label: 'Availability',
-      type: 'group',
-      admin: {
-        description: 'How this Digimon is available to players',
-      },
-      fields: [
-        {
-          name: 'canBeHatched',
-          label: 'Can Be Hatched',
-          type: 'checkbox',
-          defaultValue: false,
-          admin: {
-            description: 'Can be obtained from eggs',
-          },
-        },
-        {
-          name: 'available',
-          label: 'Currently Available',
-          type: 'checkbox',
-          defaultValue: true,
-          admin: {
-            description: 'Whether this Digimon is currently available in the game',
-          },
-        },
-        {
-          name: 'limitedTime',
-          label: 'Limited Time',
-          type: 'checkbox',
-          defaultValue: false,
-          admin: {
-            description: 'Is this a limited-time or event-exclusive Digimon',
-          },
-        },
-      ],
-    },
-    {
-      name: 'visualEvolutionLayout',
-      type: 'json',
-      admin: {
-        description: 'Visual evolution tree layout for this individual Digimon (nodes and connections)',
-      },
-    },
-    {
-      name: 'evolutionLine',
-      type: 'relationship',
-      relationTo: 'evolution-lines',
-      admin: {
-        description: 'Shared evolution line that this Digimon belongs to',
-      },
-    },
-    {
-      name: 'notes',
-      type: 'richText',
-    },
-    {
-      name: 'sources',
-      type: 'array',
-      fields: [{ name: 'source', type: 'text' }],
-    },
-    {
-      name: 'published',
-      type: 'checkbox',
-      defaultValue: false,
     },
   ],
 };

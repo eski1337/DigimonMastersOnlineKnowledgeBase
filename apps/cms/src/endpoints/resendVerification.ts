@@ -48,12 +48,12 @@ const resendVerification: Endpoint = {
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #1a1a1a; color: #fff;">
             <h1 style="color: #f97316;">Verify Your Email</h1>
             <p>Click the button below to verify your email address:</p>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${user._verificationToken}"
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info'}/verify-email?token=${user._verificationToken}"
                style="display: inline-block; padding: 12px 24px; background: #f97316; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold;">
               Verify Email Address
             </a>
             <p style="color: #999; font-size: 14px;">Or copy and paste this link:</p>
-            <p style="color: #f97316; font-size: 12px; word-break: break-all;">${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${user._verificationToken}</p>
+            <p style="color: #f97316; font-size: 12px; word-break: break-all;">${process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info'}/verify-email?token=${user._verificationToken}</p>
             <hr style="border: 1px solid #333; margin: 20px 0;">
             <p style="color: #666; font-size: 12px;">If you didn't request this, you can safely ignore this email.</p>
           </div>
@@ -71,7 +71,6 @@ const resendVerification: Endpoint = {
       console.error('❌ Stack:', error.stack);
       return res.status(500).json({
         message: 'Failed to send verification email. Please try again later.',
-        error: error.message,
       });
     }
   },

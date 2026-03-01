@@ -7,8 +7,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     { url: `${BASE_URL}/digimon`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/maps`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE_URL}/patch-notes`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     { url: `${BASE_URL}/guides`, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/quests`, changeFrequency: 'weekly', priority: 0.7 },
   ];
 
   // Fetch all published digimon slugs
@@ -28,6 +30,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   } catch {
     // CMS unavailable — skip dynamic digimon entries
+  }
+
+  // Fetch all published map slugs
+  try {
+    const maps = await fetchCMSCollection<{ slug: string; updatedAt: string }>('maps', {
+      where: { published: { equals: true } },
+      limit: 500,
+      sort: '-updatedAt',
+    });
+    for (const m of maps.docs) {
+      entries.push({
+        url: `${BASE_URL}/maps/${m.slug}`,
+        lastModified: new Date(m.updatedAt),
+        changeFrequency: 'weekly',
+        priority: 0.6,
+      });
+    }
+  } catch {
+    // CMS unavailable — skip dynamic map entries
   }
 
   // Fetch all published patch notes slugs

@@ -54,8 +54,8 @@ function patch(url, data, cookie) {
   // Step 1: Create the eski@dmokb.info user
   console.log('=== Creating eski@dmokb.info user ===');
   const createRes = await post(`${CMS}/api/users`, {
-    email: 'eski@dmokb.info',
-    password: 'EskiDMOKB2026!',
+    email: process.env.CMS_ADMIN_EMAIL,
+    password: process.env.CMS_ADMIN_PASSWORD,
     username: 'eski',
     name: 'Eski',
   });
@@ -72,8 +72,8 @@ function patch(url, data, cookie) {
   // Step 2: Login as existing owner to get admin cookie
   console.log('\n=== Logging in as existing owner ===');
   const loginRes = await post(`${CMS}/api/users/login`, {
-    email: 'lukas.bohn@icloud.com',
-    password: 'ilovecf123',
+    email: process.env.CMS_ADMIN_EMAIL,
+    password: process.env.CMS_ADMIN_PASSWORD,
   });
   console.log('Login status:', loginRes.status);
   const loginData = JSON.parse(loginRes.body);
@@ -113,8 +113,8 @@ function patch(url, data, cookie) {
       // Step 5: Verify login works
       console.log('\n=== Verifying eski login ===');
       const verifyRes = await post(`${CMS}/api/users/login`, {
-        email: 'eski@dmokb.info',
-        password: 'EskiDMOKB2026!',
+        email: process.env.CMS_ADMIN_EMAIL,
+        password: process.env.CMS_ADMIN_PASSWORD,
       });
       console.log('Login status:', verifyRes.status);
       const verifyData = JSON.parse(verifyRes.body);

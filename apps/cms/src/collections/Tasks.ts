@@ -1,5 +1,4 @@
 import { CollectionConfig } from 'payload/types';
-import { isStaff } from '../access';
 
 const Tasks: CollectionConfig = {
   slug: 'tasks',
@@ -10,10 +9,13 @@ const Tasks: CollectionConfig = {
   },
   timestamps: true,
   access: {
-    read: isStaff,
-    create: isStaff,
-    update: isStaff,
-    delete: isStaff,
+    read: ({ req: { user } }) => !!user,
+    create: ({ req: { user } }) => !!user,
+    update: ({ req: { user } }) => !!user,
+    delete: ({ req: { user } }) => {
+      if (!user) return false;
+      return ['admin', 'owner'].includes(user.role);
+    },
   },
   hooks: {
     beforeChange: [

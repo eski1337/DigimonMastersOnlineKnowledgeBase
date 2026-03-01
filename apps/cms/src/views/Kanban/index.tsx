@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import { Task, TaskUser, TaskStatus, COLUMNS } from './types';
-import { fetchTasks, fetchUsers, createTask, updateTask } from './api';
+import { fetchTasks, fetchUsers, fetchMe, createTask, updateTask } from './api';
 import KanbanColumn from './components/KanbanColumn';
 import QuickAdd from './components/QuickAdd';
 import TaskDetail from './components/TaskDetail';
@@ -9,6 +9,7 @@ import TaskDetail from './components/TaskDetail';
 const KanbanView: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<TaskUser[]>([]);
+  const [meRole, setMeRole] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -24,9 +25,10 @@ const KanbanView: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const [taskData, userData] = await Promise.all([fetchTasks(), fetchUsers()]);
+      const [taskData, userData, me] = await Promise.all([fetchTasks(), fetchUsers(), fetchMe()]);
       setTasks(taskData);
       setUsers(userData as TaskUser[]);
+      setMeRole(me?.user?.role || '');
     } catch (err: any) {
       setError(err.message || 'Failed to load data');
     } finally {
@@ -117,7 +119,16 @@ const KanbanView: React.FC = () => {
   return (
     <div className="kanban-page">
       <div className="kanban-toolbar">
-        <h1 className="kanban-toolbar__title">Tasks Board</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <a
+            href="/admin"
+            className="kanban-btn kanban-btn--secondary"
+            style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          >
+            ← Dashboard
+          </a>
+          <h1 className="kanban-toolbar__title" style={{ margin: 0 }}>Tasks Board</h1>
+        </div>
         <div className="kanban-toolbar__actions">
           <button
             className={`kanban-btn ${viewMode === 'board' ? 'kanban-btn--primary' : 'kanban-btn--secondary'}`}
@@ -229,8 +240,13 @@ const KanbanView: React.FC = () => {
           task={selectedTask}
           users={users}
           onClose={() => setSelectedTask(null)}
-          onUpdate={handleTaskUpdate}
-          onDelete={handleTaskDelete}
+          onUpdate={(updated) => {
+            setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+          }}
+          onDelete={(id) => {
+            setTasks((prev) => prev.filter((t) => t.id !== id));
+          }}
+          canDelete={meRole === 'owner'}
         />
       )}
     </div>

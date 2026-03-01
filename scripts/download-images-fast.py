@@ -2,6 +2,7 @@
 Fast image downloader for new Digimon.
 Uses short timeouts and multiple URL patterns via Wayback Machine.
 """
+import os
 import re
 import requests
 import time
@@ -11,8 +12,8 @@ CMS_URL = "http://localhost:3001"
 
 def login():
     r = requests.post(f"{CMS_URL}/api/users/login", json={
-        "email": "lukas.bohn@icloud.com",
-        "password": "ilovecf123"
+        "email": os.environ.get("CMS_ADMIN_EMAIL", ""),
+        "password": os.environ.get("CMS_ADMIN_PASSWORD", "")
     })
     return r.cookies if r.status_code == 200 else None
 

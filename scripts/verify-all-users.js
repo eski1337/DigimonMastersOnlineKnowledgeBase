@@ -25,7 +25,7 @@ function req(method, path, body, token) {
 (async () => {
   // Login as owner
   const login = await req('POST', '/api/users/login', {
-    email: 'eski@dmokb.info', password: 'EskiDMOKB2026!'
+    email: process.env.CMS_ADMIN_EMAIL, password: process.env.CMS_ADMIN_PASSWORD
   });
   const token = JSON.parse(login.body).token;
 

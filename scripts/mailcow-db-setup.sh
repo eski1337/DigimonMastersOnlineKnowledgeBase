@@ -18,7 +18,7 @@ VALUES ('dmokb.info', 'DMO Knowledge Base', 50, 10, 1073741824, 4294967296, 1073
 # Generate password hash for eski@dmokb.info
 echo ""
 echo "Creating mailbox eski@dmokb.info..."
-PASS_HASH=$(sudo docker exec mailcowdockerized-dovecot-mailcow-1 doveadm pw -s BLF-CRYPT -p 'EskiDMOKB2026!' 2>/dev/null)
+PASS_HASH=$(sudo docker exec mailcowdockerized-dovecot-mailcow-1 doveadm pw -s BLF-CRYPT -p '${CMS_ADMIN_PASSWORD}' 2>/dev/null)
 echo "Password hash: ${PASS_HASH:0:20}..."
 
 sudo docker exec mailcowdockerized-mysql-mailcow-1 mysql -u"$DBUSER" -p"$DBPASS" "$DBNAME" -e "
@@ -31,7 +31,7 @@ VALUES ('eski@dmokb.info', 'eski@dmokb.info', 'dmokb.info', 1);
 # Create noreply mailbox
 echo ""
 echo "Creating noreply@dmokb.info..."
-PASS_HASH2=$(sudo docker exec mailcowdockerized-dovecot-mailcow-1 doveadm pw -s BLF-CRYPT -p 'NoReplyDMOKB2026!' 2>/dev/null)
+PASS_HASH2=$(sudo docker exec mailcowdockerized-dovecot-mailcow-1 doveadm pw -s BLF-CRYPT -p '${NOREPLY_PASSWORD}' 2>/dev/null)
 sudo docker exec mailcowdockerized-mysql-mailcow-1 mysql -u"$DBUSER" -p"$DBPASS" "$DBNAME" -e "
 INSERT IGNORE INTO mailbox (username, password, name, maildir, quota, local_part, domain, active, multiple_bookings, kind)
 VALUES ('noreply@dmokb.info', '$PASS_HASH2', 'No Reply', 'dmokb.info/noreply/', 1073741824, 'noreply', 'dmokb.info', 1, -1, '');
@@ -53,5 +53,5 @@ sudo docker exec mailcowdockerized-mysql-mailcow-1 mysql -u"$DBUSER" -p"$DBPASS"
 
 echo ""
 echo "=== Done ==="
-echo "Webmail: https://mail.dmokb.info (login: eski@dmokb.info / EskiDMOKB2026!)"
-echo "Admin: https://mail.dmokb.info (login: admin / moohoo)"
+echo "Webmail: https://mail.dmokb.info (login: eski@dmokb.info / ${CMS_ADMIN_PASSWORD})"
+echo "Admin: https://mail.dmokb.info (login: admin / ${MAILCOW_ADMIN_PASSWORD})"

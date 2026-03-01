@@ -123,7 +123,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
         {/* Element */}
         <div>
           <h3 className="font-semibold mb-3 text-sm">Element</h3>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 p-1.5">
             {DIGIMON_ELEMENTS.map(element => (
               <button
                 key={element}
@@ -146,7 +146,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
         {/* Attribute */}
         <div>
           <h3 className="font-semibold mb-3 text-sm">Attribute</h3>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 p-1.5">
             {DIGIMON_ATTRIBUTES.map(attribute => (
               <button
                 key={attribute}
@@ -169,7 +169,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
         {/* Rank */}
         <div>
           <h3 className="font-semibold mb-3 text-sm">Rank</h3>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 p-1.5">
             {DIGIMON_RANKS.map(rank => (
               <button
                 key={rank}
@@ -192,7 +192,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
         {/* Family */}
         <div>
           <h3 className="font-semibold mb-3 text-sm">Family</h3>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 p-1.5">
             {DIGIMON_FAMILIES.map(family => (
               <button
                 key={family}
@@ -234,7 +234,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
         {/* Attacker Type */}
         <div>
           <h3 className="font-semibold mb-3 text-sm">Attacker Type</h3>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 p-1.5">
             {DIGIMON_ATTACKER_TYPES.map(type => (
               <button
                 key={type}

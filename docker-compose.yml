@@ -12,6 +12,16 @@ services:
     environment:
       MONGO_INITDB_DATABASE: dmo-kb
 
+  redis:
+    image: redis:7-alpine
+    container_name: dmo-kb-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+
   mailpit:
     image: axllent/mailpit:latest
     container_name: dmo-kb-mailpit
@@ -23,5 +33,22 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
+  mongo-tools:
+    image: mongo:7
+    container_name: dmo-kb-mongo-tools
+    profiles: ['backup']
+    depends_on:
+      - mongodb
+    volumes:
+      - backups:/backups
+    entrypoint: ['sleep', 'infinity']
+
 volumes:
   mongodb_data:
+  redis_data:
+  backups:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /backups

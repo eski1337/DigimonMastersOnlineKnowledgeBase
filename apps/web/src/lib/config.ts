@@ -171,50 +171,11 @@ export const AUTH = {
 } as const;
 
 // ============================================================================
-// User Roles
+// User Roles — re-export from shared package (single source of truth)
 // ============================================================================
 
-export const ROLES = {
-  OWNER: 'owner',
-  ADMIN: 'admin',
-  EDITOR: 'editor',
-  MEMBER: 'member',
-  GUEST: 'guest',
-} as const;
-
-export const ROLE_HIERARCHY = {
-  [ROLES.OWNER]: 5,
-  [ROLES.ADMIN]: 4,
-  [ROLES.EDITOR]: 3,
-  [ROLES.MEMBER]: 2,
-  [ROLES.GUEST]: 1,
-} as const;
-
-// ============================================================================
-// Digimon
-// ============================================================================
-
-export const DIGIMON = {
-  ELEMENTS: [
-    'Fire', 'Water', 'Plant', 'Wind', 'Earth', 
-    'Thunder', 'Light', 'Dark', 'Neutral'
-  ] as const,
-  
-  ATTRIBUTES: [
-    'Vaccine', 'Virus', 'Data', 'Free', 'Unknown'
-  ] as const,
-  
-  RANKS: [
-    'Rookie', 'Champion', 'Ultimate', 'Mega', 
-    'Armor', 'Hybrid', 'Ultra'
-  ] as const,
-  
-  FAMILIES: [
-    'Nature Spirits', 'Deep Savers', 'Nightmare Soldiers',
-    'Wind Guardians', 'Metal Empire', 'Virus Busters',
-    'Unknown', 'Dragon\'s Roar', 'Jungle Troopers',
-  ] as const,
-} as const;
+export { USER_ROLES, DIGIMON_ELEMENTS, DIGIMON_ATTRIBUTES, DIGIMON_RANKS, DIGIMON_FAMILIES, DIGIMON_FORMS, DIGIMON_ATTACKER_TYPES } from '@dmo-kb/shared';
+export type { UserRole, DigimonElement, DigimonAttribute, DigimonRank, DigimonFamily } from '@dmo-kb/shared';
 
 // ============================================================================
 // UI Constants
@@ -257,8 +218,8 @@ export const FEATURES = {
 export const EXTERNAL_LINKS = {
   DMO_WIKI: 'https://dmowiki.com',
   DMO_OFFICIAL: env.OFFICIAL_SITE_URL || 'https://dmo.gameking.com',
-  DISCORD: 'https://discord.gg/your-server',
-  GITHUB: 'https://github.com/your-repo',
+  DISCORD: 'https://discord.gg/dmokb',
+  GITHUB: 'https://github.com/dmokb',
 } as const;
 
 // ============================================================================
@@ -300,12 +261,3 @@ export const SUCCESS_MESSAGES = {
   EMAIL_SENT: 'Email sent successfully!',
 } as const;
 
-// ============================================================================
-// Type Exports
-// ============================================================================
-
-export type DigimonElement = typeof DIGIMON.ELEMENTS[number];
-export type DigimonAttribute = typeof DIGIMON.ATTRIBUTES[number];
-export type DigimonRank = typeof DIGIMON.RANKS[number];
-export type DigimonFamily = typeof DIGIMON.FAMILIES[number];
-export type UserRole = typeof ROLES[keyof typeof ROLES];

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon",
-    "build": "tsc && cp -r src/styles dist/styles 2>/dev/null || xcopy src\\styles dist\\styles /E /I /Y >nul 2>&1 & payload build",
+    "build": "tsc && node -e \"const fs=require('fs');const p=require('path');fs.mkdirSync(p.join('dist','styles'),{recursive:true});fs.readdirSync('src/styles').forEach(f=>fs.copyFileSync(p.join('src','styles',f),p.join('dist','styles',f)))\" && payload build",
     "start": "cross-env NODE_ENV=production node dist/server.js",
     "generate:types": "payload generate:types",
     "lint": "eslint \"src/**/*.ts\"",

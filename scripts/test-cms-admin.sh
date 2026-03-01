@@ -7,20 +7,20 @@ echo "--- Creating test editor user ---"
 # Login as owner first
 TOKEN=$(curl -s -X POST http://localhost:3001/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
 
 # Create editor user via API (as admin, so we can set role)
 CREATE=$(curl -s -X POST http://localhost:3001/api/users \
   -H 'Content-Type: application/json' \
   -H "Authorization: JWT $TOKEN" \
-  -d '{"email":"testeditor@dmokb.info","password":"EditorPass123!","passwordConfirm":"EditorPass123!","username":"testeditor","name":"Test Editor","role":"editor","_verified":true}')
+  -d '{"email":"testeditor@dmokb.info","password":"${TEST_EDITOR_PASSWORD}","passwordConfirm":"${TEST_EDITOR_PASSWORD}","username":"testeditor","name":"Test Editor","role":"editor","_verified":true}')
 echo "  Create editor: $(echo $CREATE | grep -o '"email":"[^"]*"') $(echo $CREATE | grep -o '"role":"[^"]*"')"
 
 # Create admin user via API
 CREATE2=$(curl -s -X POST http://localhost:3001/api/users \
   -H 'Content-Type: application/json' \
   -H "Authorization: JWT $TOKEN" \
-  -d '{"email":"testadmin@dmokb.info","password":"AdminPass123!","passwordConfirm":"AdminPass123!","username":"testadmin","name":"Test Admin","role":"admin","_verified":true}')
+  -d '{"email":"testadmin@dmokb.info","password":"${TEST_ADMIN_PASSWORD}","passwordConfirm":"${TEST_ADMIN_PASSWORD}","username":"testadmin","name":"Test Admin","role":"admin","_verified":true}')
 echo "  Create admin: $(echo $CREATE2 | grep -o '"email":"[^"]*"') $(echo $CREATE2 | grep -o '"role":"[^"]*"')"
 
 # 2. Test login for each role via CMS public URL
@@ -31,21 +31,21 @@ echo "--- Testing CMS login (via public URL) ---"
 echo -n "  Owner (eski@dmokb.info): "
 R=$(curl -s -X POST https://cms.dmokb.info/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}')
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}')
 echo "$R" | grep -q '"token"' && echo "OK - $(echo $R | grep -o '"role":"[^"]*"')" || echo "FAILED: $(echo $R | head -c 100)"
 
 # Editor
 echo -n "  Editor (testeditor@dmokb.info): "
 R=$(curl -s -X POST https://cms.dmokb.info/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"testeditor@dmokb.info","password":"EditorPass123!"}')
+  -d '{"email":"testeditor@dmokb.info","password":"${TEST_EDITOR_PASSWORD}"}')
 echo "$R" | grep -q '"token"' && echo "OK - $(echo $R | grep -o '"role":"[^"]*"')" || echo "FAILED: $(echo $R | head -c 100)"
 
 # Admin  
 echo -n "  Admin (testadmin@dmokb.info): "
 R=$(curl -s -X POST https://cms.dmokb.info/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"testadmin@dmokb.info","password":"AdminPass123!"}')
+  -d '{"email":"testadmin@dmokb.info","password":"${TEST_ADMIN_PASSWORD}"}')
 echo "$R" | grep -q '"token"' && echo "OK - $(echo $R | grep -o '"role":"[^"]*"')" || echo "FAILED: $(echo $R | head -c 100)"
 
 # Existing admin (ascherous)
@@ -64,7 +64,7 @@ echo "--- Testing admin panel with auth token ---"
 # Get editor token
 EDITOR_TOKEN=$(curl -s -X POST https://cms.dmokb.info/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"testeditor@dmokb.info","password":"EditorPass123!"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
+  -d '{"email":"testeditor@dmokb.info","password":"${TEST_EDITOR_PASSWORD}"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
 
 echo -n "  /admin with editor token: "
 curl -s -o /dev/null -w '%{http_code}' -H "Authorization: JWT $EDITOR_TOKEN" https://cms.dmokb.info/admin

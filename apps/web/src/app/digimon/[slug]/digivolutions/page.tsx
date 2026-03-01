@@ -42,7 +42,7 @@ export default function DigivolutionsPage() {
         setError(null);
         
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001'}/api/digimon/${slug}/digivolution-tree`
+          `${process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info'}/api/digimon/${slug}/digivolution-tree`
         );
 
         if (!response.ok) {

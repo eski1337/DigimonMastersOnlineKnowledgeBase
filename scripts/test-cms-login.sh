@@ -5,7 +5,7 @@ echo ""
 echo "--- Owner (eski@dmokb.info) ---"
 RESULT=$(curl -s -X POST https://cms.dmokb.info/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}')
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}')
 echo "  Status: $(echo $RESULT | grep -o '"token":"' >/dev/null && echo 'LOGIN OK' || echo 'FAILED')"
 echo "  Role: $(echo $RESULT | grep -o '"role":"[^"]*"')"
 

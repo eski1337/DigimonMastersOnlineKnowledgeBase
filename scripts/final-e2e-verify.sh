@@ -3,7 +3,7 @@ echo "=== Final End-to-End Verification ==="
 
 TOKEN=$(curl -s -X POST http://localhost:3001/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}' | python3 -c "import json,sys;print(json.load(sys.stdin).get('token',''))" 2>/dev/null)
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}' | python3 -c "import json,sys;print(json.load(sys.stdin).get('token',''))" 2>/dev/null)
 
 echo ""
 echo "--- 1. Digimon count in CMS ---"

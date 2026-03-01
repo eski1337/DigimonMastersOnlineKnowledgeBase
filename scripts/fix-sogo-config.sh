@@ -94,5 +94,5 @@ sleep 10
 # Test SOGo auth
 echo ""
 echo "=== Testing SOGo login ==="
-sudo docker compose exec -T sogo-mailcow curl -s -o /dev/null -w '%{http_code}' -X POST 'http://127.0.0.1:20000/SOGo/connect' -d 'userName=eski@dmokb.info&password=EskiDMOKB2026!' 2>&1
+sudo docker compose exec -T sogo-mailcow curl -s -o /dev/null -w '%{http_code}' -X POST 'http://127.0.0.1:20000/SOGo/connect' -d 'userName=eski@dmokb.info&password=${CMS_ADMIN_PASSWORD}' 2>&1
 echo " SOGo login status"

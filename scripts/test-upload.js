@@ -115,7 +115,7 @@ async function main() {
   console.log('=== Test CMS Upload Flow ===\n');
 
   // Login
-  const login = await request('POST', '/api/users/login', { email: 'eski@dmokb.info', password: 'EskiDMOKB2026!' });
+  const login = await request('POST', '/api/users/login', { email: process.env.CMS_ADMIN_EMAIL, password: process.env.CMS_ADMIN_PASSWORD });
   const token = login.body.token;
   if (!token) { console.error('Login failed'); process.exit(1); }
   console.log('1. Login: OK');

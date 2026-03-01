@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { GlobalSearch } from '@/components/search/global-search';
+import { NotificationBell } from './notification-bell';
 import { UserNav } from './user-nav';
+import { MobileNav } from './mobile-nav';
+import { ThemeToggle } from './theme-toggle';
 
 export function Header() {
   return (
@@ -13,7 +14,7 @@ export function Header() {
             <span className="hidden font-bold sm:inline-block">DMO KB</span>
           </Link>
         </div>
-        <nav className="flex items-center space-x-6 text-sm font-medium">
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
           <Link
             href="/digimon"
             className="transition-colors hover:text-foreground/80 text-foreground"
@@ -55,13 +56,12 @@ export function Header() {
           <div className="hidden md:block flex-1 max-w-sm">
             <GlobalSearch />
           </div>
-          <div className="hidden md:flex items-center">
+          <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
+            <NotificationBell />
             <UserNav />
           </div>
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
+          <MobileNav />
         </div>
       </div>
     </header>

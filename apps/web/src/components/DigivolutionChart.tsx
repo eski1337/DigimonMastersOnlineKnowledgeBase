@@ -1,13 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import cytoscape from 'cytoscape';
-import dagre from 'cytoscape-dagre';
-
-// Register the dagre layout
-if (typeof cytoscape !== 'undefined') {
-  cytoscape.use(dagre);
-}
 
 interface DigivolutionNode {
   id: string;
@@ -32,6 +25,8 @@ interface DigivolutionChartProps {
   highlightNodeId?: string;
 }
 
+let dagreRegistered = false;
+
 export default function DigivolutionChart({
   nodes,
   edges,
@@ -39,11 +34,27 @@ export default function DigivolutionChart({
   highlightNodeId,
 }: DigivolutionChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const cyRef = useRef<cytoscape.Core | null>(null);
+  const cyRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!containerRef.current || nodes.length === 0) return;
+
+    let destroyed = false;
+
+    (async () => {
+      // Dynamic imports — only loaded when this component mounts
+      const cytoscapeMod = await import('cytoscape');
+      const dagreMod = await import('cytoscape-dagre');
+      const cytoscape = cytoscapeMod.default;
+      const dagre = dagreMod.default;
+
+      if (!dagreRegistered) {
+        cytoscape.use(dagre);
+        dagreRegistered = true;
+      }
+
+      if (destroyed || !containerRef.current) return;
 
     // Initialize Cytoscape
     const cy = cytoscape({
@@ -100,7 +111,7 @@ export default function DigivolutionChart({
           style: {
             'border-width': 4,
             'border-color': '#00ff88',
-          } as cytoscape.Css.Node,
+          } as any,
         },
         {
           selector: 'node[id="' + highlightNodeId + '"]',
@@ -146,7 +157,7 @@ export default function DigivolutionChart({
     cyRef.current = cy;
 
     // Add click handler
-    cy.on('tap', 'node', (evt) => {
+    cy.on('tap', 'node', (evt: any) => {
       const node = evt.target;
       const slug = node.data('slug');
       if (onNodeClick && slug) {
@@ -160,10 +171,14 @@ export default function DigivolutionChart({
       setIsLoading(false);
     }, 100);
 
+    })(); // end async IIFE
+
     // Cleanup
     return () => {
+      destroyed = true;
       if (cyRef.current) {
         cyRef.current.destroy();
+        cyRef.current = null;
       }
     };
   }, [nodes, edges, onNodeClick, highlightNodeId]);

@@ -5,7 +5,7 @@ const EvolutionLines: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'rootDigimon', 'digimonCount', 'updatedAt'],
-    group: 'Content',
+    group: 'Game Data',
   },
   access: {
     read: () => true,

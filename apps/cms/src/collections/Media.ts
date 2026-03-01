@@ -3,6 +3,9 @@ import path from 'path';
 
 const Media: CollectionConfig = {
   slug: 'media',
+  admin: {
+    group: 'System',
+  },
   upload: {
     staticURL: '/media',
     staticDir: path.resolve(process.cwd(), 'media'),
@@ -71,12 +74,14 @@ const Media: CollectionConfig = {
       name: 'imageType',
       label: 'Image Type',
       type: 'select',
+      defaultValue: 'digimon-main',
       options: [
         { label: 'Digimon Icon', value: 'digimon-icon' },
         { label: 'Digimon Main Artwork', value: 'digimon-main' },
         { label: 'Digimon Sprite', value: 'digimon-sprite' },
         { label: 'Skill Icon', value: 'skill-icon' },
         { label: 'Item Icon', value: 'item-icon' },
+        { label: 'Map / Loading Screen', value: 'map-loading' },
         { label: 'Other', value: 'other' },
       ],
       admin: {

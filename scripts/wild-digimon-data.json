@@ -1,0 +1,3419 @@
+{
+  "dark-tower-wasteland": [
+    {
+      "name": "Veemon",
+      "behavior": "aggressive",
+      "level": "59-61",
+      "hp": 5100,
+      "attribute": "Vaccine",
+      "element": "Light"
+    },
+    {
+      "name": "Veemon",
+      "behavior": "defensive",
+      "level": "59-61",
+      "variant": "DarkVeemon",
+      "hp": 1320,
+      "attribute": "Vaccine",
+      "element": "Light"
+    },
+    {
+      "name": "Wormmon",
+      "behavior": "defensive",
+      "level": "51-53",
+      "hp": 1600,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Bakemon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Bakemon",
+      "behavior": "defensive",
+      "level": "53-55",
+      "variant": "DarkBakemon",
+      "hp": 1350,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Kyubimon",
+      "behavior": "defensive",
+      "level": "56-58",
+      "hp": 3800,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Antylamon",
+      "behavior": "defensive",
+      "level": "57-58",
+      "hp": 2416,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Antylamon",
+      "behavior": "aggressive",
+      "level": "60-62",
+      "variant": "Leader",
+      "hp": 6904,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Puppetmon",
+      "behavior": "defensive",
+      "level": "56-58",
+      "hp": 3800,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Puppetmon",
+      "behavior": "aggressive",
+      "level": "58-60",
+      "variant": "Leader",
+      "hp": 4560,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "SkullMeramon",
+      "behavior": "aggressive",
+      "level": "55-57",
+      "hp": 4000,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "SkullMeramon",
+      "behavior": "defensive",
+      "level": "53-55",
+      "variant": "DarkSkullMeramon",
+      "hp": 1400,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "SkullMeramon",
+      "behavior": "defensive",
+      "level": "Boss",
+      "variant": "Ruler of the Flame",
+      "hp": 26000,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "GrandKuwagamon",
+      "behavior": "defensive",
+      "level": "56-58",
+      "hp": 4500,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "GrandKuwagamon",
+      "behavior": "aggressive",
+      "level": "58-60",
+      "variant": "Leader",
+      "hp": 5400,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "BlackWarGreymon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Fire"
+    },
+    {
+      "name": "BlackWarGreymon",
+      "behavior": "aggressive",
+      "level": "Boss",
+      "variant": "DarkTowerMutant",
+      "hp": 9500,
+      "attribute": "Virus",
+      "element": "Fire"
+    },
+    {
+      "name": "WarGreymon",
+      "behavior": "defensive",
+      "level": "58-60",
+      "hp": 4600,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "WarGreymon",
+      "behavior": "aggressive",
+      "level": "60-62",
+      "variant": "Leader",
+      "hp": 5520,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "SkullGreymon",
+      "behavior": "aggressive",
+      "level": "57-59",
+      "hp": 3900,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "SkullGreymon",
+      "behavior": "defensive",
+      "level": "55-57",
+      "variant": "DarkSkullGreymon",
+      "hp": 1650,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Gryphonmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Wind"
+    },
+    {
+      "name": "Gryphonmon",
+      "behavior": "defensive",
+      "level": "Boss",
+      "variant": "Surveillant",
+      "hp": 800000,
+      "attribute": "Vaccine",
+      "element": "Wind"
+    },
+    {
+      "name": "Cherubimon",
+      "behavior": "aggressive",
+      "level": "Seraph",
+      "variant": "Jogress Quest",
+      "hp": 541015,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Cherubimon",
+      "behavior": "aggressive",
+      "level": "BOSS",
+      "variant": "White) (Jogress Quest",
+      "hp": 650000,
+      "attribute": "Vaccine",
+      "element": "Light"
+    }
+  ],
+  "digimon-maze-b1": [
+    {
+      "name": "SkullMeramon",
+      "behavior": "defensive",
+      "level": "78-80",
+      "hp": 9119,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "SkullMeramon",
+      "behavior": "aggressive",
+      "level": "78-81",
+      "variant": "Leader",
+      "hp": 10942,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "SkullMeramon",
+      "behavior": "aggressive",
+      "level": "83-84",
+      "variant": "Followers",
+      "hp": 13131,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Andromon",
+      "behavior": "defensive",
+      "level": "79-81",
+      "hp": 9610,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Andromon",
+      "behavior": "aggressive",
+      "level": "81-82",
+      "variant": "Leader",
+      "hp": 11532,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Guardromon",
+      "behavior": "defensive",
+      "level": "78-81",
+      "hp": 8919,
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Guardromon",
+      "behavior": "aggressive",
+      "level": "78-81",
+      "variant": "Leader",
+      "hp": 10702,
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Guardromon",
+      "behavior": "aggressive",
+      "level": "83-84",
+      "variant": "Followers",
+      "hp": 22602,
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Knightmon",
+      "behavior": "defensive",
+      "level": "79-81",
+      "hp": 9410,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Knightmon",
+      "behavior": "aggressive",
+      "level": "81-82",
+      "variant": "Leader",
+      "hp": 11292,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Knightmon",
+      "behavior": "aggressive",
+      "level": "83-84",
+      "variant": "Followers",
+      "hp": 13550,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "defensive",
+      "level": "78-85",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "defensive",
+      "level": "78-85",
+      "variant": "Breath of Decay",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78-85",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78-85",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78-85",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78-85",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78-85",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78-85",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78-85",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78-85",
+      "hp": 20358,
+      "attribute": "Data",
+      "element": "Steel"
+    }
+  ],
+  "digimon-maze-b2": [
+    {
+      "name": "Gladimon",
+      "behavior": "defensive",
+      "level": "77-80",
+      "hp": 7146,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Gladimon",
+      "behavior": "aggressive",
+      "level": "77-80",
+      "variant": "Leader",
+      "hp": 8575,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Roachmon",
+      "behavior": "defensive",
+      "level": "77-80",
+      "hp": 6946,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Roachmon",
+      "behavior": "aggressive",
+      "level": "77-80",
+      "variant": "Leader",
+      "hp": 19280,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Meramon",
+      "behavior": "defensive",
+      "level": "77-80",
+      "hp": 7196,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Meramon",
+      "behavior": "aggressive",
+      "level": "77-80",
+      "variant": "Leader",
+      "hp": 8635,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Giromon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Giromon",
+      "behavior": "aggressive",
+      "level": "77-80",
+      "variant": "Leader",
+      "hp": 10092,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "WaruMonzaemon",
+      "behavior": "defensive",
+      "level": "77-80",
+      "hp": 8119,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "WaruMonzaemon",
+      "behavior": "aggressive",
+      "level": "77-80",
+      "variant": "Leader",
+      "hp": 9742,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Boltmon of Blood",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Chaser",
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon of Blood",
+      "behavior": "aggressive",
+      "level": "77-80",
+      "variant": "Chaser",
+      "hp": 26465,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon of Fanatics",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Chaser",
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon of Fanatics",
+      "behavior": "aggressive",
+      "level": "77-80",
+      "variant": "Chaser",
+      "hp": 26465,
+      "attribute": "Data",
+      "element": "Steel"
+    }
+  ],
+  "digimon-maze-entrance": [
+    {
+      "name": "Rockmon",
+      "behavior": "defensive",
+      "level": "75-76",
+      "hp": 3304,
+      "attribute": "Virus",
+      "element": "Land"
+    },
+    {
+      "name": "Rockmon",
+      "behavior": "aggressive",
+      "level": "76-78",
+      "variant": "Leader",
+      "hp": 4295,
+      "attribute": "Virus",
+      "element": "Land"
+    },
+    {
+      "name": "Cerberumon",
+      "behavior": "defensive",
+      "level": "75-77",
+      "hp": 3510,
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Cerberumon",
+      "behavior": "aggressive",
+      "level": "76-78",
+      "variant": "Leader",
+      "hp": 4563,
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Volcamon",
+      "behavior": "defensive",
+      "level": "76-77",
+      "hp": 3104,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Volcamon",
+      "behavior": "aggressive",
+      "level": "77-78",
+      "variant": "Leader",
+      "hp": 4035,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "CannonBeemon",
+      "behavior": "defensive",
+      "level": "76-77",
+      "hp": 3750,
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "CannonBeemon",
+      "behavior": "aggressive",
+      "level": "77-78",
+      "variant": "Leader",
+      "hp": 4875,
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "PileVolcamon",
+      "behavior": "defensive",
+      "level": "76-78",
+      "hp": 3749,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "PileVolcamon",
+      "behavior": "aggressive",
+      "level": "78-79",
+      "variant": "Leader",
+      "hp": 4873,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "HisyaRyuumon",
+      "behavior": "defensive",
+      "level": "75-77",
+      "hp": 3104,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "HisyaRyuumon",
+      "behavior": "aggressive",
+      "level": "77-79",
+      "variant": "Leader",
+      "hp": 4035,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "defensive",
+      "level": "78",
+      "variant": "Breath of Decay",
+      "hp": 21000,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78",
+      "hp": 21000,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78",
+      "hp": 21000,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78",
+      "hp": 21000,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78",
+      "hp": 21000,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Boltmon",
+      "behavior": "aggressive",
+      "level": "78",
+      "hp": 21000,
+      "attribute": "Data",
+      "element": "Steel"
+    }
+  ],
+  "digimon-maze-f1": [
+    {
+      "name": "Wormmon",
+      "behavior": "defensive",
+      "level": "79-80",
+      "hp": 9350,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Wormmon",
+      "behavior": "aggressive",
+      "level": "79-81",
+      "variant": "Leader",
+      "hp": 11220,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Gotsumon",
+      "behavior": "defensive",
+      "level": "79-81",
+      "hp": 8849,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Gotsumon",
+      "behavior": "aggressive",
+      "level": "79-82",
+      "variant": "Leader",
+      "hp": 10618,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Goblimon",
+      "behavior": "defensive",
+      "level": "79-80",
+      "hp": 9079,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Goblimon",
+      "behavior": "aggressive",
+      "level": "80-82",
+      "variant": "Leader",
+      "hp": 10894,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Keramon",
+      "behavior": "aggressive",
+      "level": "81-83",
+      "variant": "102Mega Hacker",
+      "hp": 8800,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Keramon",
+      "behavior": "aggressive",
+      "level": "81-83",
+      "variant": "103Mega Hacker",
+      "hp": 8800,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Bakemon",
+      "behavior": "defensive",
+      "level": "80-82",
+      "hp": 9400,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Bakemon",
+      "behavior": "aggressive",
+      "level": "81-83",
+      "variant": "Leader",
+      "hp": 11280,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Bearmon",
+      "behavior": "defensive",
+      "level": "80-82",
+      "hp": 9091,
+      "attribute": "Vaccine",
+      "element": "Land"
+    },
+    {
+      "name": "Bearmon",
+      "behavior": "aggressive",
+      "level": "81-83",
+      "variant": "Leader",
+      "hp": 10909,
+      "attribute": "Vaccine",
+      "element": "Land"
+    },
+    {
+      "name": "Candlemon",
+      "behavior": "defensive",
+      "level": "79-82",
+      "hp": 9194,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Candlemon",
+      "behavior": "aggressive",
+      "level": "79-82",
+      "variant": "Leader",
+      "hp": 11032,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Keramon",
+      "behavior": "aggressive",
+      "level": "79-81",
+      "variant": "104Mega Hacker",
+      "hp": 8800,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "digimon-maze-f2": [
+    {
+      "name": "Ogremon",
+      "behavior": "defensive",
+      "level": "81-83",
+      "hp": 11280,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "aggressive",
+      "level": "82-84",
+      "variant": "Leader",
+      "hp": 13530,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Icemon",
+      "behavior": "defensive",
+      "level": "81-83",
+      "hp": 11380,
+      "attribute": "Data",
+      "element": "Ice"
+    },
+    {
+      "name": "Icemon",
+      "behavior": "aggressive",
+      "level": "82-84",
+      "variant": "Leader",
+      "hp": 13660,
+      "attribute": "Data",
+      "element": "Ice"
+    },
+    {
+      "name": "Chrysalimon",
+      "behavior": "defensive",
+      "level": "82-84",
+      "variant": "Data Crusher",
+      "hp": 11640,
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Stingmon",
+      "behavior": "defensive",
+      "level": "81-83",
+      "hp": 11760,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Stingmon",
+      "behavior": "aggressive",
+      "level": "82-84",
+      "variant": "Leader",
+      "hp": 14110,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Vegiemon",
+      "behavior": "defensive",
+      "level": "81-83",
+      "hp": 12310,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Vegiemon",
+      "behavior": "aggressive",
+      "level": "82-84",
+      "variant": "Leader",
+      "hp": 14770,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Chrysalimon",
+      "behavior": "defensive",
+      "level": "82-84",
+      "variant": "Misconnected",
+      "hp": 11640,
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Grizzmon",
+      "behavior": "defensive",
+      "level": "81-83",
+      "hp": 10670,
+      "attribute": "Vaccine",
+      "element": "Land"
+    },
+    {
+      "name": "Grizzmon",
+      "behavior": "aggressive",
+      "level": "82-84",
+      "variant": "Leader",
+      "hp": 12800,
+      "attribute": "Vaccine",
+      "element": "Land"
+    },
+    {
+      "name": "Soulmon",
+      "behavior": "defensive",
+      "level": "81-83",
+      "hp": 11490,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Soulmon",
+      "behavior": "aggressive",
+      "level": "82-84",
+      "variant": "Leader",
+      "hp": 13790,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Chrysalimon",
+      "behavior": "defensive",
+      "level": "82-84",
+      "variant": "Tentacles",
+      "hp": 11640,
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Seadramon",
+      "behavior": "defensive",
+      "level": "81-83",
+      "hp": 11980,
+      "attribute": "Data",
+      "element": "Water"
+    },
+    {
+      "name": "Seadramon",
+      "behavior": "aggressive",
+      "level": "82-84",
+      "variant": "Leader",
+      "hp": 14380,
+      "attribute": "Data",
+      "element": "Water"
+    },
+    {
+      "name": "Chrysalimon",
+      "behavior": "defensive",
+      "level": "82-84",
+      "variant": "Fighter",
+      "hp": 11640,
+      "element": "Pitch Black"
+    }
+  ],
+  "digimon-maze-f3": [
+    {
+      "name": "Meteormon",
+      "behavior": "defensive",
+      "level": "82-84",
+      "hp": 12820,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Meteormon",
+      "behavior": "aggressive",
+      "level": "83-85",
+      "variant": "Leader",
+      "hp": 15390,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Pumpkinmon",
+      "behavior": "defensive",
+      "level": "82-84",
+      "hp": 12590,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Pumpkinmon",
+      "behavior": "aggressive",
+      "level": "83-85",
+      "variant": "Leader",
+      "hp": 15100,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Infermon",
+      "behavior": "defensive",
+      "level": "83-85",
+      "variant": "Hell",
+      "hp": 13070,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Andromon",
+      "behavior": "defensive",
+      "level": "83-85",
+      "hp": 13180,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Andromon",
+      "behavior": "aggressive",
+      "level": "84-86",
+      "variant": "Leader",
+      "hp": 15820,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "JewelBeemon",
+      "behavior": "defensive",
+      "level": "82-84",
+      "hp": 12100,
+      "attribute": "Vaccine",
+      "element": "Light"
+    },
+    {
+      "name": "JewelBeemon",
+      "behavior": "aggressive",
+      "level": "83-85",
+      "variant": "Leader",
+      "hp": 14530,
+      "attribute": "Vaccine",
+      "element": "Light"
+    },
+    {
+      "name": "Infermon",
+      "behavior": "defensive",
+      "level": "83-85",
+      "variant": "Destroyer",
+      "hp": 13070,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Megadramon",
+      "behavior": "defensive",
+      "level": "83-85",
+      "hp": 14690,
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Megadramon",
+      "behavior": "aggressive",
+      "level": "84-86",
+      "variant": "Leader",
+      "hp": 17620,
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Phantomon",
+      "behavior": "defensive",
+      "level": "83-85",
+      "hp": 13310,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Phantomon",
+      "behavior": "aggressive",
+      "level": "84-86",
+      "variant": "Leader",
+      "hp": 15970,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Infermon",
+      "behavior": "defensive",
+      "level": "83-85",
+      "variant": "Cocoon",
+      "hp": 13070,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "MegaSeadramon",
+      "behavior": "defensive",
+      "level": "83-85",
+      "hp": 12950,
+      "attribute": "Data",
+      "element": "Water"
+    },
+    {
+      "name": "MegaSeadramon",
+      "behavior": "aggressive",
+      "level": "84-86",
+      "variant": "Leader",
+      "hp": 15540,
+      "attribute": "Data",
+      "element": "Water"
+    },
+    {
+      "name": "Infermon",
+      "behavior": "defensive",
+      "level": "83-85",
+      "variant": "Inferno",
+      "hp": 13070,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "digimon-maze-f4": [
+    {
+      "name": "Diablomon",
+      "behavior": "defensive",
+      "level": "?",
+      "hp": 24000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "western-area-west": [
+    {
+      "name": "SkullGreymon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "SkullGreymon",
+      "behavior": "defensive",
+      "level": "46-48",
+      "hp": 2970,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "SkullGreymon",
+      "behavior": "aggressive",
+      "level": "48-50",
+      "hp": 3564,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "MetalGreymon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "MetalGreymon",
+      "behavior": "defensive",
+      "level": "46-48",
+      "hp": 3060,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "MetalGreymon",
+      "behavior": "aggressive",
+      "level": "48-50",
+      "hp": 3672,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Okuwamon",
+      "behavior": "defensive",
+      "level": "43-45",
+      "hp": 2781,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Okuwamon",
+      "behavior": "aggressive",
+      "level": "45-47",
+      "variant": "Leader",
+      "hp": 3337,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Coredramon",
+      "behavior": "defensive",
+      "level": "43-45",
+      "variant": "Blue",
+      "hp": 3000,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Coredramon",
+      "behavior": "aggressive",
+      "level": "45-47",
+      "variant": "Leader",
+      "hp": 3600,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Coredramon",
+      "behavior": "defensive",
+      "level": "43-45",
+      "variant": "Green",
+      "hp": 3000,
+      "attribute": "Virus",
+      "element": "Fire"
+    },
+    {
+      "name": "Coredramon",
+      "behavior": "aggressive",
+      "level": "45-47",
+      "variant": "Leader",
+      "hp": 3600,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Pumpkinmon",
+      "behavior": "defensive",
+      "level": "40-42",
+      "hp": 2520,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Pumpkinmon",
+      "behavior": "aggressive",
+      "level": "43-45",
+      "variant": "Leader",
+      "hp": 3024,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "PileVolcamon",
+      "behavior": "defensive",
+      "level": "49-51",
+      "hp": 3375,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "PileVolcamon",
+      "behavior": "aggressive",
+      "level": "52-54",
+      "variant": "Leader",
+      "hp": 3996,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Kyubimon",
+      "behavior": "defensive",
+      "level": "47-49",
+      "hp": 2970,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    }
+  ],
+  "lost-historic-site": [
+    {
+      "name": "Knightmon",
+      "behavior": "aggressive",
+      "level": "80-81",
+      "hp": 67200,
+      "attribute": "Data",
+      "element": "Steel"
+    },
+    {
+      "name": "Mystimon",
+      "behavior": "aggressive",
+      "level": "80-81",
+      "hp": 100800,
+      "attribute": "Virus",
+      "element": "Fire"
+    },
+    {
+      "name": "Parasimon",
+      "behavior": "defensive",
+      "level": "80",
+      "variant": "Breath of Decay",
+      "hp": 80000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Parasimon",
+      "behavior": "aggressive",
+      "level": "80-81",
+      "variant": "Breath of Decay",
+      "hp": 120000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Garudamon",
+      "behavior": "aggressive",
+      "level": "80",
+      "variant": "Brave Fellowship",
+      "hp": 96000,
+      "attribute": "Virus",
+      "element": "Fire"
+    },
+    {
+      "name": "Volcamon",
+      "behavior": "aggressive",
+      "level": "80",
+      "hp": 80000,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Volcamon",
+      "behavior": "aggressive",
+      "level": "80",
+      "variant": "Digital",
+      "hp": 128000,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Dracmon",
+      "behavior": "aggressive",
+      "level": "50",
+      "hp": 60000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Roachmon",
+      "behavior": "aggressive",
+      "level": "80-81",
+      "variant": "Snaggle Tooth",
+      "hp": 25000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Tanemon",
+      "behavior": "defensive",
+      "level": "BOSS",
+      "variant": "Seed of Luck",
+      "hp": 100,
+      "attribute": "None",
+      "element": "Wood"
+    },
+    {
+      "name": "Centarumon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Centarumon",
+      "behavior": "aggressive",
+      "level": "90",
+      "hp": 980,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Leomon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Ancient Site Destroyer",
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Leomon",
+      "behavior": "aggressive",
+      "level": "90",
+      "variant": "Ancient Site Destroyer",
+      "hp": 1100000,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    }
+  ],
+  "crack-of-devimon": [
+    {
+      "name": "Ogremon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Patroller",
+      "hp": 382040,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Subordinate",
+      "hp": 382040,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Crack of Devimon",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Crack of Devimon",
+      "hp": 1420420,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Leomon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Patroller",
+      "hp": 458450,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Leomon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Subordinate",
+      "hp": 458450,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Leomon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Crack of Devimon",
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Leomon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Crack of Devimon",
+      "hp": 1900420,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Devimon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Patroller",
+      "hp": 550140,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Devimon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Subordinate",
+      "hp": 550140,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Devimon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Crack of Devimon",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Devimon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Crack of Devimon",
+      "hp": 2090460,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "file-island-waterfront": [
+    {
+      "name": "Zudomon",
+      "behavior": "defensive",
+      "level": "74-76",
+      "attribute": "Vaccine",
+      "element": "Water"
+    },
+    {
+      "name": "Silphymon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Wind"
+    },
+    {
+      "name": "Silphymon",
+      "behavior": "aggressive",
+      "level": "74-76",
+      "variant": "Leader",
+      "hp": 5052,
+      "attribute": "Data",
+      "element": "Wind"
+    },
+    {
+      "name": "Rapidmon",
+      "behavior": "defensive",
+      "level": "76-78",
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Arkadimon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Ultimate",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Arkadimon",
+      "behavior": "aggressive",
+      "level": "76-78",
+      "variant": "Leader",
+      "hp": 5950,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "MegaSeadramon",
+      "behavior": "defensive",
+      "level": "78-80",
+      "hp": 6320,
+      "attribute": "Data",
+      "element": "Water"
+    },
+    {
+      "name": "Giromon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Giromon",
+      "behavior": "defensive",
+      "level": "80-82",
+      "variant": "Dismantler",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Giromon",
+      "behavior": "aggressive",
+      "level": "89",
+      "variant": "Forest Destroyer",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Waspmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "Waspmon",
+      "behavior": "aggressive",
+      "level": "82-84",
+      "variant": "Leader",
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "CannonBeemon",
+      "behavior": "defensive",
+      "level": "82-84",
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "Crowmon",
+      "behavior": "defensive",
+      "level": "82-84",
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "GrandisKuwagamon",
+      "behavior": "defensive",
+      "level": "88-90",
+      "hp": 10300,
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Lillymon",
+      "behavior": "defensive",
+      "level": "84-86",
+      "attribute": "Data",
+      "element": "Wood"
+    },
+    {
+      "name": "QueenChessmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "QueenChessmon",
+      "behavior": "aggressive",
+      "level": "84-86",
+      "variant": "Leader",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "QueenChessmon",
+      "behavior": "defensive",
+      "level": "86",
+      "variant": "Royal",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "LadyDevimon",
+      "behavior": "defensive",
+      "level": "84-86",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Cherubimon",
+      "behavior": "defensive",
+      "level": "86-88",
+      "hp": 9800,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Cherubimon",
+      "behavior": "defensive",
+      "level": "86-88",
+      "variant": "White",
+      "hp": 9800,
+      "attribute": "Vaccine",
+      "element": "Light"
+    },
+    {
+      "name": "NeoDevimon",
+      "behavior": "defensive",
+      "level": "86-88",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "SkullSatamon",
+      "behavior": "defensive",
+      "level": "86-88",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Cyberdramon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Cyberdramon",
+      "behavior": "aggressive",
+      "level": "86-88",
+      "variant": "Leader",
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Archnemon",
+      "behavior": "defensive",
+      "level": "78-80",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "PileVolcamon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "PileVolcamon",
+      "behavior": "aggressive",
+      "level": "88-90",
+      "variant": "Leader",
+      "hp": 10300,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Argomon",
+      "behavior": "defensive",
+      "level": "88-90",
+      "variant": "Mega",
+      "hp": 10300,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "GrandisKuwagamon",
+      "behavior": "defensive",
+      "level": "88-90",
+      "hp": 10300,
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Wind"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "aggressive",
+      "level": "85",
+      "hp": 758775,
+      "attribute": "Data",
+      "element": "Wind"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "aggressive",
+      "level": "81",
+      "variant": "Sharp Horn",
+      "attribute": "Data",
+      "element": "Wind"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "aggressive",
+      "level": "86",
+      "variant": "Heavy Tail",
+      "attribute": "Data",
+      "element": "Wind"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "aggressive",
+      "level": "91",
+      "variant": "Heavy Paw",
+      "attribute": "Data",
+      "element": "Wind"
+    },
+    {
+      "name": "Phantomon",
+      "behavior": "defensive",
+      "level": "BOSS",
+      "hp": 2600,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "infinite-mountain": [
+    {
+      "name": "Dokugumon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Dokugumon",
+      "behavior": "aggressive",
+      "level": "86",
+      "variant": "Spoiled Spider",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Soulmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Soulmon",
+      "behavior": "aggressive",
+      "level": "86",
+      "variant": "Gravekeeper",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "WaruMonzaemon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "WaruMonzaemon",
+      "behavior": "aggressive",
+      "level": "86",
+      "variant": "Disrupter",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "QueenChessmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "QueenChessmon",
+      "behavior": "aggressive",
+      "level": "89",
+      "variant": "Royal",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Mushroomon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Mushroomon",
+      "behavior": "aggressive",
+      "level": "86",
+      "variant": "Ruler of Lonley Place",
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Lillymon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Wood"
+    },
+    {
+      "name": "Lillymon",
+      "behavior": "aggressive",
+      "level": "85",
+      "variant": "Protect Firefly",
+      "attribute": "Data",
+      "element": "Wood"
+    },
+    {
+      "name": "Giromon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Giromon",
+      "behavior": "aggressive",
+      "level": "87",
+      "variant": "Forest Destroyer",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Palmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Wood"
+    },
+    {
+      "name": "Palmon",
+      "behavior": "aggressive",
+      "level": "87",
+      "variant": "Predator of Fruit",
+      "attribute": "Data",
+      "element": "Wood"
+    },
+    {
+      "name": "Cherrymon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Cherrymon",
+      "behavior": "aggressive",
+      "level": "87",
+      "variant": "Rotten Tree",
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Wizardmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Wizardmon",
+      "behavior": "aggressive",
+      "level": "87",
+      "variant": "Star Chaser",
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Waspmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "Waspmon",
+      "behavior": "aggressive",
+      "level": "88",
+      "variant": "Guard of Queen bee",
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "Mammothmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Ice"
+    },
+    {
+      "name": "Mammothmon",
+      "behavior": "aggressive",
+      "level": "88",
+      "variant": "Mark of Legend",
+      "attribute": "Vaccine",
+      "element": "Ice"
+    },
+    {
+      "name": "RedVegiemon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "RedVegiemon",
+      "behavior": "aggressive",
+      "level": "68",
+      "variant": "Disgusting Smell",
+      "attribute": "Virus",
+      "element": "Wood"
+    }
+  ],
+  "infinite-mountain-dungeon": [
+    {
+      "name": "Kuwagamon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Ruler of Silver Lake",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Kuwagamon",
+      "behavior": "aggressive",
+      "level": "87",
+      "variant": "Ruler of Silver Lake",
+      "hp": 1187360,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Meramon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Rule of Flame",
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Meramon",
+      "behavior": "aggressive",
+      "level": "89",
+      "variant": "Rule of Flame",
+      "hp": 1555440,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Master of Battle",
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "aggressive",
+      "level": "88",
+      "variant": "Master of Battle",
+      "hp": 2115400,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Leomon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Beast King",
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Leomon",
+      "behavior": "aggressive",
+      "level": "90",
+      "variant": "Beast King",
+      "hp": 2961560,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Digimon Hunter",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "aggressive",
+      "level": "90",
+      "variant": "Digimon Hunter",
+      "hp": 3820420,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Devimon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Evil Incarnate",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Devimon",
+      "behavior": "aggressive",
+      "level": "90",
+      "variant": "Evil Incarnate",
+      "hp": 4049640,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "silent-forest": [
+    {
+      "name": "DemiMeramon",
+      "behavior": "aggressive",
+      "level": "56-58",
+      "variant": "Polluted",
+      "hp": 2640,
+      "attribute": "None",
+      "element": "Fire"
+    },
+    {
+      "name": "Meramon",
+      "behavior": "defensive",
+      "level": "53-55",
+      "hp": 2520,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Meramon",
+      "behavior": "aggressive",
+      "level": "54-56",
+      "variant": "Leader",
+      "hp": 2900,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Meramon",
+      "behavior": "aggressive",
+      "level": "56",
+      "variant": "Captain",
+      "hp": 5460,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Meramon",
+      "behavior": "aggressive",
+      "level": "60",
+      "hp": 374640,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Sharmamon",
+      "behavior": "defensive",
+      "level": "56-58",
+      "hp": 2640,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Sharmamon",
+      "behavior": "aggressive",
+      "level": "56-58",
+      "variant": "Leader",
+      "hp": 3030,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Sharmamon",
+      "behavior": "aggressive",
+      "level": "58",
+      "variant": "Captain",
+      "hp": 5610,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Bakemon",
+      "behavior": "defensive",
+      "level": "57-59",
+      "hp": 3000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Bakemon",
+      "behavior": "aggressive",
+      "level": "58-60",
+      "variant": "Leader",
+      "hp": 3300,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Bakemon",
+      "behavior": "aggressive",
+      "level": "60",
+      "variant": "Captain",
+      "hp": 5920,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Soulmon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Gravekeeper",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Soulmon",
+      "behavior": "defensive",
+      "level": "61",
+      "variant": "Gravekeeper",
+      "hp": 48600,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Devimon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Phantom",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Devimon",
+      "behavior": "aggressive",
+      "level": "60-61",
+      "variant": "Phantom",
+      "hp": 70320,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Goblimon",
+      "behavior": "defensive",
+      "level": "56-58",
+      "hp": 2640,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Goblimon",
+      "behavior": "aggressive",
+      "level": "56-58",
+      "variant": "Leader",
+      "hp": 3030,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Goblimon",
+      "behavior": "aggressive",
+      "level": "58",
+      "variant": "Captain",
+      "hp": 5610,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "defensive",
+      "level": "60-62",
+      "hp": 3240,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "aggressive",
+      "level": "60-62",
+      "variant": "Leader",
+      "hp": 3690,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "aggressive",
+      "level": "62",
+      "variant": "Captain",
+      "hp": 6550,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "aggressive",
+      "level": "66",
+      "hp": 533800,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "WaruMonzaemon",
+      "behavior": "defensive",
+      "level": "",
+      "variant": "Troublemaker",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "WaruMonzaemon",
+      "behavior": "defensive",
+      "level": "64-66",
+      "variant": "Troublemaker",
+      "hp": 24600,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Monzaemon",
+      "behavior": "defensive",
+      "level": "62-64",
+      "hp": 3840,
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Monzaemon",
+      "behavior": "aggressive",
+      "level": "62-64",
+      "variant": "Leader",
+      "hp": 4350,
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Monzaemon",
+      "behavior": "aggressive",
+      "level": "64",
+      "variant": "Captain",
+      "hp": 6860,
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "DarkTower",
+      "behavior": "defensive",
+      "level": "70",
+      "hp": 3200,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "monodramon",
+      "behavior": "aggressive",
+      "level": "??",
+      "variant": "Jogress Quest",
+      "hp": 648290,
+      "attribute": "Vaccine",
+      "element": "Wind"
+    }
+  ],
+  "silver-lake": [
+    {
+      "name": "Tsunomon",
+      "behavior": "defensive",
+      "level": "43-45",
+      "hp": 2160,
+      "attribute": "None"
+    },
+    {
+      "name": "DemiMeramon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "None"
+    },
+    {
+      "name": "DemiMeramon",
+      "behavior": "aggressive",
+      "level": "52-54",
+      "variant": "Leader",
+      "hp": 2280,
+      "attribute": "None"
+    },
+    {
+      "name": "Upamon",
+      "behavior": "defensive",
+      "level": "43-45",
+      "hp": 2160,
+      "attribute": "None"
+    },
+    {
+      "name": "Koromon",
+      "behavior": "defensive",
+      "level": "43-45",
+      "hp": 2160,
+      "attribute": "None"
+    },
+    {
+      "name": "Tanemon",
+      "behavior": "defensive",
+      "level": "43-45",
+      "hp": 2160,
+      "attribute": "None"
+    },
+    {
+      "name": "Gotsumon",
+      "behavior": "defensive",
+      "level": "53-55",
+      "hp": 2280,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Kunemon",
+      "behavior": "defensive",
+      "level": "44-46",
+      "hp": 2160,
+      "attribute": "Virus",
+      "element": "Thunder"
+    },
+    {
+      "name": "Dokunemon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Land"
+    },
+    {
+      "name": "Dokunemon",
+      "behavior": "aggressive",
+      "level": "45-47",
+      "variant": "Leader",
+      "hp": 2160,
+      "attribute": "Virus",
+      "element": "Land"
+    },
+    {
+      "name": "Palmon",
+      "behavior": "defensive",
+      "level": "44-46",
+      "hp": 2160,
+      "attribute": "Data",
+      "element": "Wood"
+    },
+    {
+      "name": "Mushroomon",
+      "behavior": "defensive",
+      "level": "47-49",
+      "hp": 2220,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Mushroomon",
+      "behavior": "aggressive",
+      "level": "49",
+      "variant": "Ruler of Byway",
+      "hp": 48000,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Elecmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Thunder"
+    },
+    {
+      "name": "Elecmon",
+      "behavior": "aggressive",
+      "level": "46-48",
+      "variant": "Leader",
+      "hp": 2160,
+      "attribute": "Data",
+      "element": "Thunder"
+    },
+    {
+      "name": "Candlemon",
+      "behavior": "defensive",
+      "level": "52-54",
+      "hp": 2280,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Tentomon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Thunder"
+    },
+    {
+      "name": "Tentomon",
+      "behavior": "defensive",
+      "level": "49-51",
+      "variant": "Vaccine",
+      "hp": 2220,
+      "attribute": "Vaccine",
+      "element": "Thunder"
+    },
+    {
+      "name": "Betamon",
+      "behavior": "defensive",
+      "level": "45-47",
+      "hp": 2160,
+      "attribute": "Virus",
+      "element": "Water"
+    },
+    {
+      "name": "Patamon",
+      "behavior": "defensive",
+      "level": "45-47",
+      "hp": 2220,
+      "attribute": "Vaccine",
+      "element": "Light"
+    },
+    {
+      "name": "Rockmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Land"
+    },
+    {
+      "name": "Rockmon",
+      "behavior": "aggressive",
+      "level": "54-56",
+      "variant": "Leader",
+      "hp": 2520,
+      "attribute": "Virus",
+      "element": "Land"
+    },
+    {
+      "name": "Woodmon",
+      "behavior": "defensive",
+      "level": "53-55",
+      "hp": 2340,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Dokugumon",
+      "behavior": "defensive",
+      "level": "67-69",
+      "hp": 4680,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Birdramon",
+      "behavior": "defensive",
+      "level": "48-50",
+      "hp": 2280,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Sabirdramon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Sabirdramon",
+      "behavior": "aggressive",
+      "level": "49-51",
+      "variant": "Leader",
+      "hp": 2280,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Kiwimon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Kiwimon",
+      "behavior": "defensive",
+      "level": "49-51",
+      "variant": "Data",
+      "hp": 2220,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "RedVegiemon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "RedVegiemon",
+      "behavior": "defensive",
+      "level": "49-51",
+      "variant": "Virus",
+      "hp": 2280,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Seadramon",
+      "behavior": "defensive",
+      "level": "46-48",
+      "hp": 2220,
+      "attribute": "Data",
+      "element": "Water"
+    },
+    {
+      "name": "Kuwagamon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Kuwagamon",
+      "behavior": "aggressive",
+      "level": "50",
+      "variant": "Despotism of Highest Hill",
+      "hp": 42000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Kuwagamon",
+      "behavior": "aggressive",
+      "level": "55",
+      "hp": 252000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Cherrymon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Cherrymon",
+      "behavior": "aggressive",
+      "level": "54-56",
+      "variant": "Leader",
+      "hp": 2520,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Lillymon",
+      "behavior": "defensive",
+      "level": "51-53",
+      "hp": 2280,
+      "attribute": "Data",
+      "element": "Wood"
+    },
+    {
+      "name": "Lillymon",
+      "behavior": "aggressive",
+      "level": "52",
+      "variant": "Protect Fire Flies",
+      "hp": 24000,
+      "attribute": "Data",
+      "element": "Wood"
+    }
+  ],
+  "datamon-maze": [
+    {
+      "name": "Gazimon",
+      "behavior": "aggressive",
+      "level": "",
+      "variant": "Elite Guard",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Nanomon",
+      "behavior": "aggressive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Etemon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "datamon-maze-hard": [
+    {
+      "name": "Gazimon",
+      "behavior": "aggressive",
+      "level": "",
+      "variant": "Elite Guard",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Nanomon",
+      "behavior": "aggressive",
+      "level": "",
+      "variant": "Hero",
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Biyomon",
+      "behavior": "aggressive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Etemon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Goblimon",
+      "behavior": "aggressive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "datamon-maze-normal": [
+    {
+      "name": "Gazimon",
+      "behavior": "aggressive",
+      "level": "93+",
+      "variant": "Elite Guard",
+      "hp": 112000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Nanomon",
+      "behavior": "aggressive",
+      "level": "99",
+      "variant": "Hero",
+      "hp": 2296300,
+      "attribute": "Virus",
+      "element": "Steel"
+    },
+    {
+      "name": "Biyomon",
+      "behavior": "aggressive",
+      "level": "",
+      "hp": 23000,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Etemon",
+      "behavior": "defensive",
+      "level": "",
+      "hp": 2434333,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Goblimon",
+      "behavior": "aggressive",
+      "level": "",
+      "hp": 7700,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "server-continent-canyon": [
+    {
+      "name": "Psychemon",
+      "behavior": "defensive",
+      "level": "90-93",
+      "hp": 37303,
+      "attribute": "Data",
+      "element": "Thunder"
+    },
+    {
+      "name": "Psychemon",
+      "behavior": "aggressive",
+      "level": "90-93",
+      "variant": "Leader",
+      "hp": 38201,
+      "attribute": "Data",
+      "element": "Thunder"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "defensive",
+      "level": "90-93",
+      "hp": 37117,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "aggressive",
+      "level": "90-93",
+      "variant": "Leader",
+      "hp": 39195,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "DemiDevimon",
+      "behavior": "defensive",
+      "level": "91-94",
+      "hp": 33476,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "DemiDevimon",
+      "behavior": "aggressive",
+      "level": "91-94",
+      "variant": "Leader",
+      "hp": 42320,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Vegiemon",
+      "behavior": "defensive",
+      "level": "92-94",
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Vegiemon",
+      "behavior": "aggressive",
+      "level": "92-94",
+      "variant": "Leader",
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Tonosama Gekomon",
+      "behavior": "defensive",
+      "level": "91-94",
+      "hp": 42320,
+      "attribute": "Virus",
+      "element": "Water"
+    },
+    {
+      "name": "Tonosama Gekomon",
+      "behavior": "aggressive",
+      "level": "91-94",
+      "variant": "Leader",
+      "hp": 47566,
+      "attribute": "Virus",
+      "element": "Water"
+    },
+    {
+      "name": "Roachmon",
+      "behavior": "defensive",
+      "level": "91-94",
+      "hp": 42320,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Roachmon",
+      "behavior": "aggressive",
+      "level": "91-94",
+      "variant": "Leader",
+      "hp": 38403,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Gazimon",
+      "behavior": "defensive",
+      "level": "91-93",
+      "hp": 41500,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Gazimon",
+      "behavior": "aggressive",
+      "level": "91-93",
+      "variant": "Leader",
+      "hp": 37958,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Cherrymon",
+      "behavior": "defensive",
+      "level": "91-93",
+      "hp": 38490,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Cherrymon",
+      "behavior": "aggressive",
+      "level": "91-93",
+      "variant": "Leader",
+      "hp": 41500,
+      "attribute": "Virus",
+      "element": "Wood"
+    },
+    {
+      "name": "Strikedramon",
+      "behavior": "defensive",
+      "level": "92-94",
+      "hp": 36010,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Strikedramon",
+      "behavior": "aggressive",
+      "level": "92-94",
+      "variant": "Leader",
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "HiAndromon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "HiAndromon",
+      "behavior": "aggressive",
+      "level": ">92",
+      "variant": "Observers",
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Slayerdramon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Vaccine",
+      "element": "Wind"
+    },
+    {
+      "name": "Slayerdramon",
+      "behavior": "aggressive",
+      "level": ">92",
+      "variant": "Commanders",
+      "attribute": "Vaccine",
+      "element": "Wind"
+    },
+    {
+      "name": "Murmukusmon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Murmukusmon",
+      "behavior": "aggressive",
+      "level": ">92",
+      "variant": "Guards",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "server-continent-desert": [
+    {
+      "name": "Aquilamon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Data",
+      "element": "Wind"
+    },
+    {
+      "name": "Aquilamon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 15000,
+      "attribute": "Data",
+      "element": "Wind"
+    },
+    {
+      "name": "Arkadimon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "variant": "Adult",
+      "hp": 14000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Arkadimon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 16000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Boarmon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Boarmon",
+      "behavior": "aggressive",
+      "level": "90-92",
+      "variant": "Leader",
+      "hp": 15000,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Boarmon",
+      "behavior": "aggressive",
+      "level": "92",
+      "variant": "Boss",
+      "hp": 19000,
+      "attribute": "Data",
+      "element": "Fire"
+    },
+    {
+      "name": "Devidramon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 14000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Devidramon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 16000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Digmon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Vaccine",
+      "element": "Land"
+    },
+    {
+      "name": "Digmon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 15000,
+      "attribute": "Vaccine",
+      "element": "Land"
+    },
+    {
+      "name": "Drimogemon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 14000,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Drimogemon",
+      "behavior": "aggressive",
+      "level": "90-92",
+      "variant": "Leader",
+      "hp": 16000,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Drimogemon",
+      "behavior": "aggressive",
+      "level": "92",
+      "variant": "Boss",
+      "hp": 19000,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Dokugumon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 16000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Dokugumon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 16000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "FanBeemon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "FanBeemon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 15000,
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "Flymon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "Flymon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 13000,
+      "attribute": "Virus",
+      "element": "Wind"
+    },
+    {
+      "name": "Gatomon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 14000,
+      "attribute": "Vaccine",
+      "element": "Light"
+    },
+    {
+      "name": "Gazimon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Gazimon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 15000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Gazimon",
+      "behavior": "aggressive",
+      "level": "92",
+      "variant": "Boss",
+      "hp": 18000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Greymon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Greymon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 15000,
+      "attribute": "Vaccine",
+      "element": "Fire"
+    },
+    {
+      "name": "Neptunemon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Vaccine",
+      "element": "Water"
+    },
+    {
+      "name": "Neptunemon",
+      "behavior": "aggressive",
+      "level": "90-92",
+      "variant": "Leader",
+      "hp": 15000,
+      "attribute": "Vaccine",
+      "element": "Water"
+    },
+    {
+      "name": "Rockmon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Virus",
+      "element": "Land"
+    },
+    {
+      "name": "Rockmon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 15000,
+      "attribute": "Virus",
+      "element": "Land"
+    },
+    {
+      "name": "Tanemon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "variant": "In-Training",
+      "attribute": "None",
+      "element": "Wood"
+    },
+    {
+      "name": "Wendigomon",
+      "behavior": "defensive",
+      "level": "89-91",
+      "hp": 13000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Wendigomon",
+      "behavior": "aggressive",
+      "level": "89-91",
+      "variant": "Leader",
+      "hp": 15000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Etemon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Etemon",
+      "behavior": "aggressive",
+      "level": "91",
+      "hp": 1557755,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Kuwagamon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Kuwagamon",
+      "behavior": "aggressive",
+      "level": "90",
+      "hp": 1150000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "SkullGreymon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "SkullGreymon",
+      "behavior": "aggressive",
+      "level": "90",
+      "hp": 1250000,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Etemon",
+      "behavior": "defensive",
+      "level": "",
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Etemon",
+      "behavior": "aggressive",
+      "level": "90",
+      "hp": 36,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    }
+  ],
+  "server-continent-pyramid": [
+    {
+      "name": "Cyberdramon",
+      "behavior": "defensive",
+      "level": "92-94",
+      "hp": 45200,
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Cyberdramon",
+      "behavior": "aggressive",
+      "level": "92-94",
+      "variant": "Leader",
+      "hp": 45200,
+      "attribute": "Vaccine",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Etemon",
+      "behavior": "defensive",
+      "level": "?",
+      "hp": 1235305,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Gazimon",
+      "behavior": "defensive",
+      "level": "92-94",
+      "hp": 45200,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Gazimon",
+      "behavior": "aggressive",
+      "level": "92-94",
+      "variant": "Leader",
+      "hp": 45200,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Meteormon",
+      "behavior": "defensive",
+      "level": "92-94",
+      "hp": 45200,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Meteormon",
+      "behavior": "aggressive",
+      "level": "92-94",
+      "variant": "Leader",
+      "hp": 45200,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "defensive",
+      "level": "92-94",
+      "hp": 45200,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Ogremon",
+      "behavior": "aggressive",
+      "level": "92-94",
+      "variant": "Leader",
+      "hp": 45200,
+      "attribute": "Virus",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Rapidmon",
+      "behavior": "defensive",
+      "level": "92-94",
+      "hp": 45200,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Rapidmon",
+      "behavior": "aggressive",
+      "level": "92-94",
+      "variant": "Leader",
+      "hp": 45200,
+      "attribute": "Vaccine",
+      "element": "Steel"
+    },
+    {
+      "name": "Volcamon",
+      "behavior": "defensive",
+      "level": "92-94",
+      "hp": 45200,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Volcamon",
+      "behavior": "aggressive",
+      "level": "92-94",
+      "variant": "Leader",
+      "hp": 45200,
+      "attribute": "Data",
+      "element": "Pitch Black"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "defensive",
+      "level": "92-94",
+      "hp": 45200,
+      "attribute": "Data",
+      "element": "Land"
+    },
+    {
+      "name": "Monochromon",
+      "behavior": "aggressive",
+      "level": "92-94",
+      "variant": "Leader",
+      "hp": 45200,
+      "attribute": "Data",
+      "element": "Land"
+    }
+  ]
+}

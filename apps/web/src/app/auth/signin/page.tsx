@@ -65,7 +65,7 @@ export default function SignInPage() {
       });
 
       if (result?.error) {
-        setError('Invalid email or password. Please try again.');
+        setError('Invalid email/username or password. Please try again.');
       } else if (result?.url) {
         window.location.href = result.url;
       }

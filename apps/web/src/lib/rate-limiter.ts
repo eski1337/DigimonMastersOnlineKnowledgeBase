@@ -1,20 +1,18 @@
 /**
- * Lightweight rate limiter for API routes
- * Tracks requests per IP address using in-memory store
+ * Unified Rate Limiter — Redis-backed with in-memory fallback
+ *
+ * Single implementation used by both middleware and API route handlers.
+ * Redis ensures rate limits are shared across PM2 cluster workers.
+ * Falls back to in-memory Map when Redis is unavailable (dev mode).
  */
 
-interface RateLimitStore {
-  [key: string]: {
-    count: number;
-    resetTime: number;
-  };
-}
+import { getRedis } from './redis';
 
-const store: RateLimitStore = {};
+// ── Types ──────────────────────────────────────────────────────────
 
 export interface RateLimitConfig {
-  maxRequests?: number;
-  windowMs?: number;
+  maxRequests: number;
+  windowMs: number;
 }
 
 export interface RateLimitResult {
@@ -24,86 +22,97 @@ export interface RateLimitResult {
   reset: number;
 }
 
-/**
- * Check if request is within rate limit
- */
-export function checkRateLimit(
-  identifier: string,
-  config: RateLimitConfig = {}
-): RateLimitResult {
-  const maxRequests = config.maxRequests || parseInt(process.env.RATE_LIMIT_MAX || '100');
-  const windowMs = config.windowMs || parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000');
+// ── In-memory fallback store ───────────────────────────────────────
 
+interface MemEntry { count: number; resetTime: number; }
+const memStore = new Map<string, MemEntry>();
+
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [k, v] of memStore) {
+      if (v.resetTime < now) memStore.delete(k);
+    }
+  }, 5 * 60 * 1000);
+}
+
+function checkMemory(key: string, config: RateLimitConfig): RateLimitResult {
   const now = Date.now();
-  const record = store[identifier];
+  const entry = memStore.get(key);
 
-  // No record or window expired - create new
-  if (!record || now > record.resetTime) {
-    store[identifier] = {
-      count: 1,
-      resetTime: now + windowMs,
-    };
-
-    return {
-      success: true,
-      limit: maxRequests,
-      remaining: maxRequests - 1,
-      reset: now + windowMs,
-    };
+  if (!entry || entry.resetTime < now) {
+    memStore.set(key, { count: 1, resetTime: now + config.windowMs });
+    return { success: true, limit: config.maxRequests, remaining: config.maxRequests - 1, reset: now + config.windowMs };
   }
 
-  // Within window - check limit
-  if (record.count < maxRequests) {
-    record.count++;
-    return {
-      success: true,
-      limit: maxRequests,
-      remaining: maxRequests - record.count,
-      reset: record.resetTime,
-    };
+  if (entry.count < config.maxRequests) {
+    entry.count++;
+    return { success: true, limit: config.maxRequests, remaining: config.maxRequests - entry.count, reset: entry.resetTime };
   }
 
-  // Rate limit exceeded
-  return {
-    success: false,
-    limit: maxRequests,
-    remaining: 0,
-    reset: record.resetTime,
+  return { success: false, limit: config.maxRequests, remaining: 0, reset: entry.resetTime };
+}
+
+// ── Redis-backed check (atomic INCR + PEXPIRE) ────────────────────
+
+async function checkRedis(key: string, config: RateLimitConfig): Promise<RateLimitResult | null> {
+  try {
+    const redis = await getRedis();
+    if (!redis) return null;
+
+    const count = await redis.incr(key);
+    if (count === 1) {
+      await redis.pexpire(key, config.windowMs);
+    }
+    const ttl = await redis.pttl(key);
+    const reset = Date.now() + Math.max(ttl, 0);
+    const remaining = Math.max(config.maxRequests - count, 0);
+
+    return {
+      success: count <= config.maxRequests,
+      limit: config.maxRequests,
+      remaining,
+      reset,
+    };
+  } catch {
+    return null; // fall through to in-memory
+  }
+}
+
+// ── Public API ─────────────────────────────────────────────────────
+
+const DEFAULT_CONFIG: RateLimitConfig = {
+  maxRequests: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10),
+};
+
+/**
+ * Check rate limit — tries Redis first, falls back to in-memory.
+ */
+export async function checkRateLimit(
+  identifier: string,
+  config: Partial<RateLimitConfig> = {},
+): Promise<RateLimitResult> {
+  const cfg: RateLimitConfig = {
+    maxRequests: config.maxRequests ?? DEFAULT_CONFIG.maxRequests,
+    windowMs: config.windowMs ?? DEFAULT_CONFIG.windowMs,
   };
+
+  const redisResult = await checkRedis(`rl:${identifier}`, cfg);
+  if (redisResult) return redisResult;
+
+  return checkMemory(identifier, cfg);
 }
 
 /**
- * Get client identifier from request
+ * Extract client IP from request headers (proxy-aware).
  */
 export function getClientIdentifier(request: Request): string {
-  // Try to get IP from headers (for proxies/load balancers)
   const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    return forwarded.split(',')[0].trim();
-  }
+  if (forwarded) return forwarded.split(',')[0].trim();
 
   const realIp = request.headers.get('x-real-ip');
-  if (realIp) {
-    return realIp;
-  }
+  if (realIp) return realIp;
 
-  // Fallback to a generic identifier
   return 'anonymous';
-}
-
-/**
- * Clean up expired entries periodically
- */
-export function cleanupExpiredEntries(): void {
-  const now = Date.now();
-  Object.keys(store).forEach((key) => {
-    if (store[key].resetTime < now) {
-      delete store[key];
-    }
-  });
-}
-
-// Run cleanup every 5 minutes
-if (typeof setInterval !== 'undefined') {
-  setInterval(cleanupExpiredEntries, 5 * 60 * 1000);
 }

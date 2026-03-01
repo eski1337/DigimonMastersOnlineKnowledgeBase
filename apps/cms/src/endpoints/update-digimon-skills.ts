@@ -43,7 +43,7 @@ const updateDigimonSkills: Endpoint = {
     } catch (error: any) {
       console.error('Error updating Digimon skills:', error);
       return res.status(500).json({
-        error: error.message || 'Internal server error',
+        error: 'Internal server error',
       });
     }
   },

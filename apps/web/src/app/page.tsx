@@ -25,8 +25,9 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
-        <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+      <section className="relative overflow-hidden space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+        <div className="container relative flex max-w-[64rem] flex-col items-center gap-4 text-center">
           <Badge variant="secondary" className="text-sm">
             Community-Driven Knowledge Base
           </Badge>

@@ -4,7 +4,10 @@ import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { SessionProvider } from '@/components/providers/session-provider';
+import { ThemeProvider } from '@/components/providers/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
+import { ScrollToTop } from '@/components/common/scroll-to-top';
+import { HeroBackground } from '@/components/home/hero-background';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://dmokb.local',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info',
     siteName: 'DMO KB',
     title: 'DMO KB - Digimon Masters Online Knowledge Base',
     description: 'Comprehensive DMO knowledge base with Digimon stats, quests, and guides.',
@@ -43,14 +46,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
         <SessionProvider>
           <div className="relative flex min-h-screen flex-col">
+            <div className="fixed inset-0 pointer-events-none z-0">
+              <HeroBackground />
+            </div>
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="relative z-10 flex-1">{children}</main>
             <Footer />
           </div>
           <Toaster />
+          <ScrollToTop />
         </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -3,7 +3,7 @@ echo "=== Current State Assessment ==="
 
 TOKEN=$(curl -s -X POST http://localhost:3001/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}' | python3 -c "import json,sys;print(json.load(sys.stdin).get('token',''))" 2>/dev/null)
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}' | python3 -c "import json,sys;print(json.load(sys.stdin).get('token',''))" 2>/dev/null)
 
 echo "--- Digimon count ---"
 curl -s -H "Authorization: JWT $TOKEN" "http://localhost:3001/api/digimon?limit=1" | python3 -c "
@@ -68,7 +68,7 @@ import json, urllib.request
 token = open('/dev/stdin','r').read().strip() if False else ''
 # Re-login
 import urllib.parse
-data = json.dumps({"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}).encode()
+data = json.dumps({"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}).encode()
 req = urllib.request.Request('http://localhost:3001/api/users/login', data=data, headers={'Content-Type':'application/json'}, method='POST')
 resp = urllib.request.urlopen(req)
 token = json.loads(resp.read()).get('token','')

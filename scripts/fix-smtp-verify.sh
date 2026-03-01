@@ -4,7 +4,7 @@ echo "=== 1. Auto-verify all unverified users ==="
 # Login as owner
 TOKEN=$(curl -s -X POST http://localhost:3001/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
 
 # Find pelikanbot1337
 FIND=$(curl -s -H "Authorization: JWT $TOKEN" 'http://localhost:3001/api/users?where[email][equals]=lubo-random@web.de&limit=1')
@@ -43,7 +43,7 @@ try:
     s = smtplib.SMTP('127.0.0.1', 587, timeout=5)
     s.ehlo()
     s.starttls()
-    s.login('noreply@dmokb.info', 'NoReplyDMOKB2026!')
+    s.login('noreply@dmokb.info', '${NOREPLY_PASSWORD}')
     print('  SMTP auth: SUCCESS')
     s.quit()
 except Exception as e:
@@ -63,7 +63,7 @@ try:
     s = smtplib.SMTP('127.0.0.1', 587, timeout=5)
     s.ehlo()
     s.starttls()
-    s.login('noreply@dmokb.info', 'NoReplyDMOKB2026!')
+    s.login('noreply@dmokb.info', '${NOREPLY_PASSWORD}')
     s.send_message(msg)
     print('  Test email sent to eski@dmokb.info!')
     s.quit()

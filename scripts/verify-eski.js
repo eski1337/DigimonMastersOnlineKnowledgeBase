@@ -26,12 +26,12 @@ function post(url, data) {
   const db = client.db('dmo-kb');
   
   const result = await db.collection('users').updateOne(
-    { email: 'eski@dmokb.info' },
+    { email: process.env.CMS_ADMIN_EMAIL },
     { $set: { _verified: true } }
   );
   console.log('Verified updated:', result.modifiedCount);
   
-  const user = await db.collection('users').findOne({ email: 'eski@dmokb.info' });
+  const user = await db.collection('users').findOne({ email: process.env.CMS_ADMIN_EMAIL });
   console.log('User:', user.email, 'role:', user.role, 'verified:', user._verified);
   
   await client.close();
@@ -39,8 +39,8 @@ function post(url, data) {
   // Step 2: Test login
   console.log('\n=== Testing login ===');
   const loginRes = await post('http://localhost:3001/api/users/login', {
-    email: 'eski@dmokb.info',
-    password: 'EskiDMOKB2026!',
+    email: process.env.CMS_ADMIN_EMAIL,
+    password: process.env.CMS_ADMIN_PASSWORD,
   });
   console.log('Login status:', loginRes.status);
   const data = JSON.parse(loginRes.body);

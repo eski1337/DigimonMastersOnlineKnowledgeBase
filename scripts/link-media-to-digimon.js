@@ -8,8 +8,8 @@
 const http = require('http');
 
 const CMS_URL = 'http://localhost:3001';
-const OWNER_EMAIL = 'eski@dmokb.info';
-const OWNER_PASS = 'EskiDMOKB2026!';
+const OWNER_EMAIL = process.env.CMS_ADMIN_EMAIL;
+const OWNER_PASS = process.env.CMS_ADMIN_PASSWORD;
 
 function req(method, path, body, token) {
   return new Promise((resolve, reject) => {

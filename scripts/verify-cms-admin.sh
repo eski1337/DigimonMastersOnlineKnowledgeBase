@@ -7,7 +7,7 @@ sleep 3
 # Login as owner to get token for creating test users
 TOKEN=$(curl -s -X POST http://localhost:3001/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
 
 echo ""
 echo "--- 1. Create test editor & admin users ---"
@@ -15,13 +15,13 @@ echo "--- 1. Create test editor & admin users ---"
 curl -s -X POST http://localhost:3001/api/users \
   -H 'Content-Type: application/json' \
   -H "Authorization: JWT $TOKEN" \
-  -d '{"email":"testeditor@dmokb.info","password":"EditorPass123!","passwordConfirm":"EditorPass123!","username":"testeditor2","name":"Test Editor","role":"editor","_verified":true}' | python3 -c "import json,sys;d=json.load(sys.stdin);print(f'  Editor: {d.get(\"doc\",{}).get(\"email\",\"FAILED\")} role={d.get(\"doc\",{}).get(\"role\",\"?\")}')" 2>/dev/null
+  -d '{"email":"testeditor@dmokb.info","password":"${TEST_EDITOR_PASSWORD}","passwordConfirm":"${TEST_EDITOR_PASSWORD}","username":"testeditor2","name":"Test Editor","role":"editor","_verified":true}' | python3 -c "import json,sys;d=json.load(sys.stdin);print(f'  Editor: {d.get(\"doc\",{}).get(\"email\",\"FAILED\")} role={d.get(\"doc\",{}).get(\"role\",\"?\")}')" 2>/dev/null
 
 # Create admin
 curl -s -X POST http://localhost:3001/api/users \
   -H 'Content-Type: application/json' \
   -H "Authorization: JWT $TOKEN" \
-  -d '{"email":"testadmin@dmokb.info","password":"AdminPass123!","passwordConfirm":"AdminPass123!","username":"testadmin2","name":"Test Admin","role":"admin","_verified":true}' | python3 -c "import json,sys;d=json.load(sys.stdin);print(f'  Admin: {d.get(\"doc\",{}).get(\"email\",\"FAILED\")} role={d.get(\"doc\",{}).get(\"role\",\"?\")}')" 2>/dev/null
+  -d '{"email":"testadmin@dmokb.info","password":"${TEST_ADMIN_PASSWORD}","passwordConfirm":"${TEST_ADMIN_PASSWORD}","username":"testadmin2","name":"Test Admin","role":"admin","_verified":true}' | python3 -c "import json,sys;d=json.load(sys.stdin);print(f'  Admin: {d.get(\"doc\",{}).get(\"email\",\"FAILED\")} role={d.get(\"doc\",{}).get(\"role\",\"?\")}')" 2>/dev/null
 
 echo ""
 echo "--- 2. Test login via public CMS URL ---"
@@ -30,21 +30,21 @@ echo "--- 2. Test login via public CMS URL ---"
 echo -n "  Owner (eski@dmokb.info): "
 R=$(curl -s -X POST https://cms.dmokb.info/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"eski@dmokb.info","password":"EskiDMOKB2026!"}')
+  -d '{"email":"${CMS_ADMIN_EMAIL}","password":"${CMS_ADMIN_PASSWORD}"}')
 echo "$R" | grep -q '"token"' && echo "✅ LOGIN OK" || echo "❌ FAILED"
 
 # Editor login
 echo -n "  Editor (testeditor@dmokb.info): "
 R=$(curl -s -X POST https://cms.dmokb.info/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"testeditor@dmokb.info","password":"EditorPass123!"}')
+  -d '{"email":"testeditor@dmokb.info","password":"${TEST_EDITOR_PASSWORD}"}')
 echo "$R" | grep -q '"token"' && echo "✅ LOGIN OK" || echo "❌ FAILED"
 
 # Admin login
 echo -n "  Admin (testadmin@dmokb.info): "
 R=$(curl -s -X POST https://cms.dmokb.info/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"testadmin@dmokb.info","password":"AdminPass123!"}')
+  -d '{"email":"testadmin@dmokb.info","password":"${TEST_ADMIN_PASSWORD}"}')
 echo "$R" | grep -q '"token"' && echo "✅ LOGIN OK" || echo "❌ FAILED"
 
 echo ""
@@ -53,7 +53,7 @@ echo "--- 3. Test admin panel access with tokens ---"
 # Editor accesses admin
 EDITOR_TOKEN=$(curl -s -X POST https://cms.dmokb.info/api/users/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"testeditor@dmokb.info","password":"EditorPass123!"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
+  -d '{"email":"testeditor@dmokb.info","password":"${TEST_EDITOR_PASSWORD}"}' | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
 
 echo -n "  Editor → /admin: "
 curl -s -o /dev/null -w '%{http_code}' -b "payload-token=$EDITOR_TOKEN" https://cms.dmokb.info/admin

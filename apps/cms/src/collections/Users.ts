@@ -5,6 +5,8 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info';
 const Users: CollectionConfig = {
   slug: 'users',
   auth: {
+    maxLoginAttempts: 10,
+    lockTime: 300000, // 5 minutes (down from default 10)
     verify: {
       generateEmailSubject: () => 'Verify your DMO Knowledge Base account',
       generateEmailHTML: ({ token, user }) => {
@@ -135,11 +137,8 @@ const Users: CollectionConfig = {
   },
   access: {
     read: ({ req: { user } }) => {
-      // Admins/owners can read all users
       if (user && ['admin', 'owner'].includes(user.role)) return true;
-      // Authenticated users can read all users (sensitive fields hidden via field-level access)
       if (user) return true;
-      // Public: only public profiles
       return { profileVisibility: { equals: 'public' } };
     },
     create: () => true, // Allow public registration
@@ -200,9 +199,9 @@ const Users: CollectionConfig = {
       ],
       access: {
         create: ({ req: { user } }) => {
-          // Public users can only set 'member' role (enforced by hook)
-          if (!user) return true;
-          // Authenticated admins/owners can set any role
+          // Deny role field to unauthenticated registrations (hook enforces 'member')
+          if (!user) return false;
+          // Only admins/owners can set role on creation
           return ['admin', 'owner'].includes(user.role);
         },
         update: ({ req: { user } }) => {

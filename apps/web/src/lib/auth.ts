@@ -225,17 +225,22 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async redirect({ url, baseUrl }) {
-      if (url.startsWith(baseUrl)) {
-        if (url.includes('callbackUrl')) {
-          const params = new URL(url).searchParams;
-          const callbackUrl = params.get('callbackUrl');
+      try {
+        const parsed = new URL(url, baseUrl);
+        // Only allow redirects to our own origin (prevents open redirect)
+        if (parsed.origin !== new URL(baseUrl).origin) {
+          return baseUrl;
+        }
+        if (parsed.searchParams.has('callbackUrl')) {
+          const callbackUrl = parsed.searchParams.get('callbackUrl');
           if (callbackUrl?.includes('discord')) {
             return `${baseUrl}/auth/welcome?new=true`;
           }
         }
-        return url;
+        return parsed.href;
+      } catch {
+        return baseUrl;
       }
-      return baseUrl;
     },
     async session({ session, token }) {
       if (session.user) {

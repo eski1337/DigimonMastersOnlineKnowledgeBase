@@ -1,0 +1,39 @@
+.mediaStage {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.5rem, 1.2vw, 1rem);
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 55%, hsl(var(--card)) 100%);
+}
+
+.mediaInner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.digimonImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  transform: translateZ(0);
+  transition: transform 220ms ease;
+  will-change: transform;
+}
+
+.mediaStage:hover .digimonImage {
+  transform: scale(1.03) translateZ(0);
+}
+
+@media (max-width: 640px) {
+  .mediaStage {
+    padding: 0.5rem;
+  }
+}

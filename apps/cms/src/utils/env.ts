@@ -35,8 +35,8 @@ export function getRequiredEnv() {
     mongodbUri: getEnv('MONGODB_URI'),
     payloadSecret: getEnv('PAYLOAD_SECRET'),
     nodeEnv: getEnv('NODE_ENV', 'development'),
-    cmsUrl: getEnv('NEXT_PUBLIC_CMS_URL', 'http://localhost:3001'),
-    appUrl: getEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000'),
+    cmsUrl: getEnv('NEXT_PUBLIC_CMS_URL', 'https://cms.dmokb.info'),
+    appUrl: getEnv('NEXT_PUBLIC_APP_URL', 'https://dmokb.info'),
   };
 }
 
@@ -47,8 +47,8 @@ export const env = {
   get MONGODB_URI() { return getEnv('MONGODB_URI'); },
   get PAYLOAD_SECRET() { return getEnv('PAYLOAD_SECRET'); },
   get NODE_ENV() { return getEnv('NODE_ENV', 'development'); },
-  get CMS_URL() { return getEnv('NEXT_PUBLIC_CMS_URL', 'http://localhost:3001'); },
-  get APP_URL() { return getEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000'); },
+  get CMS_URL() { return getEnv('NEXT_PUBLIC_CMS_URL', 'https://cms.dmokb.info'); },
+  get APP_URL() { return getEnv('NEXT_PUBLIC_APP_URL', 'https://dmokb.info'); },
   get LOG_LEVEL() { return getEnv('LOG_LEVEL', 'info'); },
 };
 
@@ -56,7 +56,7 @@ export const env = {
  * Get CORS/CSRF allowed origins
  */
 export function getAllowedOrigins(): string[] {
-  const appUrl = getEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000');
+  const appUrl = getEnv('NEXT_PUBLIC_APP_URL', 'https://dmokb.info');
   const customOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
   return [appUrl, ...customOrigins].filter(Boolean);
 }

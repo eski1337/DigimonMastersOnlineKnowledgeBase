@@ -45,6 +45,28 @@
     --radius: 0.5rem;
   }
 
+  .light {
+    --background: 40 33% 96%;
+    --foreground: 40 14% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 40 14% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 40 14% 14%;
+    --primary: 24 80% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 25% 90%;
+    --secondary-foreground: 40 14% 20%;
+    --muted: 40 20% 92%;
+    --muted-foreground: 40 10% 44%;
+    --accent: 28 75% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 4 79% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 40 18% 84%;
+    --input: 40 18% 84%;
+    --ring: 24 80% 50%;
+  }
+
   * {
     @apply border-border;
   }
@@ -73,22 +95,23 @@
   }
 }
 
-/* Custom scrollbar for Gruvbox theme */
+/* Custom scrollbar — adapts to theme via CSS variables */
 ::-webkit-scrollbar {
   width: 12px;
   height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gruvbox-bg1;
+  background: hsl(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gruvbox-bg3 rounded;
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gruvbox-bg4;
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 
 /* Focus visible styles */
@@ -117,7 +140,7 @@
 }
 
 .prose pre {
-  @apply bg-gruvbox-bg1 border border-border;
+  @apply bg-muted border border-border;
 }
 
 /* Card hover effects */

@@ -27,7 +27,7 @@ interface EvolutionTreeProps {
   digivolvesTo?: Array<{ name: string; requiredLevel?: number; requiredItem?: string }>;
 }
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
 
 export function EvolutionTree({
   currentDigimon,

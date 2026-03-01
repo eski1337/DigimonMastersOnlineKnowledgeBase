@@ -8,12 +8,13 @@ const KanbanNavLink: React.FC = () => {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
+        gap: '10px',
         padding: '6px 20px',
-        color: 'var(--theme-text)',
+        color: 'var(--ds-text-secondary)',
         textDecoration: 'none',
         fontSize: '13px',
-        transition: 'color 0.15s',
+        fontWeight: 500,
+        transition: 'color 0.1s, background 0.1s',
       }}
     >
       <span className="nav__link-icon" style={{ width: 20, height: 20 }}>

@@ -4,6 +4,7 @@ Parses all fields: name, localized names, stats, skills with damage tables,
 form, rank, attribute, element, attackerType, families, introduction,
 digivolutions, rideability, availability, etc.
 """
+import os
 import re
 import json
 import sys
@@ -11,8 +12,8 @@ import requests
 import time
 
 CMS_URL = "http://localhost:3001"
-EMAIL = "lukas.bohn@icloud.com"
-PASSWORD = "ilovecf123"
+EMAIL = os.environ.get("CMS_ADMIN_EMAIL", "")
+PASSWORD = os.environ.get("CMS_ADMIN_PASSWORD", "")
 
 VALID_FORMS = ['Fresh', 'In-Training', 'Rookie', 'Champion', 'Ultimate', 'Mega',
                'Burst Mode', 'Jogress', 'Armor', 'Hybrid', 'Ultra', 'Side Mega']

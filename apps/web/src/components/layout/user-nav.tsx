@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut, Settings, MessageSquare } from 'lucide-react';
 import { FaDiscord } from 'react-icons/fa';
 
 export function UserNav() {
@@ -72,6 +72,12 @@ export function UserNav() {
           <Link href="/profile" className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/messages" className="cursor-pointer">
+            <MessageSquare className="mr-2 h-4 w-4" />
+            <span>Messages</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

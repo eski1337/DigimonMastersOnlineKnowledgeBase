@@ -101,7 +101,7 @@ async function checkDatabase(): Promise<ServiceStatus> {
  */
 async function checkCMS(): Promise<ServiceStatus> {
   const startTime = Date.now();
-  const cmsUrl = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+  const cmsUrl = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
   
   try {
     const response = await fetch(`${cmsUrl}/api/access`, {

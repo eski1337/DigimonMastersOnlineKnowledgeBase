@@ -28,7 +28,7 @@ function req(method, path, body, token) {
 
 async function main() {
   // Login
-  const login = await req('POST', '/api/users/login', { email: 'eski@dmokb.info', password: 'EskiDMOKB2026!' });
+  const login = await req('POST', '/api/users/login', { email: process.env.CMS_ADMIN_EMAIL, password: process.env.CMS_ADMIN_PASSWORD });
   const token = login.body.token;
   console.log('Login:', token ? 'OK' : 'FAILED');
 

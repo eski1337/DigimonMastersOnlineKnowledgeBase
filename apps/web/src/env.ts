@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 const envSchema = z.object({
   // Public (exposed to browser)
-  NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
-  NEXT_PUBLIC_CMS_URL: z.string().url().default('http://localhost:3001'),
+  NEXT_PUBLIC_APP_URL: z.string().url().default('https://dmokb.info'),
+  NEXT_PUBLIC_CMS_URL: z.string().url().default('https://cms.dmokb.info'),
   
   // Server-only (not exposed to browser)
   NEXTAUTH_URL: z.string().url(),

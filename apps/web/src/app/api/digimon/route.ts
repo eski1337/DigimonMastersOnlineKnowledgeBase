@@ -1,13 +1,11 @@
 import { NextRequest } from 'next/server';
 import { withErrorHandler, apiResponse } from '@/lib/api-handler';
-import { parseFilterParams } from '@/lib/filters';
 
 // Use internal URL for server-side fetches (faster, avoids SSL roundtrip)
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
 async function digimonListHandler(request: NextRequest) {
     const { searchParams } = new URL(request.url);
-    const filters = parseFilterParams(searchParams);
     
     // Build CMS query parameters
     const cmsParams = new URLSearchParams();
@@ -15,41 +13,41 @@ async function digimonListHandler(request: NextRequest) {
     // Only fetch published Digimon
     cmsParams.append('where[published][equals]', 'true');
     
-    // Apply filters
-    if (filters.search) {
-      cmsParams.append('where[name][contains]', filters.search);
+    // Search
+    const search = searchParams.get('search');
+    if (search) {
+      cmsParams.append('where[name][contains]', search);
     }
+
+    // Multi-value filters — accept both comma-separated and repeated params
+    const multiFilter = (paramName: string, cmsField: string) => {
+      const values = searchParams.getAll(paramName);
+      const all = values.flatMap(v => v.split(',').map(s => s.trim())).filter(Boolean);
+      if (all.length > 0) {
+        all.forEach(val => cmsParams.append(`where[${cmsField}][in]`, val));
+      }
+    };
+
+    multiFilter('element', 'element');
+    multiFilter('attribute', 'attribute');
+    multiFilter('rank', 'rank');
+    multiFilter('form', 'form');
+    multiFilter('attackerType', 'attackerType');
+    multiFilter('family', 'families');
     
-    if (filters.element && filters.element.length > 0) {
-      filters.element.forEach(e => {
-        cmsParams.append('where[element][in]', e);
-      });
-    }
-    
-    if (filters.attribute && filters.attribute.length > 0) {
-      filters.attribute.forEach(a => {
-        cmsParams.append('where[attribute][in]', a);
-      });
-    }
-    
-    if (filters.rank && filters.rank.length > 0) {
-      filters.rank.forEach(r => {
-        cmsParams.append('where[rank][in]', r);
-      });
-    }
-    
-    // Pagination
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '100', 10);
+    // Pagination (cap limit at 100 to prevent abuse)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '36', 10)));
     cmsParams.append('page', page.toString());
     cmsParams.append('limit', limit.toString());
     cmsParams.append('depth', '1');
+    cmsParams.append('sort', 'name');
     
     // Fetch from CMS
     const response = await fetch(`${CMS_URL}/api/digimon?${cmsParams.toString()}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store', // Always fetch fresh data from CMS
+      cache: 'no-store',
     });
     
     if (!response.ok) {
@@ -58,7 +56,6 @@ async function digimonListHandler(request: NextRequest) {
     
     const data = await response.json();
     
-    // Return in expected format
     return apiResponse({
       success: true,
       docs: data.docs || [],

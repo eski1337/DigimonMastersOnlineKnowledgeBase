@@ -110,6 +110,17 @@ function EvolutionEdgeInner(props: EdgeProps) {
 
   return (
     <>
+      {/* Background outline — creates visual bridge at crossings */}
+      <BaseEdge
+        id={`${id}-outline`}
+        path={edgePath}
+        style={{
+          stroke: '#0a0a0f',
+          strokeWidth: 10,
+          strokeLinecap: 'round',
+        }}
+      />
+
       {/* Glow layer for jogress */}
       {isJogress && (
         <BaseEdge

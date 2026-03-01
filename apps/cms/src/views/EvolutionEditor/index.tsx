@@ -208,6 +208,8 @@ function EditorEdgeInner(props: EdgeProps) {
 
   return (
     <>
+      {/* Background outline — creates visual bridge at crossings */}
+      <BaseEdge id={`${id}-outline`} path={edgePath} style={{ stroke: '#0a0a0f', strokeWidth: 10, strokeLinecap: 'round' }} />
       <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} style={style} />
       <EdgeLabelRenderer>
         {/* Gap distance label (above the edge midpoint) */}

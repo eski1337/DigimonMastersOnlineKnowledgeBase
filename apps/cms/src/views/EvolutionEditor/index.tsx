@@ -893,7 +893,7 @@ const EvolutionEditor: React.FC = () => {
         >
           ← Dashboard
         </a>
-        <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Evolution Editor</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Digivolution Editor</h1>
       </div>
       <p style={{ color: 'var(--theme-elevation-400)', marginBottom: 16, fontSize: 14 }}>
         Search Digimon in the sidebar, click to add. Drag from the <span style={{ color: '#60a5fa' }}>blue handle</span> (right) to the <span style={{ color: '#f97316' }}>orange handle</span> (left) to connect.

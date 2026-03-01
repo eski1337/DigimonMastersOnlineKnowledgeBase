@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { BaseEdge, getBezierPath, EdgeLabelRenderer, type EdgeProps } from '@xyflow/react';
+import { BaseEdge, getSmoothStepPath, EdgeLabelRenderer, type EdgeProps } from '@xyflow/react';
 
 /* ── Edge color map by evolution type ─────────────────────────────────── */
 
@@ -82,15 +82,22 @@ function EvolutionEdgeInner(props: EdgeProps) {
 
   const label = formatEdgeLabel(evolutionType, requiredLevel, requiredItem);
 
-  const [edgePath, labelX, labelY] = getBezierPath({
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    sourcePosition,
-    targetPosition,
-    curvature: 0.3,
-  });
+  // Straight line when nearly horizontal, smoothstep otherwise
+  const nearlyAligned = Math.abs(sourceY - targetY) < 15;
+  const [edgePath, labelX, labelY] = nearlyAligned
+    ? [
+        `M ${sourceX},${sourceY} L ${targetX},${targetY}`,
+        (sourceX + targetX) / 2,
+        (sourceY + targetY) / 2,
+      ] as [string, number, number]
+    : getSmoothStepPath({
+        sourceX,
+        sourceY,
+        targetX,
+        targetY,
+        sourcePosition,
+        targetPosition,
+      });
 
   return (
     <>

@@ -26,7 +26,7 @@ const EvolutionEditorNavLink: React.FC = () => {
           <line x1="16.5" y1="7.5" x2="13.5" y2="16" />
         </svg>
       </span>
-      <span>Evolution Editor</span>
+      <span>Digivolution Editor</span>
     </a>
   );
 };

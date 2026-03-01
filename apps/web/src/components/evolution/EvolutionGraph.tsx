@@ -69,7 +69,7 @@ export function EvolutionGraph({ slug }: EvolutionGraphProps) {
     return (
       <div className={styles.wrapper}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Evolution Graph</h2>
+          <h2 className={styles.title}>Digivolution Graph</h2>
         </div>
         <div className={styles.skeleton}>
           <div className={styles.spinner} />
@@ -83,10 +83,10 @@ export function EvolutionGraph({ slug }: EvolutionGraphProps) {
     return (
       <div className={styles.wrapper}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Evolution Graph</h2>
+          <h2 className={styles.title}>Digivolution Graph</h2>
         </div>
         <div className={styles.fallback}>
-          <p className={styles.fallbackText}>Evolution graph temporarily unavailable.</p>
+          <p className={styles.fallbackText}>Digivolution graph temporarily unavailable.</p>
           <p className={styles.fallbackSub}>{error}</p>
         </div>
       </div>
@@ -98,10 +98,10 @@ export function EvolutionGraph({ slug }: EvolutionGraphProps) {
     return (
       <div className={styles.wrapper}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Evolution Graph</h2>
+          <h2 className={styles.title}>Digivolution Graph</h2>
         </div>
         <div className={styles.fallback}>
-          <p className={styles.fallbackText}>No evolution data available yet.</p>
+          <p className={styles.fallbackText}>No digivolution data available yet.</p>
         </div>
       </div>
     );
@@ -111,7 +111,7 @@ export function EvolutionGraph({ slug }: EvolutionGraphProps) {
   return (
     <div>
       <div className={styles.header}>
-        <h2 className={styles.title}>Evolution Graph</h2>
+        <h2 className={styles.title}>Digivolution Graph</h2>
       </div>
 
       {/* Legend — only show if multiple edge types */}

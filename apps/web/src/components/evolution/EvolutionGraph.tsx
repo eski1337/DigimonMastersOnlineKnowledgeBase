@@ -151,6 +151,7 @@ export function EvolutionGraph({ slug }: EvolutionGraphProps) {
           maxZoom={2}
           fitView={!data.layout?.viewport}
           fitViewOptions={{ padding: 0.2, maxZoom: 1.2 }}
+          connectionMode="loose"
           proOptions={{ hideAttribution: true }}
         >
           <Background

@@ -82,26 +82,18 @@ function EvolutionEdgeInner(props: EdgeProps) {
 
   const label = formatEdgeLabel(evolutionType, requiredLevel, requiredItem);
 
-  // Use straight lines for horizontal connections (Left↔Right handles).
-  // Only use smoothstep for vertical connections (Top↔Bottom handles).
+  // Straight line only for same-height horizontal connections.
+  // Smoothstep (90° step routing) for everything else — no diagonals.
   const isHorizontal =
     (sourcePosition === 'right' && targetPosition === 'left') ||
     (sourcePosition === 'left' && targetPosition === 'right');
-  const isVertical =
-    (sourcePosition === 'bottom' && targetPosition === 'top') ||
-    (sourcePosition === 'top' && targetPosition === 'bottom');
+  const sameHeight = Math.abs(sourceY - targetY) < 15;
 
   let edgePath: string;
   let labelX: number;
   let labelY: number;
 
-  if (isVertical) {
-    // Vertical: straight line between top/bottom handles
-    edgePath = `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
-    labelX = (sourceX + targetX) / 2;
-    labelY = (sourceY + targetY) / 2;
-  } else if (isHorizontal || Math.abs(sourceY - targetY) < 60) {
-    // Horizontal: always straight line
+  if (isHorizontal && sameHeight) {
     edgePath = `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
     labelX = (sourceX + targetX) / 2;
     labelY = (sourceY + targetY) / 2;

@@ -150,10 +150,15 @@ function DigimonEditorNode({ data }: NodeProps) {
           {d.form}
         </span>
       )}
-      <Handle type="target" position={Position.Left} id="left" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', left: -6 }} />
-      <Handle type="source" position={Position.Right} id="right" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', right: -6 }} />
-      <Handle type="target" position={Position.Top} id="top" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', top: -6 }} />
-      <Handle type="source" position={Position.Bottom} id="bottom" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', bottom: -6 }} />
+      {/* Each position has both source + target so any-to-any connections work */}
+      <Handle type="target" position={Position.Left} id="left-t" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', left: -6 }} />
+      <Handle type="source" position={Position.Left} id="left-s" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', left: -6 }} />
+      <Handle type="target" position={Position.Right} id="right-t" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', right: -6 }} />
+      <Handle type="source" position={Position.Right} id="right-s" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', right: -6 }} />
+      <Handle type="target" position={Position.Top} id="top-t" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', top: -6 }} />
+      <Handle type="source" position={Position.Top} id="top-s" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', top: -6 }} />
+      <Handle type="target" position={Position.Bottom} id="bottom-t" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', bottom: -6 }} />
+      <Handle type="source" position={Position.Bottom} id="bottom-s" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', bottom: -6 }} />
     </div>
   );
 }
@@ -173,17 +178,27 @@ function EditorEdgeInner(props: EdgeProps) {
     sourcePosition, targetPosition, data, style, markerEnd,
   } = props;
 
-  const nearlyAligned = Math.abs(sourceY - targetY) < 15;
-  const [edgePath, labelX, labelY] = nearlyAligned
-    ? [
-        `M ${sourceX},${sourceY} L ${targetX},${targetY}`,
-        (sourceX + targetX) / 2,
-        (sourceY + targetY) / 2,
-      ] as [string, number, number]
-    : getSmoothStepPath({
-        sourceX, sourceY, targetX, targetY,
-        sourcePosition, targetPosition,
-      });
+  // Straight line only when handles are on the same height (horizontal connection)
+  // Smoothstep for everything else — no diagonals
+  const isHorizontal =
+    (sourcePosition === 'right' && targetPosition === 'left') ||
+    (sourcePosition === 'left' && targetPosition === 'right');
+  const sameHeight = Math.abs(sourceY - targetY) < 15;
+
+  let edgePath: string;
+  let labelX: number;
+  let labelY: number;
+
+  if (isHorizontal && sameHeight) {
+    edgePath = `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
+    labelX = (sourceX + targetX) / 2;
+    labelY = (sourceY + targetY) / 2;
+  } else {
+    [edgePath, labelX, labelY] = getSmoothStepPath({
+      sourceX, sourceY, targetX, targetY,
+      sourcePosition, targetPosition,
+    });
+  }
 
   // Gap = distance between the two handles (= node borders)
   const gap = Math.round(Math.abs(targetX - sourceX));
@@ -1025,7 +1040,7 @@ const EvolutionEditor: React.FC = () => {
         <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Digivolution Editor</h1>
       </div>
       <p style={{ color: 'var(--theme-elevation-400)', marginBottom: 16, fontSize: 14 }}>
-        Search Digimon in the sidebar, click to add. Drag from the <span style={{ color: '#60a5fa' }}>blue handle</span> (right) to the <span style={{ color: '#f97316' }}>orange handle</span> (left) to connect.
+        Search Digimon in the sidebar, click to add. Drag from any handle to any handle to connect.
         Click an edge to set evolution type. Drag nodes to arrange.
       </p>
 

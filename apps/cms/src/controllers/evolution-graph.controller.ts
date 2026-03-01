@@ -163,17 +163,14 @@ export function createEvolutionGraphController(payload: Payload) {
                 }
               }
               if (Object.keys(slugPositions).length > 0) {
-                // Extract and convert edge handle mappings (keys use Digimon IDs → convert to slugs)
+                // Extract and convert edge handle mappings (keys are "srcId->tgtId", convert to slugs)
                 const rawHandles = (nodePositions as any).__edgeHandles;
                 let edgeHandles: Record<string, { sourceHandle?: string; targetHandle?: string }> | undefined;
                 if (rawHandles && typeof rawHandles === 'object') {
                   edgeHandles = {};
-                  for (const [editorEdgeId, handles] of Object.entries(rawHandles)) {
-                    // Editor edge ID format: "e-{srcId}-{tgtId}-{sHandle}-{tHandle}"
-                    const parts = editorEdgeId.split('-');
-                    if (parts.length >= 3) {
-                      const srcId = parts[1];
-                      const tgtId = parts[2];
+                  for (const [key, handles] of Object.entries(rawHandles)) {
+                    const [srcId, tgtId] = key.split('->');
+                    if (srcId && tgtId) {
                       const srcSlug = idToSlug.get(srcId);
                       const tgtSlug = idToSlug.get(tgtId);
                       if (srcSlug && tgtSlug) {

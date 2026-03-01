@@ -816,11 +816,12 @@ const EvolutionEditor: React.FC = () => {
             }
           }
 
-          // Restore edge handle info (top/bottom connections)
+          // Restore edge handle info (top/bottom connections) — keyed by source->target
           const savedEdgeHandles = savedLayout.__edgeHandles;
           if (savedEdgeHandles && typeof savedEdgeHandles === 'object') {
             for (const edge of newEdges) {
-              const handles = savedEdgeHandles[edge.id];
+              const key = `${edge.source}->${edge.target}`;
+              const handles = savedEdgeHandles[key];
               if (handles) {
                 if (handles.sourceHandle) edge.sourceHandle = handles.sourceHandle;
                 if (handles.targetHandle) edge.targetHandle = handles.targetHandle;
@@ -940,11 +941,11 @@ const EvolutionEditor: React.FC = () => {
       const layoutSearchData = await layoutSearchRes.json();
       const existingLayoutId = layoutSearchData.docs?.[0]?.id;
 
-      // Also save edge handle mappings
+      // Save edge handle mappings keyed by source->target (edge IDs change on reload)
       const edgeHandles: Record<string, { sourceHandle?: string | null; targetHandle?: string | null }> = {};
       for (const edge of edges) {
         if (edge.sourceHandle || edge.targetHandle) {
-          edgeHandles[edge.id] = { sourceHandle: edge.sourceHandle, targetHandle: edge.targetHandle };
+          edgeHandles[`${edge.source}->${edge.target}`] = { sourceHandle: edge.sourceHandle, targetHandle: edge.targetHandle };
         }
       }
 

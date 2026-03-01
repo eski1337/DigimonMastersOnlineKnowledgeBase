@@ -787,12 +787,14 @@ const EvolutionEditor: React.FC = () => {
           edgeDocs.push(...(data.docs || []));
         }
 
-        // Deduplicate edges (check both directions to prevent double lines)
+        // Only keep edges where BOTH source and target are in this line
+        const lineDigimonSet = new Set(digimonIds);
         const edgeMap = new Map<string, EvolutionEdgeDoc>();
         const seenPairs = new Set<string>();
         for (const e of edgeDocs) {
           const src = resolveId(e.source);
           const tgt = resolveId(e.target);
+          if (!lineDigimonSet.has(src) || !lineDigimonSet.has(tgt)) continue; // skip edges pointing outside the line
           const fwd = `${src}->${tgt}`;
           const rev = `${tgt}->${src}`;
           if (!seenPairs.has(fwd) && !seenPairs.has(rev)) {
@@ -802,13 +804,8 @@ const EvolutionEditor: React.FC = () => {
           }
         }
 
-        // Build nodes
-        const nodeSet = new Set<string>();
-        for (const digId of digimonIds) nodeSet.add(digId);
-        for (const [, e] of edgeMap) {
-          nodeSet.add(resolveId(e.source));
-          nodeSet.add(resolveId(e.target));
-        }
+        // Build nodes — only from the line's digimonInLine, never from edges
+        const nodeSet = new Set<string>(digimonIds);
 
         const newNodes: Node[] = [];
         for (const digId of nodeSet) {

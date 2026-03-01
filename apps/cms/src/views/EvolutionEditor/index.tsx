@@ -1098,21 +1098,39 @@ const EvolutionEditor: React.FC = () => {
         <div style={{ flex: 1 }} />
 
         <button
-          onClick={handleAutoLayout}
-          disabled={nodes.length === 0}
+          onClick={() => { if (edges.length > 0) { setEdges((prev) => prev.slice(0, -1)); setDirty(true); } }}
+          disabled={edges.length === 0}
           style={{
             padding: '6px 16px',
             borderRadius: 6,
-            border: '1px solid var(--theme-elevation-150)',
-            background: 'var(--theme-elevation-50)',
-            color: 'var(--theme-text)',
+            border: '1px solid #f59e0b',
+            background: 'transparent',
+            color: '#f59e0b',
             fontSize: 13,
             fontWeight: 500,
-            cursor: nodes.length > 0 ? 'pointer' : 'default',
-            opacity: nodes.length > 0 ? 1 : 0.4,
+            cursor: edges.length > 0 ? 'pointer' : 'default',
+            opacity: edges.length > 0 ? 1 : 0.4,
           }}
         >
-          Auto Layout
+          Undo Connection
+        </button>
+
+        <button
+          onClick={() => { if (edges.length > 0 && confirm('Clear all connections?')) { setEdges([]); setDirty(true); } }}
+          disabled={edges.length === 0}
+          style={{
+            padding: '6px 16px',
+            borderRadius: 6,
+            border: '1px solid #ef4444',
+            background: 'transparent',
+            color: '#ef4444',
+            fontSize: 13,
+            fontWeight: 500,
+            cursor: edges.length > 0 ? 'pointer' : 'default',
+            opacity: edges.length > 0 ? 1 : 0.4,
+          }}
+        >
+          Clear Connections
         </button>
 
         <button

@@ -10,8 +10,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CMS_URL = 'https://cms.dmokb.info';
 const ICONS_DIR = path.resolve(__dirname, '..', 'Digimon Icons');
-const EMAIL = 'lukas.bohn@icloud.com';
-const PASSWORD = 'ilovecf123';
+const EMAIL = 'svc@dmokb.info';
+const PASSWORD = 'DmokbService2026SecurePass';
 
 /* ── Helpers ─────────────────────────────────────────────────────────── */
 

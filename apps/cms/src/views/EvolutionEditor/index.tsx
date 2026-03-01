@@ -149,8 +149,10 @@ function DigimonEditorNode({ data }: NodeProps) {
           {d.form}
         </span>
       )}
-      <Handle type="target" position={Position.Left} style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', left: -6 }} />
-      <Handle type="source" position={Position.Right} style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', right: -6 }} />
+      <Handle type="target" position={Position.Left} id="left" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', left: -6 }} />
+      <Handle type="source" position={Position.Right} id="right" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', right: -6 }} />
+      <Handle type="target" position={Position.Top} id="top" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', top: -6 }} />
+      <Handle type="source" position={Position.Bottom} id="bottom" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', bottom: -6 }} />
     </div>
   );
 }

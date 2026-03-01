@@ -83,6 +83,10 @@ export function registerPostInitRoutes(
   app.use(createPatchNotesScraperRoutes());
   startScrapeCron();
 
+  // Temporary migration route (DELETE after migration)
+  const { createMigrationRoutes } = require('./routes/migration.routes');
+  app.use(createMigrationRoutes(payload));
+
   // Centralized error handler (must be last)
   app.use(errorHandler);
 }

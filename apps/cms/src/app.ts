@@ -61,6 +61,10 @@ export function registerPostInitRoutes(
   app.use(createScraperRoutes(payload));
   app.use(createDigimonRoutes(payload));
 
+  // Evolution graph (public, read-only)
+  const { createEvolutionGraphRoutes } = require('./routes/evolution-graph.routes');
+  app.use(createEvolutionGraphRoutes(payload));
+
   // Metrics routes (admin-only, after Payload auth middleware)
   const { createMetricsRoutes } = require('./routes/metrics.routes');
   const { startMetricsCollection } = require('./controllers/metrics.controller');

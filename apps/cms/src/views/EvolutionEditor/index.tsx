@@ -75,8 +75,8 @@ const EVOLUTION_TYPES = [
 
 /* ── Dagre auto-layout ─────────────────────────────────────────────── */
 
-const NODE_W = 140;
-const NODE_H = 100;
+const NODE_W = 160;
+const NODE_H = 120;
 
 function autoLayout(nodes: Node[], edges: Edge[]): Node[] {
   const g = new dagre.graphlib.Graph();

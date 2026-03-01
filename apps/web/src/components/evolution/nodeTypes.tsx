@@ -16,27 +16,15 @@ export interface DigimonNodeData {
   [key: string]: unknown;
 }
 
-/* ── Form color palette ───────────────────────────────────────────────── */
+/* ── Colors ───────────────────────────────────────────────────────────── */
 
-const FORM_COLORS: Record<string, { border: string; glow: string; bg: string }> = {
-  'In-Training': { border: '#94a3b8', glow: 'rgba(148,163,184,0.15)', bg: 'rgba(148,163,184,0.06)' },
-  'Rookie':      { border: '#4ade80', glow: 'rgba(74,222,128,0.18)',  bg: 'rgba(74,222,128,0.06)'  },
-  'Champion':    { border: '#60a5fa', glow: 'rgba(96,165,250,0.18)',  bg: 'rgba(96,165,250,0.06)'  },
-  'Ultimate':    { border: '#a78bfa', glow: 'rgba(167,139,250,0.20)', bg: 'rgba(167,139,250,0.06)' },
-  'Mega':        { border: '#f97316', glow: 'rgba(249,115,22,0.25)',  bg: 'rgba(249,115,22,0.06)'  },
-  'Burst Mode':  { border: '#ef4444', glow: 'rgba(239,68,68,0.25)',   bg: 'rgba(239,68,68,0.06)'   },
-  'Jogress':     { border: '#ec4899', glow: 'rgba(236,72,153,0.22)',  bg: 'rgba(236,72,153,0.06)'  },
-  'Armor':       { border: '#eab308', glow: 'rgba(234,179,8,0.20)',   bg: 'rgba(234,179,8,0.06)'   },
-  'Side Mega':   { border: '#f97316', glow: 'rgba(249,115,22,0.22)',  bg: 'rgba(249,115,22,0.06)'  },
-  'Ultra':       { border: '#dc2626', glow: 'rgba(220,38,38,0.28)',   bg: 'rgba(220,38,38,0.06)'   },
-};
-
-const DEFAULT_FORM = { border: '#f97316', glow: 'rgba(249,115,22,0.15)', bg: 'rgba(249,115,22,0.04)' };
-
-function getFormStyle(level?: string) {
-  if (!level) return DEFAULT_FORM;
-  return FORM_COLORS[level] || DEFAULT_FORM;
-}
+const NEUTRAL_BORDER = '#4b5563';    // gray-600
+const NEUTRAL_GLOW = 'rgba(75,85,99,0.12)';
+const NEUTRAL_BG = 'rgba(75,85,99,0.04)';
+const CURRENT_BORDER = '#f97316';    // orange-500
+const CURRENT_GLOW = 'rgba(249,115,22,0.35)';
+const CURRENT_BG = 'rgba(249,115,22,0.08)';
+const BADGE_COLOR = '#9ca3af';       // gray-400
 
 function isValidIconUrl(icon?: string): boolean {
   if (!icon) return false;
@@ -48,12 +36,11 @@ function isValidIconUrl(icon?: string): boolean {
 
 function DigimonNodeInner({ data }: NodeProps) {
   const d = data as DigimonNodeData;
-  const form = getFormStyle(d.level);
   const hasIcon = isValidIconUrl(d.icon);
   const isCurrent = d.isCurrent === true;
+  const isClickable = Boolean(d.slug && !isCurrent);
 
-  const currentBorder = '#f97316';
-  const borderColor = isCurrent ? currentBorder : form.border;
+  const borderColor = isCurrent ? CURRENT_BORDER : NEUTRAL_BORDER;
 
   const inner = (
     <div
@@ -66,14 +53,14 @@ function DigimonNodeInner({ data }: NodeProps) {
         borderRadius: '12px',
         border: `2px solid ${borderColor}`,
         background: isCurrent
-          ? 'linear-gradient(145deg, rgba(249,115,22,0.08), rgba(17,24,39,0.96))'
-          : `linear-gradient(145deg, ${form.bg}, rgba(17,24,39,0.96))`,
+          ? `linear-gradient(145deg, ${CURRENT_BG}, rgba(17,24,39,0.96))`
+          : `linear-gradient(145deg, ${NEUTRAL_BG}, rgba(17,24,39,0.96))`,
         backdropFilter: 'blur(6px)',
         boxShadow: isCurrent
-          ? `0 0 20px rgba(249,115,22,0.35), 0 0 6px rgba(249,115,22,0.15), 0 2px 8px rgba(0,0,0,0.4)`
-          : `0 0 12px ${form.glow}, 0 2px 8px rgba(0,0,0,0.3)`,
+          ? `0 0 20px ${CURRENT_GLOW}, 0 0 6px rgba(249,115,22,0.15), 0 2px 8px rgba(0,0,0,0.4)`
+          : `0 0 12px ${NEUTRAL_GLOW}, 0 2px 8px rgba(0,0,0,0.3)`,
         transition: 'box-shadow 0.2s ease, transform 0.15s ease',
-        cursor: d.slug && !isCurrent ? 'pointer' : 'default',
+        cursor: isClickable ? 'pointer' : 'default',
         userSelect: 'none' as const,
         width: 110,
       }}
@@ -87,7 +74,7 @@ function DigimonNodeInner({ data }: NodeProps) {
           borderRadius: '8px',
           overflow: 'hidden',
           background: 'rgba(17,24,39,0.6)',
-          border: `1px solid ${borderColor}30`,
+          border: '1px solid rgba(75,85,99,0.2)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -136,8 +123,8 @@ function DigimonNodeInner({ data }: NodeProps) {
             fontWeight: 600,
             padding: '1px 6px',
             borderRadius: '8px',
-            backgroundColor: `${form.border}18`,
-            color: form.border,
+            backgroundColor: 'rgba(156,163,175,0.12)',
+            color: BADGE_COLOR,
             letterSpacing: '0.03em',
             textTransform: 'uppercase' as const,
           }}
@@ -186,7 +173,7 @@ function DigimonNodeInner({ data }: NodeProps) {
     </div>
   );
 
-  if (d.slug && !isCurrent) {
+  if (isClickable) {
     return (
       <Link href={`/digimon/${d.slug}`} style={{ textDecoration: 'none', display: 'block', position: 'relative' }}>
         {inner}

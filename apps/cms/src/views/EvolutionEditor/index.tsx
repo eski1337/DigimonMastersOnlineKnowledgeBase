@@ -167,10 +167,18 @@ function EditorEdgeInner(props: EdgeProps) {
     sourcePosition, targetPosition, data, style, markerEnd,
   } = props;
 
-  const [edgePath, labelX, labelY] = getSmoothStepPath({
-    sourceX, sourceY, targetX, targetY,
-    sourcePosition, targetPosition,
-  });
+  // Use straight line when nearly horizontal, smoothstep otherwise
+  const nearlyAligned = Math.abs(sourceY - targetY) < 15;
+  const [edgePath, labelX, labelY] = nearlyAligned
+    ? [
+        `M ${sourceX},${sourceY} L ${targetX},${targetY}`,
+        (sourceX + targetX) / 2,
+        (sourceY + targetY) / 2,
+      ] as [string, number, number]
+    : getSmoothStepPath({
+        sourceX, sourceY, targetX, targetY,
+        sourcePosition, targetPosition,
+      });
 
   // Calculate distance in grid units (snap grid = 10px)
   const dx = Math.abs(targetX - sourceX);

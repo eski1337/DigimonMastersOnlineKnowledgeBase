@@ -15,6 +15,7 @@ import {
   getSmoothStepPath,
   useReactFlow,
   useViewport,
+  ConnectionMode,
   type Node,
   type Edge,
   type Connection,
@@ -150,15 +151,11 @@ function DigimonEditorNode({ data }: NodeProps) {
           {d.form}
         </span>
       )}
-      {/* Each position has both source + target so any-to-any connections work */}
-      <Handle type="target" position={Position.Left} id="left-t" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', left: -6 }} />
-      <Handle type="source" position={Position.Left} id="left-s" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', left: -6 }} />
-      <Handle type="target" position={Position.Right} id="right-t" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', right: -6 }} />
-      <Handle type="source" position={Position.Right} id="right-s" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', right: -6 }} />
-      <Handle type="target" position={Position.Top} id="top-t" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', top: -6 }} />
-      <Handle type="source" position={Position.Top} id="top-s" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', top: -6 }} />
-      <Handle type="target" position={Position.Bottom} id="bottom-t" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', bottom: -6 }} />
-      <Handle type="source" position={Position.Bottom} id="bottom-s" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', bottom: -6 }} />
+      {/* All handles are type="source" — connectionMode="loose" on ReactFlow allows any-to-any */}
+      <Handle type="source" position={Position.Left} id="left" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', left: -6 }} />
+      <Handle type="source" position={Position.Right} id="right" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', right: -6 }} />
+      <Handle type="source" position={Position.Top} id="top" style={{ width: 10, height: 10, background: '#f97316', border: '2px solid var(--theme-bg)', top: -6 }} />
+      <Handle type="source" position={Position.Bottom} id="bottom" style={{ width: 10, height: 10, background: '#60a5fa', border: '2px solid var(--theme-bg)', bottom: -6 }} />
     </div>
   );
 }
@@ -1327,6 +1324,7 @@ const EvolutionEditor: React.FC = () => {
             maxZoom={3}
             snapToGrid
             snapGrid={[10, 10]}
+            connectionMode={ConnectionMode.Loose}
           >
             <AlignmentOverlay nodes={nodes} draggingId={draggingNodeId} showGaps={showGaps} />
             <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--theme-elevation-100)" />

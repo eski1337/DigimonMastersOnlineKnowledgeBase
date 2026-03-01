@@ -643,9 +643,11 @@ const EvolutionEditor: React.FC = () => {
       if (exists) return;
 
       const newEdge: Edge = {
-        id: `e-${connection.source}-${connection.target}`,
+        id: `e-${connection.source}-${connection.target}-${connection.sourceHandle || 'r'}-${connection.targetHandle || 'l'}`,
         source: connection.source,
         target: connection.target,
+        sourceHandle: connection.sourceHandle,
+        targetHandle: connection.targetHandle,
         type: 'smoothstep',
         data: { evolutionType: 'normal' },
         style: { stroke: '#60a5fa', strokeWidth: 2 },
@@ -800,12 +802,24 @@ const EvolutionEditor: React.FC = () => {
         const layoutRes = await fetch(`/api/evolution-graph-layouts?where[rootDigimon][equals]=${resolveId(lineDoc.rootDigimon)}&depth=0&limit=1`);
         const layoutData = await layoutRes.json();
         const savedLayout = layoutData.docs?.[0]?.nodePositions;
+        const savedEdgeHandles = layoutData.docs?.[0]?.edgeHandles;
 
         if (savedLayout && typeof savedLayout === 'object') {
           for (const n of newNodes) {
             const pos = savedLayout[n.id];
             if (pos && typeof pos.x === 'number') {
               n.position = { x: pos.x, y: pos.y };
+            }
+          }
+        }
+
+        // Restore edge handle info (top/bottom connections)
+        if (savedEdgeHandles && typeof savedEdgeHandles === 'object') {
+          for (const edge of newEdges) {
+            const handles = savedEdgeHandles[edge.id];
+            if (handles) {
+              if (handles.sourceHandle) edge.sourceHandle = handles.sourceHandle;
+              if (handles.targetHandle) edge.targetHandle = handles.targetHandle;
             }
           }
         }
@@ -921,9 +935,18 @@ const EvolutionEditor: React.FC = () => {
       const layoutSearchData = await layoutSearchRes.json();
       const existingLayoutId = layoutSearchData.docs?.[0]?.id;
 
+      // Also save edge handle mappings
+      const edgeHandles: Record<string, { sourceHandle?: string | null; targetHandle?: string | null }> = {};
+      for (const edge of edges) {
+        if (edge.sourceHandle || edge.targetHandle) {
+          edgeHandles[edge.id] = { sourceHandle: edge.sourceHandle, targetHandle: edge.targetHandle };
+        }
+      }
+
       const layoutPayload = {
         rootDigimon: rootDigimonId,
         nodePositions,
+        edgeHandles,
       };
 
       if (existingLayoutId) {

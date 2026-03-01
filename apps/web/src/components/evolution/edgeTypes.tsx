@@ -82,22 +82,39 @@ function EvolutionEdgeInner(props: EdgeProps) {
 
   const label = formatEdgeLabel(evolutionType, requiredLevel, requiredItem);
 
-  // Straight line when nearly horizontal, smoothstep otherwise
-  const nearlyAligned = Math.abs(sourceY - targetY) < 40;
-  const [edgePath, labelX, labelY] = nearlyAligned
-    ? [
-        `M ${sourceX},${sourceY} L ${targetX},${targetY}`,
-        (sourceX + targetX) / 2,
-        (sourceY + targetY) / 2,
-      ] as [string, number, number]
-    : getSmoothStepPath({
-        sourceX,
-        sourceY,
-        targetX,
-        targetY,
-        sourcePosition,
-        targetPosition,
-      });
+  // Use straight lines for horizontal connections (Left↔Right handles).
+  // Only use smoothstep for vertical connections (Top↔Bottom handles).
+  const isHorizontal =
+    (sourcePosition === 'right' && targetPosition === 'left') ||
+    (sourcePosition === 'left' && targetPosition === 'right');
+  const isVertical =
+    (sourcePosition === 'bottom' && targetPosition === 'top') ||
+    (sourcePosition === 'top' && targetPosition === 'bottom');
+
+  let edgePath: string;
+  let labelX: number;
+  let labelY: number;
+
+  if (isVertical) {
+    // Vertical: straight line between top/bottom handles
+    edgePath = `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
+    labelX = (sourceX + targetX) / 2;
+    labelY = (sourceY + targetY) / 2;
+  } else if (isHorizontal || Math.abs(sourceY - targetY) < 60) {
+    // Horizontal: always straight line
+    edgePath = `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
+    labelX = (sourceX + targetX) / 2;
+    labelY = (sourceY + targetY) / 2;
+  } else {
+    [edgePath, labelX, labelY] = getSmoothStepPath({
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+      sourcePosition,
+      targetPosition,
+    });
+  }
 
   return (
     <>

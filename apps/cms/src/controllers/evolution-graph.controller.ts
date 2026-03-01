@@ -70,7 +70,7 @@ export function createEvolutionGraphController(payload: Payload) {
             collection: 'digimon',
             where: { id: { in: batch } },
             limit: 50,
-            depth: 0,
+            depth: 1,
           });
           for (const d of result.docs) digimonById.set((d as any).id, d);
         }

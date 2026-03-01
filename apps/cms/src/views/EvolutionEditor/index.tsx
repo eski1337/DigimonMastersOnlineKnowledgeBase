@@ -667,8 +667,11 @@ const EvolutionEditor: React.FC = () => {
       if (!connection.source || !connection.target) return;
       if (connection.source === connection.target) return;
 
-      // Check for duplicate
-      const exists = edges.some((e) => e.source === connection.source && e.target === connection.target);
+      // Check for duplicate in either direction
+      const exists = edges.some((e) =>
+        (e.source === connection.source && e.target === connection.target) ||
+        (e.source === connection.target && e.target === connection.source)
+      );
       if (exists) return;
 
       const newEdge: Edge = {
@@ -783,11 +786,19 @@ const EvolutionEditor: React.FC = () => {
           edgeDocs.push(...(data.docs || []));
         }
 
-        // Deduplicate edges
+        // Deduplicate edges (check both directions to prevent double lines)
         const edgeMap = new Map<string, EvolutionEdgeDoc>();
+        const seenPairs = new Set<string>();
         for (const e of edgeDocs) {
-          const key = `${resolveId(e.source)}->${resolveId(e.target)}`;
-          if (!edgeMap.has(key)) edgeMap.set(key, e);
+          const src = resolveId(e.source);
+          const tgt = resolveId(e.target);
+          const fwd = `${src}->${tgt}`;
+          const rev = `${tgt}->${src}`;
+          if (!seenPairs.has(fwd) && !seenPairs.has(rev)) {
+            edgeMap.set(fwd, e);
+            seenPairs.add(fwd);
+            seenPairs.add(rev);
+          }
         }
 
         // Build nodes
@@ -921,8 +932,10 @@ const EvolutionEditor: React.FC = () => {
       const currentEdgeKeys = new Set<string>();
       for (const edge of edges) {
         const key = `${edge.source}->${edge.target}`;
+        const revKey = `${edge.target}->${edge.source}`;
         currentEdgeKeys.add(key);
-        const existingDocId = existingEdgeDocsRef.current.get(key);
+        currentEdgeKeys.add(revKey); // mark reverse as "handled" so old reverse dupes get deleted
+        const existingDocId = existingEdgeDocsRef.current.get(key) || existingEdgeDocsRef.current.get(revKey);
         const edgeData: any = {
           source: edge.source,
           target: edge.target,

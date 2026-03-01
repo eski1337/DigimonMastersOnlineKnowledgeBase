@@ -157,6 +157,9 @@ function DigimonEditorNode({ data }: NodeProps) {
 
 const nodeTypes = { digimon: React.memo(DigimonEditorNode) };
 
+/* ── Module-level spacer toggle (read by edge component) ──────────── */
+let _showSpacers = true;
+
 /* ══════════════════════════════════════════════════════════════════════
    Custom Editor Edge — shows distance + requirement labels
    ══════════════════════════════════════════════════════════════════════ */
@@ -185,6 +188,10 @@ function EditorEdgeInner(props: EdgeProps) {
   const dy = Math.abs(targetY - sourceY);
   const dist = Math.round(Math.sqrt(dx * dx + dy * dy) / 10);
 
+  // Spacer color: read from edge data (set by parent when toggling)
+  const targetDist = (data as any)?._targetDist as number | undefined;
+  const spacerColor = targetDist != null && dist === targetDist ? '#22c55e' : targetDist != null ? '#f59e0b' : 'var(--theme-elevation-300)';
+
   const evoType = (data?.evolutionType as string) || 'normal';
   const reqLevel = data?.requiredLevel as number | undefined;
   const reqItem = data?.requiredItem as string | undefined;
@@ -199,31 +206,33 @@ function EditorEdgeInner(props: EdgeProps) {
     <>
       <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} style={style} />
       <EdgeLabelRenderer>
-        {/* Distance badge */}
-        <div
-          className="nodrag nopan"
-          style={{
-            position: 'absolute',
-            transform: `translate(-50%, -130%) translate(${labelX}px,${labelY}px)`,
-            zIndex: 10,
-            pointerEvents: 'none',
-          }}
-        >
-          <span
+        {/* Distance badge (spacer) */}
+        {_showSpacers && (
+          <div
+            className="nodrag nopan"
             style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: 'var(--theme-elevation-300)',
-              background: 'var(--theme-bg)',
-              border: '1px solid var(--theme-elevation-100)',
-              borderRadius: 4,
-              padding: '1px 5px',
-              fontFamily: 'monospace',
+              position: 'absolute',
+              transform: `translate(-50%, -130%) translate(${labelX}px,${labelY}px)`,
+              zIndex: 10,
+              pointerEvents: 'none',
             }}
           >
-            {dist}u
-          </span>
-        </div>
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                color: spacerColor,
+                background: 'var(--theme-bg)',
+                border: `1px solid ${spacerColor}40`,
+                borderRadius: 4,
+                padding: '1px 5px',
+                fontFamily: 'monospace',
+              }}
+            >
+              {dist}u
+            </span>
+          </div>
+        )}
 
         {/* Requirement labels (below edge) */}
         {hasReqs && (
@@ -385,6 +394,45 @@ const EvolutionEditor: React.FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
   const [dirty, setDirty] = useState(false);
+
+  /* ── Spacers toggle ─────────────────────────────────────────────── */
+  const [showSpacers, setShowSpacers] = useState(true);
+
+  // Sync module-level flag + inject _targetDist into edge data
+  useEffect(() => {
+    _showSpacers = showSpacers;
+    if (!showSpacers || edges.length === 0 || nodes.length === 0) return;
+
+    // Compute distance for each edge
+    const nodePos = new Map<string, { x: number; y: number }>();
+    for (const n of nodes) nodePos.set(n.id, n.position);
+
+    const dists: number[] = [];
+    for (const e of edges) {
+      const sp = nodePos.get(e.source);
+      const tp = nodePos.get(e.target);
+      if (!sp || !tp) continue;
+      const dx = Math.abs((tp.x) - (sp.x + NODE_W));
+      const dy = Math.abs(tp.y - sp.y);
+      dists.push(Math.round(Math.sqrt(dx * dx + dy * dy) / 10));
+    }
+
+    // Find most common distance
+    const freq = new Map<number, number>();
+    for (const d of dists) freq.set(d, (freq.get(d) || 0) + 1);
+    let modeDist = dists[0] ?? 0;
+    let modeCount = 0;
+    for (const [d, c] of freq) { if (c > modeCount) { modeDist = d; modeCount = c; } }
+
+    // Inject into edge data (only if changed)
+    setEdges((prev) =>
+      prev.map((e) => {
+        const cur = (e.data as any)?._targetDist;
+        if (cur === modeDist) return e;
+        return { ...e, data: { ...e.data, _targetDist: modeDist } };
+      }),
+    );
+  }, [showSpacers, nodes, edges.length]);
 
   /* ── Edge popup ─────────────────────────────────────────────────── */
   const [edgePopup, setEdgePopup] = useState<{ id: string; x: number; y: number } | null>(null);
@@ -924,6 +972,22 @@ const EvolutionEditor: React.FC = () => {
           }}
         >
           Auto Layout
+        </button>
+
+        <button
+          onClick={() => { setShowSpacers((s) => !s); _showSpacers = !showSpacers; }}
+          style={{
+            padding: '6px 16px',
+            borderRadius: 6,
+            border: `1px solid ${showSpacers ? '#22c55e' : 'var(--theme-elevation-150)'}`,
+            background: showSpacers ? 'rgba(34,197,94,0.1)' : 'var(--theme-elevation-50)',
+            color: showSpacers ? '#22c55e' : 'var(--theme-text)',
+            fontSize: 13,
+            fontWeight: 500,
+            cursor: 'pointer',
+          }}
+        >
+          {showSpacers ? '📏 Spacers ON' : '📏 Spacers OFF'}
         </button>
 
         <button

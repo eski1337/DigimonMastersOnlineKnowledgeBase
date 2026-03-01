@@ -73,6 +73,7 @@ const EVOLUTION_TYPES = [
   { label: 'Normal', value: 'normal' },
   { label: 'Jogress / DNA', value: 'jogress' },
   { label: 'Digi-Egg', value: 'digi-egg' },
+  { label: 'Armor', value: 'armor' },
   { label: 'X-Antibody', value: 'x-antibody' },
   { label: 'Variant', value: 'variant' },
   { label: 'Alternate', value: 'alternate' },

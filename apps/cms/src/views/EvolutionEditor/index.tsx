@@ -14,6 +14,7 @@ import {
   EdgeLabelRenderer,
   getSmoothStepPath,
   useReactFlow,
+  useViewport,
   type Node,
   type Edge,
   type Connection,
@@ -274,6 +275,7 @@ const SNAP_PX = 5;
 interface GapLabel { x: number; y: number; gap: number; dir: 'h' | 'v'; x1: number; y1: number; x2: number; y2: number }
 
 function AlignmentOverlay({ nodes, draggingId, showGaps }: { nodes: Node[]; draggingId: string | null; showGaps: boolean }) {
+  const { x: vx, y: vy, zoom } = useViewport();
   const guides: JSX.Element[] = [];
   const gaps: GapLabel[] = [];
 
@@ -383,31 +385,34 @@ function AlignmentOverlay({ nodes, draggingId, showGaps }: { nodes: Node[]; drag
 
   return (
     <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 5, overflow: 'visible' }}>
-      {guides}
-      {gaps.map((m, i) => {
-        const isH = m.dir === 'h';
-        return (
-          <g key={`gap${i}`}>
-            {/* Measurement line */}
-            <line x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2} stroke="#22c55e" strokeWidth={1} strokeDasharray="3 2" opacity={0.5} />
-            {/* End caps */}
-            {isH ? (
-              <>
-                <line x1={m.x1} y1={m.y1 - 6} x2={m.x1} y2={m.y1 + 6} stroke="#22c55e" strokeWidth={1} opacity={0.5} />
-                <line x1={m.x2} y1={m.y2 - 6} x2={m.x2} y2={m.y2 + 6} stroke="#22c55e" strokeWidth={1} opacity={0.5} />
-              </>
-            ) : (
-              <>
-                <line x1={m.x1 - 6} y1={m.y1} x2={m.x1 + 6} y2={m.y1} stroke="#22c55e" strokeWidth={1} opacity={0.5} />
-                <line x1={m.x2 - 6} y1={m.y2} x2={m.x2 + 6} y2={m.y2} stroke="#22c55e" strokeWidth={1} opacity={0.5} />
-              </>
-            )}
-            {/* Label */}
-            <rect x={m.x - 16} y={m.y - 8} width={32} height={15} rx={3} fill="rgba(0,0,0,0.85)" />
-            <text x={m.x} y={m.y + 4} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight={700} fill="#22c55e">{m.gap}px</text>
-          </g>
-        );
-      })}
+      <g transform={`translate(${vx}, ${vy}) scale(${zoom})`}>
+        {guides}
+        {gaps.map((m, i) => {
+          const isH = m.dir === 'h';
+          const sw = 1 / zoom; // keep stroke width constant regardless of zoom
+          return (
+            <g key={`gap${i}`}>
+              {/* Measurement line */}
+              <line x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2} stroke="#22c55e" strokeWidth={sw} strokeDasharray="3 2" opacity={0.5} />
+              {/* End caps */}
+              {isH ? (
+                <>
+                  <line x1={m.x1} y1={m.y1 - 6} x2={m.x1} y2={m.y1 + 6} stroke="#22c55e" strokeWidth={sw} opacity={0.5} />
+                  <line x1={m.x2} y1={m.y2 - 6} x2={m.x2} y2={m.y2 + 6} stroke="#22c55e" strokeWidth={sw} opacity={0.5} />
+                </>
+              ) : (
+                <>
+                  <line x1={m.x1 - 6} y1={m.y1} x2={m.x1 + 6} y2={m.y1} stroke="#22c55e" strokeWidth={sw} opacity={0.5} />
+                  <line x1={m.x2 - 6} y1={m.y2} x2={m.x2 + 6} y2={m.y2} stroke="#22c55e" strokeWidth={sw} opacity={0.5} />
+                </>
+              )}
+              {/* Label */}
+              <rect x={m.x - 16} y={m.y - 8} width={32} height={15} rx={3} fill="rgba(0,0,0,0.85)" />
+              <text x={m.x} y={m.y + 4} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight={700} fill="#22c55e">{m.gap}px</text>
+            </g>
+          );
+        })}
+      </g>
     </svg>
   );
 }

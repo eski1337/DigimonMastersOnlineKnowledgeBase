@@ -87,7 +87,7 @@ function DigimonNodeInner({ data }: NodeProps) {
             width={72}
             height={72}
             className="object-contain"
-            style={{ width: 72, height: 72 }}
+            style={{ width: 72, height: 72, objectFit: 'contain' }}
             loading="lazy"
             unoptimized
           />

@@ -61,15 +61,15 @@ function DigimonNodeInner({ data }: NodeProps) {
         transition: 'box-shadow 0.2s ease, transform 0.15s ease',
         cursor: isClickable ? 'pointer' : 'default',
         userSelect: 'none' as const,
-        width: 110,
+        width: 150,
       }}
       className="evolution-node-card"
     >
       {/* Image container */}
       <div
         style={{
-          width: 64,
-          height: 64,
+          width: 80,
+          height: 80,
           borderRadius: '8px',
           overflow: 'hidden',
           background: 'rgba(17,24,39,0.6)',
@@ -84,10 +84,10 @@ function DigimonNodeInner({ data }: NodeProps) {
           <Image
             src={d.icon!}
             alt={d.label}
-            width={56}
-            height={56}
+            width={72}
+            height={72}
             className="object-contain"
-            style={{ width: 56, height: 56 }}
+            style={{ width: 72, height: 72 }}
             loading="lazy"
             unoptimized
           />
@@ -99,12 +99,12 @@ function DigimonNodeInner({ data }: NodeProps) {
       {/* Name */}
       <span
         style={{
-          fontSize: '10px',
+          fontSize: '12px',
           fontWeight: 700,
           lineHeight: 1.2,
           textAlign: 'center',
           color: isCurrent ? '#fb923c' : '#e5e7eb',
-          maxWidth: 100,
+          maxWidth: 140,
           overflow: 'hidden',
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -118,7 +118,7 @@ function DigimonNodeInner({ data }: NodeProps) {
       {d.level && (
         <span
           style={{
-            fontSize: '7.5px',
+            fontSize: '9px',
             fontWeight: 600,
             padding: '1px 6px',
             borderRadius: '8px',

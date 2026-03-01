@@ -83,7 +83,7 @@ function EvolutionEdgeInner(props: EdgeProps) {
   const label = formatEdgeLabel(evolutionType, requiredLevel, requiredItem);
 
   // Straight line when nearly horizontal, smoothstep otherwise
-  const nearlyAligned = Math.abs(sourceY - targetY) < 15;
+  const nearlyAligned = Math.abs(sourceY - targetY) < 40;
   const [edgePath, labelX, labelY] = nearlyAligned
     ? [
         `M ${sourceX},${sourceY} L ${targetX},${targetY}`,

@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SkillsSection } from '@/components/digimon/skills-section';
-import { DigivolutionTreeButton } from '@/components/digimon/digivolution-tree-button';
 import { ImageModal } from '@/components/digimon/image-modal';
 import { LocalizedNames } from '@/components/digimon/localized-names';
 import { EvolutionTreeV2 as EvolutionTree } from '@/components/digimon/evolution-tree-v2';
@@ -164,7 +163,6 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   Edit
                 </a>
               )}
-              <DigivolutionTreeButton slug={params.slug} />
             </div>
           </div>
 

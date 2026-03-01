@@ -7,6 +7,7 @@ import {
   Background,
   Controls,
   BackgroundVariant,
+  ConnectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -151,7 +152,7 @@ export function EvolutionGraph({ slug }: EvolutionGraphProps) {
           maxZoom={2}
           fitView={!data.layout?.viewport}
           fitViewOptions={{ padding: 0.2, maxZoom: 1.2 }}
-          connectionMode="loose"
+          connectionMode={ConnectionMode.Loose}
           proOptions={{ hideAttribution: true }}
         >
           <Background

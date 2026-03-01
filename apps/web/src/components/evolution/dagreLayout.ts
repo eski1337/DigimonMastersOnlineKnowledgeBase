@@ -52,15 +52,33 @@ export function buildFlowElements(
       };
     });
 
-    // Apply saved edge handle info (top/bottom connections)
-    // Keys are "sourceSlug->targetSlug" format from the API
-    if (layout!.edgeHandles) {
-      for (const edge of edges) {
-        const key = `${edge.source}->${edge.target}`;
-        const handles = layout!.edgeHandles[key];
-        if (handles) {
-          if (handles.sourceHandle) edge.sourceHandle = handles.sourceHandle;
-          if (handles.targetHandle) edge.targetHandle = handles.targetHandle;
+    // Apply saved edge handle info, or auto-assign based on node positions
+    const posMap = new Map<string, { x: number; y: number }>();
+    for (const n of nodes) posMap.set(n.id, n.position);
+
+    for (const edge of edges) {
+      // Try saved handles first
+      const key = `${edge.source}->${edge.target}`;
+      const saved = layout!.edgeHandles?.[key];
+      if (saved?.sourceHandle && saved?.targetHandle) {
+        edge.sourceHandle = saved.sourceHandle;
+        edge.targetHandle = saved.targetHandle;
+      } else {
+        // Auto-assign based on relative position
+        const sPos = posMap.get(edge.source);
+        const tPos = posMap.get(edge.target);
+        if (sPos && tPos) {
+          const dx = tPos.x - sPos.x;
+          const dy = tPos.y - sPos.y;
+          if (Math.abs(dx) > Math.abs(dy)) {
+            // Primarily horizontal
+            edge.sourceHandle = dx > 0 ? 'right' : 'left';
+            edge.targetHandle = dx > 0 ? 'left' : 'right';
+          } else {
+            // Primarily vertical
+            edge.sourceHandle = dy > 0 ? 'bottom' : 'top';
+            edge.targetHandle = dy > 0 ? 'top' : 'bottom';
+          }
         }
       }
     }
@@ -117,6 +135,25 @@ function autoLayout(
       },
     };
   });
+
+  // Auto-assign handles based on dagre positions
+  const posMap = new Map<string, { x: number; y: number }>();
+  for (const n of nodes) posMap.set(n.id, n.position);
+  for (const edge of edges) {
+    const sPos = posMap.get(edge.source);
+    const tPos = posMap.get(edge.target);
+    if (sPos && tPos) {
+      const dx = tPos.x - sPos.x;
+      const dy = tPos.y - sPos.y;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        edge.sourceHandle = dx > 0 ? 'right' : 'left';
+        edge.targetHandle = dx > 0 ? 'left' : 'right';
+      } else {
+        edge.sourceHandle = dy > 0 ? 'bottom' : 'top';
+        edge.targetHandle = dy > 0 ? 'top' : 'bottom';
+      }
+    }
+  }
 
   return { nodes, edges };
 }

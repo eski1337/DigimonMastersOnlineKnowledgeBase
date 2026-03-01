@@ -5,16 +5,7 @@
 import { Router } from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import { getMetrics, streamMetrics } from '../controllers/metrics.controller';
-
-// Simple admin-role check via Payload session
-function requireAdmin(req: Request, res: Response, next: NextFunction): void {
-  const user = (req as any).user;
-  if (!user || !['admin', 'owner'].includes(user.role)) {
-    res.status(403).json({ error: 'Admin access required' });
-    return;
-  }
-  next();
-}
+import { requireAdmin } from '../middleware/require-admin';
 
 // Per-IP rate limit for metrics endpoint (max 30 req/min)
 const rateBuckets = new Map<string, { count: number; reset: number }>();

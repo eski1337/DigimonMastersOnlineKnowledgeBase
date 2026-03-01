@@ -1,7 +1,31 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limiter';
+
+// ── Edge-compatible in-memory rate limiter (no Redis/Node deps) ──────
+const rateLimitMap = new Map<string, { count: number; reset: number }>();
+
+function edgeRateLimit(key: string, max: number, windowMs: number) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(key);
+  if (!entry || entry.reset < now) {
+    rateLimitMap.set(key, { count: 1, reset: now + windowMs });
+    return { success: true, limit: max, remaining: max - 1, reset: now + windowMs };
+  }
+  if (entry.count < max) {
+    entry.count++;
+    return { success: true, limit: max, remaining: max - entry.count, reset: entry.reset };
+  }
+  return { success: false, limit: max, remaining: 0, reset: entry.reset };
+}
+
+function getClientIdentifier(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0].trim();
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return realIp;
+  return 'anonymous';
+}
 
 const ALLOWED_ORIGINS = new Set(
   [
@@ -43,7 +67,7 @@ export async function middleware(request: NextRequest) {
       : { maxRequests: 100, windowMs: 60_000 };  // 100/min for reads
 
     const key = isWrite ? `${clientId}:write` : clientId;
-    const rateLimitResult = await checkRateLimit(key, config);
+    const rateLimitResult = edgeRateLimit(key, config.maxRequests, config.windowMs);
 
     if (!rateLimitResult.success) {
       const retryAfter = Math.ceil((rateLimitResult.reset - Date.now()) / 1000);

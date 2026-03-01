@@ -9,10 +9,10 @@ import { createLogger } from './logger';
 
 const log = createLogger('backup-health');
 
-const BACKUP_ROOT = process.env.BACKUP_DIR || '/backups';
+const BACKUP_ROOT = process.env.BACKUP_DIR || '/home/deploy/backups';
 const MONGO_DIR = path.join(BACKUP_ROOT, 'mongo');
 const UPLOADS_DIR = path.join(BACKUP_ROOT, 'uploads');
-const LOG_FILE = '/var/log/dmokb-backup.log';
+const LOG_FILE = process.env.BACKUP_LOG_FILE || '/home/deploy/backups/backup.log';
 
 export interface RetentionCounts {
   daily: number;

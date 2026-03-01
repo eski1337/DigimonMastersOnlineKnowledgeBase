@@ -16,7 +16,7 @@ const AuditLogs: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'documentTitle',
-    group: 'System',
+    group: { en: 'System', zhTw: '系統' },
     defaultColumns: ['action', 'collection', 'documentTitle', 'userEmail', 'timestamp'],
     description: 'Immutable log of all CMS operations',
   },

@@ -8,7 +8,7 @@ export const Items: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
-    group: 'Game Data',
+    group: { en: 'Game Data', zhTw: '遊戲資料' },
     defaultColumns: ['name', 'category', 'icon'],
   },
   access: {

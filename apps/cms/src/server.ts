@@ -32,7 +32,43 @@ async function start(): Promise<void> {
   // 1. Create the Express app (pre-init middleware + routes)
   const app = createApp();
 
-  // 2. Initialize Payload CMS
+  // 2. Username-to-email login resolver (MUST be before payload.init)
+  //    Intercepts POST /api/users/login, resolves username→email,
+  //    then passes through to Payload's own login handler.
+  //
+  //    This middleware is REGISTERED before payload.init() (so it runs first
+  //    in the Express middleware chain), but EXECUTES only at request time
+  //    (after init has completed), so `payload` is fully initialized.
+  //
+  //    Uses payload.find() instead of raw mongoose — avoids pnpm hoisting
+  //    issues where require('mongoose') fails in strict node_modules.
+  app.use('/api/users/login', async (req, res, next) => {
+    if (req.method !== 'POST' || !req.body?.email) { next(); return; }
+    const identifier = (req.body.email as string).trim();
+    if (identifier.includes('@')) { next(); return; }
+    if (identifier.length === 0 || identifier.length > 64) { next(); return; }
+    try {
+      const result = await payload.find({
+        collection: 'users',
+        where: {
+          username: { equals: identifier.toLowerCase() },
+        },
+        limit: 1,
+        depth: 0,
+        overrideAccess: true,
+        showHiddenFields: false,
+      });
+      if (result.docs.length > 0 && result.docs[0].email) {
+        logger.info({ username: identifier }, 'Resolved username to email for login');
+        req.body.email = result.docs[0].email;
+      }
+    } catch (err: any) {
+      logger.warn({ error: err.message }, 'Username lookup failed, falling through');
+    }
+    next();
+  });
+
+  // 3. Initialize Payload CMS
   await payload.init({
     secret: env.PAYLOAD_SECRET,
     express: app,
@@ -41,22 +77,7 @@ async function start(): Promise<void> {
     },
   });
 
-  // 3. Patch admin HTML responses to remove Payload's default header elements
-  app.use('/admin', (req, res, next) => {
-    if (req.method !== 'GET') { next(); return; }
-    const origSend = res.send.bind(res);
-    res.send = function patchedSend(body: any) {
-      if (typeof body === 'string' && body.includes('</head>')) {
-        body = body.replace('</head>', `<style>
-          header .nav__toggle, header .hamburger { display: none !important; }
-        </style></head>`);
-      }
-      return origSend(body);
-    };
-    next();
-  });
-
-  // 4. Register post-init routes (scraper, digimon, admin pages)
+  // 3. Register post-init routes (scraper, digimon, admin pages)
   registerPostInitRoutes(app, payload);
 
   // 5. Start HTTP server

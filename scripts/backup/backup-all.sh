@@ -16,7 +16,7 @@ if [[ -f "${PROJECT_ROOT}/.env" ]]; then
     load_env "${PROJECT_ROOT}/.env"
 fi
 
-BACKUP_DIR="${BACKUP_DIR:-/backups}"
+BACKUP_DIR="${BACKUP_DIR:-/home/deploy/backups}"
 export BACKUP_DIR
 
 FULL_START=$(date +%s)

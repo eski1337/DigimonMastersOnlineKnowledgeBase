@@ -126,5 +126,7 @@ export interface PatchNoteDoc extends PayloadDoc {
   url?: string;
   sourceId?: number;
   sourceHash?: string;
+  eventStatus?: 'in_progress' | 'finished';
+  sourceType?: 'event' | 'patchnote';
   published?: boolean;
 }

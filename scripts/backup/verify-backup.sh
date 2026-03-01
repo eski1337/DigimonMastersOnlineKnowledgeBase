@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 MONGODB_URI="${MONGODB_URI:-mongodb://localhost:27017/dmo-kb}"
-BACKUP_DIR="${BACKUP_DIR:-/backups/mongo}"
+BACKUP_DIR="${BACKUP_DIR:-/home/deploy/backups/mongo}"
 TEST_DB="dmokb_backup_verify_$$"
 
 # --- Resolve backup file ---

@@ -16,21 +16,23 @@ export default function DigimonPage() {
   const router = useRouter();
   
   // Parse filters from URL search params
+  // Values are comma-separated (e.g. element=Wood,Ice)
   const initialFilters = useMemo<Filters>(() => {
     const f: Filters = {};
-    const attribute = searchParams.get('attribute');
-    const element = searchParams.get('element');
-    const rank = searchParams.get('rank');
-    const family = searchParams.get('family');
-    const form = searchParams.get('form');
-    const attackerType = searchParams.get('attackerType');
+    const split = (v: string | null) => v ? v.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const attribute = split(searchParams.get('attribute'));
+    const element = split(searchParams.get('element'));
+    const rank = split(searchParams.get('rank'));
+    const family = split(searchParams.get('family'));
+    const form = split(searchParams.get('form'));
+    const attackerType = split(searchParams.get('attackerType'));
     const search = searchParams.get('search');
-    if (attribute) f.attribute = [attribute] as any;
-    if (element) f.element = [element] as any;
-    if (rank) f.rank = [rank] as any;
-    if (family) f.family = [family] as any;
-    if (form) f.form = [form] as any;
-    if (attackerType) f.attackerType = [attackerType] as any;
+    if (attribute.length) f.attribute = attribute as any;
+    if (element.length) f.element = element as any;
+    if (rank.length) f.rank = rank as any;
+    if (family.length) f.family = family as any;
+    if (form.length) f.form = form as any;
+    if (attackerType.length) f.attackerType = attackerType as any;
     if (search) f.search = search;
     return f;
   }, [searchParams]);
@@ -53,12 +55,12 @@ export default function DigimonPage() {
     params.set('limit', ITEMS_PER_PAGE.toString());
     params.set('page', page.toString());
     if (f.search) params.set('search', f.search);
-    if (f.element?.length) f.element.forEach(e => params.append('element', e));
-    if (f.attribute?.length) f.attribute.forEach(a => params.append('attribute', a));
-    if (f.rank?.length) f.rank.forEach(r => params.append('rank', r));
-    if (f.form?.length) f.form.forEach(fo => params.append('form', fo));
-    if (f.family?.length) f.family.forEach(fa => params.append('family', fa));
-    if (f.attackerType?.length) f.attackerType.forEach(at => params.append('attackerType', at));
+    if (f.element?.length) params.set('element', f.element.join(','));
+    if (f.attribute?.length) params.set('attribute', f.attribute.join(','));
+    if (f.rank?.length) params.set('rank', f.rank.join(','));
+    if (f.form?.length) params.set('form', f.form.join(','));
+    if (f.family?.length) params.set('family', f.family.join(','));
+    if (f.attackerType?.length) params.set('attackerType', f.attackerType.join(','));
     return params.toString();
   }, []);
 

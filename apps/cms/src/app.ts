@@ -49,10 +49,10 @@ export function registerPostInitRoutes(
   const { createPostInitAdminRoutes } = require('./routes/admin.routes');
   const { createScraperRoutes } = require('./routes/scraper.routes');
   const { createDigimonRoutes } = require('./routes/digimon.routes');
-  const { createLoginResolver } = require('./middleware/auth');
 
-  // Username-to-email login resolver
-  app.use('/api/users/login', createLoginResolver(payload));
+  // NOTE: Username-to-email login resolver is in server.ts (pre-init)
+  // because Payload's own login handler runs first and would consume
+  // the request before any post-init middleware can modify req.body.
 
   // Post-init admin pages
   app.use(createPostInitAdminRoutes());
@@ -64,12 +64,20 @@ export function registerPostInitRoutes(
   // Metrics routes (admin-only, after Payload auth middleware)
   const { createMetricsRoutes } = require('./routes/metrics.routes');
   const { startMetricsCollection } = require('./controllers/metrics.controller');
+  const { setPayloadRef } = require('./services/metrics.service');
+  setPayloadRef(payload); // Inject initialized Payload so Mongo health check works
   app.use(createMetricsRoutes());
   startMetricsCollection();
 
   // Admin backup routes (admin-only)
   const { createAdminBackupRoutes } = require('./routes/admin-backup.routes');
   app.use(createAdminBackupRoutes());
+
+  // Patch notes scraper routes + auto-sync cron (admin-only)
+  const { createPatchNotesScraperRoutes } = require('./routes/patchnotes-scraper.routes');
+  const { startScrapeCron } = require('./services/patchnotes-scraper.service');
+  app.use(createPatchNotesScraperRoutes());
+  startScrapeCron();
 
   // Centralized error handler (must be last)
   app.use(errorHandler);

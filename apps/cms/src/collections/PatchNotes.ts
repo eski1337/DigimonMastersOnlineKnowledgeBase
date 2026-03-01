@@ -4,8 +4,8 @@ const PatchNotes: CollectionConfig = {
   slug: 'patchNotes',
   admin: {
     useAsTitle: 'title',
-    group: 'Content',
-    defaultColumns: ['title', 'version', 'publishedDate', 'published'],
+    group: { en: 'Content', zhTw: '內容' },
+    defaultColumns: ['title', 'eventStatus', 'sourceType', 'publishedDate', 'published'],
   },
   access: {
     read: () => true,
@@ -83,6 +83,28 @@ const PatchNotes: CollectionConfig = {
       type: 'text',
       admin: {
         description: 'SHA-256 hash of scraped content for change detection',
+      },
+    },
+    {
+      name: 'eventStatus',
+      type: 'select',
+      options: [
+        { label: 'In Progress', value: 'in_progress' },
+        { label: 'Finished', value: 'finished' },
+      ],
+      admin: {
+        description: 'Event status from official site (IN PROGRESS / FINISHED)',
+      },
+    },
+    {
+      name: 'sourceType',
+      type: 'select',
+      options: [
+        { label: 'Event', value: 'event' },
+        { label: 'Patch Note', value: 'patchnote' },
+      ],
+      admin: {
+        description: 'Whether this came from the Events or Patch Notes section',
       },
     },
     {

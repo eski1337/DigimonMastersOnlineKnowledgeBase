@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # --- Logging ---
-LOG_FILE="${LOG_FILE:-/var/log/dmokb-backup.log}"
+LOG_FILE="${LOG_FILE:-/home/deploy/backups/backup.log}"
 
 _log() {
     local level="$1"; shift

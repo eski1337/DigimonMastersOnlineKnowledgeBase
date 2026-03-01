@@ -10,6 +10,10 @@ import { createLogger } from './logger';
 
 const log = createLogger('metrics');
 
+// --- Payload reference (injected after init) ---
+let payloadRef: any = null;
+export function setPayloadRef(p: any): void { payloadRef = p; }
+
 // --- Cache ---
 let cachedMetrics: FullMetrics | null = null;
 let cacheTimestamp = 0;
@@ -193,9 +197,16 @@ async function collectMongo(): Promise<MongoMetrics> {
     storageSizeMB: 0, dataSize: 0, collections: 0, ok: false,
   };
   try {
-    const mongoose = require('mongoose');
-    const db = mongoose.connection?.db;
-    if (!db) return fallback;
+    // Use the injected Payload reference (set via setPayloadRef after init).
+    // require('payload') is unreliable due to ESM/CJS interop under pnpm.
+    const p = payloadRef;
+    if (!p) return fallback;
+    const adapter = p.db as any;
+    const connection = adapter?.connection;
+    const db = connection?.db;
+
+    // readyState: 0=disconnected, 1=connected, 2=connecting, 3=disconnecting
+    if (!db || connection?.readyState !== 1) return fallback;
 
     const [serverStatus, dbStats] = await Promise.all([
       db.command({ serverStatus: 1 }).catch(() => null),
@@ -207,7 +218,8 @@ async function collectMongo(): Promise<MongoMetrics> {
     const totalOps = (ops.insert || 0) + (ops.query || 0) + (ops.update || 0) + (ops.delete || 0) + (ops.command || 0);
 
     return {
-      connections: conns.current || 0,
+      // Fallback to 1 if connected but serverStatus unavailable (requires clusterMonitor role)
+      connections: conns.current || (connection?.readyState === 1 ? 1 : 0),
       availableConnections: conns.available || 0,
       opsPerSec: totalOps, // cumulative, delta computed client-side
       storageSizeMB: dbStats ? Math.round((dbStats.storageSize || 0) / 1048576) : 0,

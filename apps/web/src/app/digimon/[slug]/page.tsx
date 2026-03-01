@@ -8,11 +8,13 @@ import { ImageModal } from '@/components/digimon/image-modal';
 import { LocalizedNames } from '@/components/digimon/localized-names';
 import { EvolutionTreeV2 as EvolutionTree } from '@/components/digimon/evolution-tree-v2';
 import { VisualEvolutionEditor } from '@/components/digimon/visual-evolution-editor';
+import { EvolutionGraphLoader } from '@/components/evolution/EvolutionGraphLoader';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import type { PayloadMedia } from '@/types/digimon';
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+const USE_NEW_EVOLUTION = process.env.NEXT_PUBLIC_USE_NEW_EVOLUTION === 'true';
 
 async function getDigimon(slug: string) {
   try {
@@ -257,25 +259,32 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
       </div>
 
 
-      {/* Complete Evolution Tree - Always show */}
-      <EvolutionTree
-        currentDigimon={{ 
-          name: d.name, 
-          slug: d.slug,
-          icon: typeof d.icon === 'string' ? d.icon : (d.icon as PayloadMedia)?.url,
-          rank: d.rank
-        }}
-        digivolvesFrom={d.digivolutions?.digivolvesFrom || []}
-        digivolvesTo={d.digivolutions?.digivolvesTo || []}
-      />
+      {/* Evolution Display */}
+      {USE_NEW_EVOLUTION ? (
+        <EvolutionGraphLoader slug={d.slug} />
+      ) : (
+        <>
+          {/* Complete Evolution Tree - Always show */}
+          <EvolutionTree
+            currentDigimon={{ 
+              name: d.name, 
+              slug: d.slug,
+              icon: typeof d.icon === 'string' ? d.icon : (d.icon as PayloadMedia)?.url,
+              rank: d.rank
+            }}
+            digivolvesFrom={d.digivolutions?.digivolvesFrom || []}
+            digivolvesTo={d.digivolutions?.digivolvesTo || []}
+          />
 
-      {/* Visual Evolution Editor - Only for Owner/Admin/Editor */}
-      <VisualEvolutionEditor
-        digimonId={d.id}
-        digimonName={d.name}
-        digimonSlug={d.slug}
-        userRole={session?.user?.role}
-      />
+          {/* Visual Evolution Editor - Only for Owner/Admin/Editor */}
+          <VisualEvolutionEditor
+            digimonId={d.id}
+            digimonName={d.name}
+            digimonSlug={d.slug}
+            userRole={session?.user?.role}
+          />
+        </>
+      )}
 
       {/* Skills - Always show */}
       {d.skills && d.skills.length > 0 ? (

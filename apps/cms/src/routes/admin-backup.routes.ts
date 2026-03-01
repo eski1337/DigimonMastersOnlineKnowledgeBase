@@ -3,17 +3,8 @@
  * No business logic — wires HTTP → controller.
  */
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
 import { listBackups, downloadBackup, runBackup, runVerify } from '../controllers/backup.controller';
-
-function requireAdmin(req: Request, res: Response, next: NextFunction): void {
-  const user = (req as any).user;
-  if (!user || !['admin', 'owner'].includes(user.role)) {
-    res.status(403).json({ error: 'Admin access required' });
-    return;
-  }
-  next();
-}
+import { requireAdmin } from '../middleware/require-admin';
 
 export function createAdminBackupRoutes(): Router {
   const router = Router();

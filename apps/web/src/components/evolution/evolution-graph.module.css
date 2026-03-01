@@ -1,0 +1,192 @@
+/* ── Evolution Graph Container ─────────────────────────────────────── */
+
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: min(480px, 65vh);
+  min-height: 340px;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 2px solid rgba(249, 115, 22, 0.25);
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(249, 115, 22, 0.03) 0%, transparent 60%),
+    linear-gradient(160deg, rgba(12, 14, 20, 0.95), rgba(20, 24, 36, 0.95));
+  contain: layout style paint;
+}
+
+/* ── React Flow overrides ─────────────────────────────────────────── */
+
+.wrapper :global(.react-flow) {
+  width: 100%;
+  height: 100%;
+}
+
+.wrapper :global(.react-flow__background) {
+  opacity: 0.2;
+}
+
+.wrapper :global(.react-flow__attribution) {
+  display: none;
+}
+
+.wrapper :global(.react-flow__controls) {
+  bottom: 10px;
+  right: 10px;
+  left: auto;
+  gap: 2px;
+}
+
+.wrapper :global(.react-flow__controls button) {
+  width: 26px;
+  height: 26px;
+  background: rgba(12, 14, 20, 0.92);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  color: #f97316;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
+.wrapper :global(.react-flow__controls button:hover) {
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(249, 115, 22, 0.45);
+}
+
+.wrapper :global(.react-flow__controls button svg) {
+  fill: currentColor;
+  max-width: 14px;
+  max-height: 14px;
+}
+
+.wrapper :global(.react-flow__minimap) {
+  display: none;
+}
+
+/* ── Node hover elevation ─────────────────────────────────────────── */
+
+.wrapper :global(.react-flow__node:hover .evolution-node-card) {
+  box-shadow:
+    0 0 20px rgba(249, 115, 22, 0.25),
+    0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+/* ── Current node pulse ───────────────────────────────────────────── */
+
+@keyframes currentPulse {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 0.7; }
+}
+
+/* ── Mobile touch ─────────────────────────────────────────────────── */
+
+.wrapper :global(.react-flow__pane) {
+  touch-action: none;
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    height: min(360px, 55vh);
+    min-height: 280px;
+    touch-action: pan-y;
+  }
+}
+
+/* ── Outer card ───────────────────────────────────────────────────── */
+
+.card {
+  border-radius: 0.75rem;
+  border: 2px solid rgba(249, 115, 22, 0.3);
+  background: linear-gradient(160deg, rgba(17, 24, 39, 0.8), rgba(31, 41, 55, 0.8));
+  overflow: hidden;
+}
+
+/* ── Header ───────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem 0.25rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fb923c, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.01em;
+}
+
+/* ── Legend ────────────────────────────────────────────────────────── */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  padding: 0.125rem 1rem 0.5rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.6875rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.legendDot {
+  width: 8px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Loading skeleton ─────────────────────────────────────────────── */
+
+.skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-bottom-color: #f97316;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Error / empty fallback ───────────────────────────────────────── */
+
+.fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.fallbackText {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.fallbackSub {
+  font-size: 0.75rem;
+  color: #6b7280;
+}

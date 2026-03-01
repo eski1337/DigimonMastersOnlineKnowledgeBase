@@ -101,7 +101,7 @@ const Users: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'email',
-    group: 'System',
+    group: { en: 'System', zhTw: '系統' },
     listSearchableFields: ['email', 'username', 'name'],
     defaultColumns: ['email', 'username', 'name', 'role'],
   },
@@ -161,20 +161,27 @@ const Users: CollectionConfig = {
     },
   },
   fields: [
+    // username field is now managed by Payload's loginWithUsername
+    // but we keep explicit config for indexing and auto-generation
     {
       name: 'username',
       type: 'text',
-      required: false, // Not required - allows existing users to login
+      required: false,
       unique: true,
+      index: true,
       admin: {
-        description: 'Unique username for login (optional)',
+        description: 'Unique username for login',
       },
       hooks: {
         beforeValidate: [
           ({ value, data }) => {
             // Auto-generate username from email if not provided
             if (!value && data?.email) {
-              return data.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+              return data.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_-]/g, '');
+            }
+            // Normalize: lowercase, strip dangerous chars
+            if (typeof value === 'string') {
+              return value.trim().toLowerCase();
             }
             return value;
           },

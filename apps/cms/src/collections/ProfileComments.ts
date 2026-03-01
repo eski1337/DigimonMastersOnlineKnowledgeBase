@@ -15,7 +15,7 @@ const ProfileComments: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'id',
-    group: 'Social',
+    group: { en: 'Social', zhTw: '社交' },
     defaultColumns: ['author', 'profile', 'body', 'createdAt'],
   },
   timestamps: true,

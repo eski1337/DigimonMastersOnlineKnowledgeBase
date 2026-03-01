@@ -4,7 +4,7 @@ import path from 'path';
 const Media: CollectionConfig = {
   slug: 'media',
   admin: {
-    group: 'System',
+    group: { en: 'System', zhTw: '系統' },
   },
   upload: {
     staticURL: '/media',

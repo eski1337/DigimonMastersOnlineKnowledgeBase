@@ -16,7 +16,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 # --- Configuration ---
 MEDIA_DIR="${MEDIA_DIR:-${PROJECT_ROOT}/apps/cms/media}"
-BACKUP_DIR="${BACKUP_DIR:-/backups/uploads}"
+BACKUP_DIR="${BACKUP_DIR:-/home/deploy/backups/uploads}"
 TIMESTAMP="$(date +%Y-%m-%d_%H-%M)"
 TARBALL="${BACKUP_DIR}/uploads_${TIMESTAMP}.tar.gz"
 RETENTION_DAYS=14

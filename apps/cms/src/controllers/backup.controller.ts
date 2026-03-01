@@ -80,7 +80,7 @@ export function runBackup(req: Request, res: Response): void {
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Transfer-Encoding': 'chunked' });
 
   const proc = spawn('bash', [scriptPath], {
-    env: { ...process.env, BACKUP_DIR: process.env.BACKUP_DIR || '/backups' },
+    env: { ...process.env, BACKUP_DIR: process.env.BACKUP_DIR || '/home/deploy/backups' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 
@@ -134,7 +134,7 @@ export function runVerify(req: Request, res: Response): void {
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Transfer-Encoding': 'chunked' });
 
   const proc = spawn('bash', [scriptPath], {
-    env: { ...process.env, BACKUP_DIR: process.env.BACKUP_DIR || '/backups' },
+    env: { ...process.env, BACKUP_DIR: process.env.BACKUP_DIR || '/home/deploy/backups' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 

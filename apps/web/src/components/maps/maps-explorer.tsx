@@ -28,9 +28,13 @@ const PUBLIC_CMS_URL = 'https://cms.dmokb.info';
 
 function imgUrl(media: { url: string } | string | null | undefined): string | null {
   if (!media) return null;
-  const url = typeof media === 'string' ? media : media.url;
-  if (!url) return null;
-  return url.startsWith('http') ? url : `${PUBLIC_CMS_URL}${url}`;
+  const raw = typeof media === 'string' ? media : media.url;
+  if (!raw) return null;
+  // Reject raw MongoDB ObjectIDs (depth=0 returns just the ID string)
+  if (/^[a-f0-9]{24}$/.test(raw)) return null;
+  const full = raw.startsWith('http') ? raw : `${PUBLIC_CMS_URL}${raw}`;
+  // Encode characters that break CSS url() — parentheses, spaces, quotes
+  return full.replace(/[() '"]/g, c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'));
 }
 
 /* ── Map type labels ──────────────────────────────────────────────── */
@@ -203,6 +207,8 @@ export function MapsExplorer({ maps }: Props) {
       const params = new URLSearchParams(searchParams?.toString() || '');
       if (next) {
         params.set('area', next);
+        // Scroll to top so the hex map grid is visible
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         params.delete('area');
       }

@@ -21,7 +21,7 @@ const Notifications: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'type',
-    group: 'Social',
+    group: { en: 'Social', zhTw: '社交' },
     defaultColumns: ['recipient', 'type', 'title', 'isRead', 'createdAt'],
   },
   timestamps: true,

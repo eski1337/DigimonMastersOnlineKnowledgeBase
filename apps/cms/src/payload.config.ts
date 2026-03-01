@@ -1,4 +1,5 @@
 import { buildConfig } from 'payload/config';
+import type { CollectionConfig } from 'payload/types';
 import { webpackBundler } from '@payloadcms/bundler-webpack';
 import { mongooseAdapter } from '@payloadcms/db-mongodb';
 import { slateEditor } from '@payloadcms/richtext-slate';
@@ -7,6 +8,8 @@ import path from 'path';
 import Users from './collections/Users';
 import Digimon from './collections/Digimon';
 import EvolutionLines from './collections/EvolutionLines';
+import EvolutionEdges from './collections/EvolutionEdges';
+import EvolutionGraphLayouts from './collections/EvolutionGraphLayouts';
 import Items from './collections/Items';
 import Maps from './collections/Maps';
 import Quests from './collections/Quests';
@@ -25,12 +28,42 @@ import Notifications from './collections/Notifications';
 import UserBlocks from './collections/UserBlocks';
 import Reports from './collections/Reports';
 import { withAuditHooks } from './lib/audit/hooks';
+
+/* ── i18n collection labels (en + Traditional Chinese) ──────────── */
+const i18nLabels: Record<string, { singular: Record<string, string>; plural: Record<string, string> }> = {
+  users:           { singular: { en: 'User',             zhTw: '使用者' },           plural: { en: 'Users',             zhTw: '使用者' } },
+  digimon:         { singular: { en: 'Digimon',           zhTw: '數碼獸' },           plural: { en: 'Digimon',           zhTw: '數碼獸' } },
+  'evolution-lines':{ singular: { en: 'Evolution Line',   zhTw: '進化路線' },         plural: { en: 'Evolution Lines',   zhTw: '進化路線' } },
+  'evolution-edges':{ singular: { en: 'Evolution Edge',   zhTw: '進化邊' },           plural: { en: 'Evolution Edges',   zhTw: '進化邊' } },
+  'evolution-graph-layouts':{ singular: { en: 'Graph Layout', zhTw: '圖表佈局' },        plural: { en: 'Graph Layouts',     zhTw: '圖表佈局' } },
+  items:           { singular: { en: 'Item',              zhTw: '道具' },             plural: { en: 'Items',             zhTw: '道具' } },
+  maps:            { singular: { en: 'Map',               zhTw: '地圖' },             plural: { en: 'Maps',              zhTw: '地圖' } },
+  quests:          { singular: { en: 'Quest',             zhTw: '任務' },             plural: { en: 'Quests',            zhTw: '任務' } },
+  guides:          { singular: { en: 'Guide',             zhTw: '攻略' },             plural: { en: 'Guides',            zhTw: '攻略' } },
+  tools:           { singular: { en: 'Tool',              zhTw: '工具' },             plural: { en: 'Tools',             zhTw: '工具' } },
+  patchNotes:      { singular: { en: 'Patch Note',        zhTw: '更新公告' },         plural: { en: 'Patch Notes',       zhTw: '更新公告' } },
+  events:          { singular: { en: 'Event',             zhTw: '活動' },             plural: { en: 'Events',            zhTw: '活動' } },
+  media:           { singular: { en: 'Media',             zhTw: '媒體' },             plural: { en: 'Media',             zhTw: '媒體' } },
+  tasks:           { singular: { en: 'Task',              zhTw: '工作' },             plural: { en: 'Tasks',             zhTw: '工作' } },
+  'task-comments':  { singular: { en: 'Task Comment',     zhTw: '工作留言' },         plural: { en: 'Task Comments',     zhTw: '工作留言' } },
+  'audit-logs':     { singular: { en: 'Audit Log',        zhTw: '稽核紀錄' },         plural: { en: 'Audit Logs',        zhTw: '稽核紀錄' } },
+  'profile-comments':{ singular: { en: 'Profile Comment', zhTw: '個人檔案留言' },     plural: { en: 'Profile Comments',  zhTw: '個人檔案留言' } },
+  conversations:   { singular: { en: 'Conversation',      zhTw: '對話' },             plural: { en: 'Conversations',     zhTw: '對話' } },
+  messages:        { singular: { en: 'Message',           zhTw: '訊息' },             plural: { en: 'Messages',          zhTw: '訊息' } },
+  notifications:   { singular: { en: 'Notification',      zhTw: '通知' },             plural: { en: 'Notifications',     zhTw: '通知' } },
+  'user-blocks':    { singular: { en: 'User Block',       zhTw: '封鎖' },             plural: { en: 'User Blocks',       zhTw: '封鎖' } },
+  reports:         { singular: { en: 'Report',            zhTw: '檢舉' },             plural: { en: 'Reports',           zhTw: '檢舉' } },
+};
+function withI18nLabels(cfg: CollectionConfig): CollectionConfig {
+  const labels = i18nLabels[cfg.slug];
+  return labels ? { ...cfg, labels } : cfg;
+}
 import KanbanView from './views/Kanban/index';
 import KanbanNavLink from './views/Kanban/NavLink';
 import RegionEditor from './views/RegionEditor/index';
 import RegionEditorNavLink from './views/RegionEditor/NavLink';
 import Dashboard from './views/Dashboard/index';
-import BeforeLogin from './components/BeforeLogin';
+import CustomLogin from './components/CustomLogin';
 import PageJumpProvider from './components/PageJumpProvider';
 import resendVerification from './endpoints/resendVerification';
 import updateDigimonSkills from './endpoints/update-digimon-skills';
@@ -59,7 +92,7 @@ export default buildConfig({
     },
     css: path.resolve(__dirname, 'styles/custom.css'),
     components: {
-      beforeLogin: [BeforeLogin],
+      beforeLogin: [CustomLogin],
       beforeDashboard: [Dashboard],
       providers: [PageJumpProvider],
       views: {
@@ -87,28 +120,33 @@ export default buildConfig({
       afterNavLinks: [KanbanNavLink, RegionEditorNavLink, LogViewerNavLink, ServerHealthNavLink, BackupsNavLink],
     },
   },
+  i18n: {
+    fallbackLng: 'en',
+  },
   editor: slateEditor({}),
   collections: [
-    withAuditHooks(Users),
-    withAuditHooks(Digimon),
-    withAuditHooks(EvolutionLines),
-    withAuditHooks(Items),
-    withAuditHooks(Maps),
-    withAuditHooks(Quests),
-    withAuditHooks(Guides),
-    withAuditHooks(Tools),
-    withAuditHooks(PatchNotes),
-    withAuditHooks(Events),
-    withAuditHooks(Media),
-    withAuditHooks(Tasks),
-    withAuditHooks(TaskComments),
-    withAuditHooks(ProfileComments),
-    withAuditHooks(Conversations),
-    withAuditHooks(Messages),
-    Notifications, // Not audited — high-volume, ephemeral
-    withAuditHooks(UserBlocks),
-    withAuditHooks(Reports),
-    AuditLogs, // Not wrapped — must not audit itself
+    withAuditHooks(withI18nLabels(Users)),
+    withAuditHooks(withI18nLabels(Digimon)),
+    withAuditHooks(withI18nLabels(EvolutionLines)),
+    withAuditHooks(withI18nLabels(EvolutionEdges)),
+    withAuditHooks(withI18nLabels(EvolutionGraphLayouts)),
+    withAuditHooks(withI18nLabels(Items)),
+    withAuditHooks(withI18nLabels(Maps)),
+    withAuditHooks(withI18nLabels(Quests)),
+    withAuditHooks(withI18nLabels(Guides)),
+    withAuditHooks(withI18nLabels(Tools)),
+    withAuditHooks(withI18nLabels(PatchNotes)),
+    withAuditHooks(withI18nLabels(Events)),
+    withAuditHooks(withI18nLabels(Media)),
+    withAuditHooks(withI18nLabels(Tasks)),
+    withAuditHooks(withI18nLabels(TaskComments)),
+    withAuditHooks(withI18nLabels(ProfileComments)),
+    withAuditHooks(withI18nLabels(Conversations)),
+    withAuditHooks(withI18nLabels(Messages)),
+    withI18nLabels(Notifications), // Not audited — high-volume, ephemeral
+    withAuditHooks(withI18nLabels(UserBlocks)),
+    withAuditHooks(withI18nLabels(Reports)),
+    withI18nLabels(AuditLogs), // Not wrapped — must not audit itself
   ],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),

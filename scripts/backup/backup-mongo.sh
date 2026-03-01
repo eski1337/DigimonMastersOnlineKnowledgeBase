@@ -13,7 +13,7 @@ source "${SCRIPT_DIR}/common.sh"
 
 # --- Configuration ---
 MONGODB_URI="${MONGODB_URI:-mongodb://localhost:27017/dmo-kb}"
-BACKUP_DIR="${BACKUP_DIR:-/backups/mongo}"
+BACKUP_DIR="${BACKUP_DIR:-/home/deploy/backups/mongo}"
 TIMESTAMP="$(date +%Y-%m-%d_%H-%M)"
 BACKUP_FILE="${BACKUP_DIR}/dmokb_${TIMESTAMP}.archive.gz"
 RETENTION_DAYS=14

@@ -4,7 +4,7 @@ const DigimonImporter: CollectionConfig = {
   slug: 'digimon-importer',
   admin: {
     useAsTitle: 'name',
-    group: 'Tools',
+    group: { en: 'Tools', zhTw: '工具' },
     hidden: ({ user }) => !user || !['editor', 'admin', 'owner'].includes((user as any).role ?? ''),
     disableDuplicate: true,
     description: 'Click "Create New" to import a Digimon from DMO Wiki',

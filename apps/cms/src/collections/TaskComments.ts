@@ -5,7 +5,7 @@ const TaskComments: CollectionConfig = {
   slug: 'task-comments',
   admin: {
     useAsTitle: 'id',
-    group: 'Internal',
+    group: { en: 'Internal', zhTw: '內部' },
   },
   timestamps: true,
   access: {

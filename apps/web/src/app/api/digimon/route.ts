@@ -20,11 +20,12 @@ async function digimonListHandler(request: NextRequest) {
     }
 
     // Multi-value filters — accept both comma-separated and repeated params
+    // Payload CMS [in] operator expects a single comma-separated string
     const multiFilter = (paramName: string, cmsField: string) => {
       const values = searchParams.getAll(paramName);
       const all = values.flatMap(v => v.split(',').map(s => s.trim())).filter(Boolean);
       if (all.length > 0) {
-        all.forEach(val => cmsParams.append(`where[${cmsField}][in]`, val));
+        cmsParams.append(`where[${cmsField}][in]`, all.join(','));
       }
     };
 

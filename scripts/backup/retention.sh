@@ -9,7 +9,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
-BACKUP_ROOT="${BACKUP_ROOT:-/backups}"
+BACKUP_ROOT="${BACKUP_ROOT:-/home/deploy/backups}"
 DAILY_KEEP=14
 WEEKLY_KEEP=4
 MONTHLY_KEEP=6

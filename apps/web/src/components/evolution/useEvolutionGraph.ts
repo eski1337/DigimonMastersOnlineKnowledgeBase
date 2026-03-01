@@ -31,6 +31,7 @@ export interface EvolutionGraphData {
   nodes: EvolutionNode[];
   edges: EvolutionEdge[];
   layout?: EvolutionLayout | null;
+  lineId?: string;
 }
 
 export interface UseEvolutionGraphResult {
@@ -83,6 +84,7 @@ export function useEvolutionGraph(slug: string): UseEvolutionGraphResult {
           nodes: json.nodes ?? [],
           edges: json.edges ?? [],
           layout: json.layout ?? null,
+          lineId: json.lineId ?? undefined,
         });
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === 'AbortError') return;

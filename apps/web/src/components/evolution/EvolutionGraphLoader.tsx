@@ -27,12 +27,13 @@ const EvolutionGraph = dynamic(
 
 interface Props {
   slug: string;
+  userRole?: string;
 }
 
-export function EvolutionGraphLoader({ slug }: Props) {
+export function EvolutionGraphLoader({ slug, userRole }: Props) {
   return (
     <EvolutionGraphErrorBoundary slug={slug}>
-      <EvolutionGraph slug={slug} />
+      <EvolutionGraph slug={slug} userRole={userRole} />
     </EvolutionGraphErrorBoundary>
   );
 }

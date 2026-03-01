@@ -21,11 +21,15 @@ import styles from './evolution-graph.module.css';
 
 interface EvolutionGraphProps {
   slug: string;
+  userRole?: string;
 }
 
 /* ── Component ────────────────────────────────────────────────────────── */
 
-export function EvolutionGraph({ slug }: EvolutionGraphProps) {
+const CMS_EDITOR_URL = 'https://cms.dmokb.info/admin/evolution-editor';
+const EDIT_ROLES = ['admin', 'editor', 'owner'];
+
+export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
   const router = useRouter();
   const { data, isLoading, error } = useEvolutionGraph(slug);
 
@@ -113,6 +117,29 @@ export function EvolutionGraph({ slug }: EvolutionGraphProps) {
     <div>
       <div className={styles.header}>
         <h2 className={styles.title}>Digivolution Graph</h2>
+        {userRole && EDIT_ROLES.includes(userRole) && data?.lineId && (
+          <a
+            href={`${CMS_EDITOR_URL}?line=${data.lineId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              marginLeft: 12,
+              padding: '4px 12px',
+              borderRadius: 6,
+              border: '1px solid rgba(249, 115, 22, 0.4)',
+              background: 'rgba(249, 115, 22, 0.1)',
+              color: '#f97316',
+              fontSize: 13,
+              fontWeight: 500,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            Edit
+          </a>
+        )}
       </div>
 
       {/* Legend — only show if multiple edge types */}

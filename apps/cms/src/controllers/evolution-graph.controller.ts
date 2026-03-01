@@ -188,7 +188,7 @@ export function createEvolutionGraphController(payload: Payload) {
         }
 
         // 8. Respond
-        res.json({ nodes, edges, layout });
+        res.json({ nodes, edges, layout, lineId: line.id });
       } catch (error: any) {
         log.error({ error: error.message, stack: error.stack }, 'Evolution graph error');
         res.status(500).json({ error: 'Failed to build evolution graph' });

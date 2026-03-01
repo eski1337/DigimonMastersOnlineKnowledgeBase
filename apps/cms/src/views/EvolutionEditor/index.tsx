@@ -608,6 +608,18 @@ const EvolutionEditor: React.FC = () => {
     return () => { cancelled = true; };
   }, []);
 
+  /* ── Auto-load line from URL query param (?line=xxx) ────────────── */
+  const autoLoadedRef = useRef(false);
+  useEffect(() => {
+    if (loadingInit || autoLoadedRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const lineParam = params.get('line');
+    if (lineParam && allLines.some((l) => l.id === lineParam)) {
+      autoLoadedRef.current = true;
+      loadLine(lineParam);
+    }
+  }, [loadingInit, allLines]);
+
   /* ── Search results ─────────────────────────────────────────────── */
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];

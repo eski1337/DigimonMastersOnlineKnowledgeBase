@@ -259,7 +259,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
 
       {/* Evolution Display */}
       {USE_NEW_EVOLUTION ? (
-        <EvolutionGraphLoader slug={d.slug} />
+        <EvolutionGraphLoader slug={d.slug} userRole={session?.user?.role as string | undefined} />
       ) : (
         <>
           {/* Complete Evolution Tree - Always show */}

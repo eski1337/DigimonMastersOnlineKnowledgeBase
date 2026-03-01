@@ -9,7 +9,10 @@
  */
 
 const CMS = process.env.CMS_URL || 'http://localhost:3001';
-const API_KEY = process.env.PAYLOAD_API_KEY || '';
+const LOGIN_EMAIL = process.env.CMS_EMAIL || process.env.ADMIN_EMAIL || '';
+const LOGIN_PASSWORD = process.env.CMS_PASSWORD || process.env.ADMIN_PASSWORD || '';
+
+let TOKEN = '';
 
 /* ── HTTP helpers ─────────────────────────────────────────────────────── */
 
@@ -19,7 +22,7 @@ async function api(method, path, body) {
     method,
     headers: { 'Content-Type': 'application/json' },
   };
-  if (API_KEY) opts.headers['Authorization'] = `Bearer ${API_KEY}`;
+  if (TOKEN) opts.headers['Authorization'] = `JWT ${TOKEN}`;
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch(url, opts);
   if (!res.ok) {
@@ -27,6 +30,26 @@ async function api(method, path, body) {
     throw new Error(`${method} ${path} => ${res.status}: ${text.slice(0, 200)}`);
   }
   return res.json();
+}
+
+async function login() {
+  if (!LOGIN_EMAIL || !LOGIN_PASSWORD) {
+    console.error('ERROR: Set CMS_EMAIL and CMS_PASSWORD env vars (admin account)');
+    process.exit(1);
+  }
+  console.log(`Logging in as ${LOGIN_EMAIL}...`);
+  const res = await fetch(`${CMS}/api/users/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: LOGIN_EMAIL, password: LOGIN_PASSWORD }),
+  });
+  if (!res.ok) {
+    console.error(`Login failed: ${res.status}`);
+    process.exit(1);
+  }
+  const data = await res.json();
+  TOKEN = data.token;
+  console.log(`  Logged in as ${data.user?.username || data.user?.email} (role: ${data.user?.role})\n`);
 }
 
 async function findAll(collection, depth = 1) {
@@ -46,6 +69,9 @@ async function findAll(collection, depth = 1) {
 async function run() {
   console.log('=== Evolution Edges + Lines Migration ===');
   console.log(`CMS: ${CMS}\n`);
+
+  // 0. Authenticate
+  await login();
 
   // 1. Load all Digimon
   console.log('Loading all Digimon...');

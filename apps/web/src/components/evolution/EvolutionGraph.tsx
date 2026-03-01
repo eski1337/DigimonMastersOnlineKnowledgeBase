@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ReactFlow,
   Background,
@@ -24,6 +25,7 @@ interface EvolutionGraphProps {
 /* ── Component ────────────────────────────────────────────────────────── */
 
 export function EvolutionGraph({ slug }: EvolutionGraphProps) {
+  const router = useRouter();
   const { data, isLoading, error } = useEvolutionGraph(slug);
 
   // Build React Flow elements from API data
@@ -38,6 +40,14 @@ export function EvolutionGraph({ slug }: EvolutionGraphProps) {
     const types = new Set(data.edges.map((e) => e.evolutionType));
     return Array.from(types).filter((t) => t in EDGE_COLORS);
   }, [data]);
+
+  // Navigate on node click
+  const onNodeClick = useCallback((_event: React.MouseEvent, node: { data: Record<string, unknown> }) => {
+    const d = node.data as { slug?: string; isCurrent?: boolean };
+    if (d.slug && !d.isCurrent) {
+      router.push(`/digimon/${d.slug}`);
+    }
+  }, [router]);
 
   // Fit view after init
   const onInit = useCallback((instance: { fitView: (opts?: { padding?: number; maxZoom?: number }) => void }) => {
@@ -127,6 +137,7 @@ export function EvolutionGraph({ slug }: EvolutionGraphProps) {
           edgeTypes={edgeTypes}
           defaultViewport={defaultViewport}
           onInit={onInit}
+          onNodeClick={onNodeClick}
           /* ── Read-only config ──────────────────────── */
           nodesDraggable={false}
           nodesConnectable={false}

@@ -2,7 +2,6 @@
 
 import { memo } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import Link from 'next/link';
 import Image from 'next/image';
 
 /* ── Node data shape ──────────────────────────────────────────────────── */
@@ -172,14 +171,6 @@ function DigimonNodeInner({ data }: NodeProps) {
       />
     </div>
   );
-
-  if (isClickable) {
-    return (
-      <Link href={`/digimon/${d.slug}`} style={{ textDecoration: 'none', display: 'block', position: 'relative' }}>
-        {inner}
-      </Link>
-    );
-  }
 
   return <div style={{ position: 'relative' }}>{inner}</div>;
 }

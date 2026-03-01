@@ -10,10 +10,15 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
+  BaseEdge,
+  EdgeLabelRenderer,
+  getSmoothStepPath,
+  useReactFlow,
   type Node,
   type Edge,
   type Connection,
   type NodeProps,
+  type EdgeProps,
   type OnConnect,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -151,6 +156,112 @@ function DigimonEditorNode({ data }: NodeProps) {
 }
 
 const nodeTypes = { digimon: React.memo(DigimonEditorNode) };
+
+/* ══════════════════════════════════════════════════════════════════════
+   Custom Editor Edge — shows distance + requirement labels
+   ══════════════════════════════════════════════════════════════════════ */
+
+function EditorEdgeInner(props: EdgeProps) {
+  const {
+    id, sourceX, sourceY, targetX, targetY,
+    sourcePosition, targetPosition, data, style, markerEnd,
+  } = props;
+
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
+    sourceX, sourceY, targetX, targetY,
+    sourcePosition, targetPosition,
+  });
+
+  // Calculate distance in grid units (snap grid = 10px)
+  const dx = Math.abs(targetX - sourceX);
+  const dy = Math.abs(targetY - sourceY);
+  const dist = Math.round(Math.sqrt(dx * dx + dy * dy) / 10);
+
+  const evoType = (data?.evolutionType as string) || 'normal';
+  const reqLevel = data?.requiredLevel as number | undefined;
+  const reqItem = data?.requiredItem as string | undefined;
+  const hasReqs = Boolean(reqLevel || reqItem);
+
+  // Build label parts
+  const parts: string[] = [];
+  if (reqLevel) parts.push(`Lv.${reqLevel}`);
+  if (reqItem) parts.push(reqItem);
+
+  return (
+    <>
+      <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} style={style} />
+      <EdgeLabelRenderer>
+        {/* Distance badge */}
+        <div
+          className="nodrag nopan"
+          style={{
+            position: 'absolute',
+            transform: `translate(-50%, -130%) translate(${labelX}px,${labelY}px)`,
+            zIndex: 10,
+            pointerEvents: 'none',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: 'var(--theme-elevation-300)',
+              background: 'var(--theme-bg)',
+              border: '1px solid var(--theme-elevation-100)',
+              borderRadius: 4,
+              padding: '1px 5px',
+              fontFamily: 'monospace',
+            }}
+          >
+            {dist}u
+          </span>
+        </div>
+
+        {/* Requirement labels (below edge) */}
+        {hasReqs && (
+          <div
+            className="nodrag nopan"
+            style={{
+              position: 'absolute',
+              transform: `translate(-50%, 30%) translate(${labelX}px,${labelY}px)`,
+              zIndex: 10,
+              pointerEvents: 'none',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                background: 'rgba(15,15,20,0.9)',
+                border: `1px solid ${evoType === 'jogress' ? '#ec4899' : '#60a5fa'}40`,
+                borderRadius: 6,
+                padding: '2px 7px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {reqLevel && (
+                <span style={{ fontSize: 10, fontWeight: 600, color: '#fbbf24' }}>
+                  Lv.{reqLevel}
+                </span>
+              )}
+              {reqLevel && reqItem && (
+                <span style={{ fontSize: 8, color: 'var(--theme-elevation-300)' }}>&bull;</span>
+              )}
+              {reqItem && (
+                <span style={{ fontSize: 10, fontWeight: 500, color: '#a5b4fc' }}>
+                  {reqItem}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </EdgeLabelRenderer>
+    </>
+  );
+}
+
+const editorEdgeTypes = { smoothstep: React.memo(EditorEdgeInner) };
 
 /* ══════════════════════════════════════════════════════════════════════
    Edge Type Picker Popup
@@ -991,6 +1102,7 @@ const EvolutionEditor: React.FC = () => {
             onConnect={onConnect}
             onEdgeClick={handleEdgeClick}
             nodeTypes={nodeTypes}
+            edgeTypes={editorEdgeTypes}
             fitView
             fitViewOptions={{ padding: 0.3, maxZoom: 1.5 }}
             deleteKeyCode="Delete"

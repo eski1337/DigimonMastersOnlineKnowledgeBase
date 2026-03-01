@@ -705,6 +705,7 @@ const EvolutionEditor: React.FC = () => {
 
   /* ── Click edge → show popup ────────────────────────────────────── */
   const handleEdgeClick = useCallback((_event: React.MouseEvent, edge: Edge) => {
+    _event.stopPropagation();
     setEdgePopup({ id: edge.id, x: _event.clientX, y: _event.clientY });
   }, []);
 
@@ -738,8 +739,9 @@ const EvolutionEditor: React.FC = () => {
   useEffect(() => {
     if (!edgePopup) return;
     const handler = () => setEdgePopup(null);
-    window.addEventListener('click', handler);
-    return () => window.removeEventListener('click', handler);
+    // Defer so the opening click doesn't immediately close it
+    const timer = setTimeout(() => window.addEventListener('click', handler), 0);
+    return () => { clearTimeout(timer); window.removeEventListener('click', handler); };
   }, [edgePopup]);
 
   /* ── Auto-layout ────────────────────────────────────────────────── */

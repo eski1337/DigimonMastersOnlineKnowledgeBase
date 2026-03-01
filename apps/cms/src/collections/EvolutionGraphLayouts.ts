@@ -96,7 +96,7 @@ const EvolutionGraphLayouts: CollectionConfig = {
   admin: {
     useAsTitle: 'rootDigimon',
     defaultColumns: ['rootDigimon', 'updatedAt'],
-    group: { en: 'Game Data', zhTw: '遊戲資料' },
+    group: { en: 'Game Data', zh: '遊戲資料' },
     description: 'Stores manually arranged node positions and viewport state for evolution graphs.',
   },
   access: {

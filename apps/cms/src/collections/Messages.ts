@@ -15,7 +15,7 @@ const Messages: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'id',
-    group: { en: 'Social', zhTw: '社交' },
+    group: { en: 'Social', zh: '社交' },
     defaultColumns: ['sender', 'conversation', 'body', 'createdAt'],
   },
   timestamps: true,

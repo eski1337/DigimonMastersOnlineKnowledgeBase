@@ -4,7 +4,7 @@ const PatchNotes: CollectionConfig = {
   slug: 'patchNotes',
   admin: {
     useAsTitle: 'title',
-    group: { en: 'Content', zhTw: '內容' },
+    group: { en: 'Content', zh: '內容' },
     defaultColumns: ['title', 'eventStatus', 'sourceType', 'publishedDate', 'published'],
   },
   access: {

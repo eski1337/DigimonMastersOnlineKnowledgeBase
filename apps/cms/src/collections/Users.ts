@@ -101,7 +101,7 @@ const Users: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'email',
-    group: { en: 'System', zhTw: '系統' },
+    group: { en: 'System', zh: '系統' },
     listSearchableFields: ['email', 'username', 'name'],
     defaultColumns: ['email', 'username', 'name', 'role'],
   },

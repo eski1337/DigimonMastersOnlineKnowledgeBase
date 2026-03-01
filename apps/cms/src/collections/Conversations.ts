@@ -22,7 +22,7 @@ const Conversations: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'id',
-    group: { en: 'Social', zhTw: '社交' },
+    group: { en: 'Social', zh: '社交' },
     defaultColumns: ['participants', 'lastMessageAt', 'createdAt'],
   },
   timestamps: true,

@@ -5,7 +5,7 @@ const Tasks: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'status', 'priority', 'assignee', 'dueDate'],
-    group: { en: 'Internal', zhTw: '內部' },
+    group: { en: 'Internal', zh: '內部' },
   },
   timestamps: true,
   access: {

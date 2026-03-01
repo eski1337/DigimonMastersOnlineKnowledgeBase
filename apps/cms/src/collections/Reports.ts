@@ -15,7 +15,7 @@ const Reports: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'reason',
-    group: { en: 'Social', zhTw: '社交' },
+    group: { en: 'Social', zh: '社交' },
     defaultColumns: ['reporter', 'targetType', 'reason', 'status', 'createdAt'],
   },
   timestamps: true,

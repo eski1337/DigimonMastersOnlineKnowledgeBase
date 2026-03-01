@@ -5,7 +5,7 @@ const Quests: CollectionConfig = {
   slug: 'quests',
   admin: {
     useAsTitle: 'title',
-    group: { en: 'Content', zhTw: '內容' },
+    group: { en: 'Content', zh: '內容' },
   },
   access: {
     read: () => true,

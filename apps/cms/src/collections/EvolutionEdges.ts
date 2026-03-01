@@ -83,7 +83,7 @@ const EvolutionEdges: CollectionConfig = {
   admin: {
     useAsTitle: 'evolutionType',
     defaultColumns: ['source', 'target', 'evolutionType', 'requiredLevel', 'updatedAt'],
-    group: { en: 'Game Data', zhTw: '遊戲資料' },
+    group: { en: 'Game Data', zh: '遊戲資料' },
     description: 'Directed edges in the evolution graph. Each edge represents one evolution path between two Digimon.',
   },
   access: {

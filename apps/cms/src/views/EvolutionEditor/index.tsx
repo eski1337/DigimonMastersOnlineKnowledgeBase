@@ -157,11 +157,8 @@ function DigimonEditorNode({ data }: NodeProps) {
 
 const nodeTypes = { digimon: React.memo(DigimonEditorNode) };
 
-/* ── Module-level spacer toggle (read by edge component) ──────────── */
-let _showSpacers = true;
-
 /* ══════════════════════════════════════════════════════════════════════
-   Custom Editor Edge — shows distance + requirement labels
+   Custom Editor Edge — smoothstep with requirement labels
    ══════════════════════════════════════════════════════════════════════ */
 
 function EditorEdgeInner(props: EdgeProps) {
@@ -170,7 +167,6 @@ function EditorEdgeInner(props: EdgeProps) {
     sourcePosition, targetPosition, data, style, markerEnd,
   } = props;
 
-  // Use straight line when nearly horizontal, smoothstep otherwise
   const nearlyAligned = Math.abs(sourceY - targetY) < 15;
   const [edgePath, labelX, labelY] = nearlyAligned
     ? [
@@ -183,64 +179,21 @@ function EditorEdgeInner(props: EdgeProps) {
         sourcePosition, targetPosition,
       });
 
-  // Calculate distance in grid units (snap grid = 10px)
-  const dx = Math.abs(targetX - sourceX);
-  const dy = Math.abs(targetY - sourceY);
-  const dist = Math.round(Math.sqrt(dx * dx + dy * dy) / 10);
-
-  // Spacer color: read from edge data (set by parent when toggling)
-  const targetDist = (data as any)?._targetDist as number | undefined;
-  const spacerColor = targetDist != null && dist === targetDist ? '#22c55e' : targetDist != null ? '#f59e0b' : 'var(--theme-elevation-300)';
-
   const evoType = (data?.evolutionType as string) || 'normal';
   const reqLevel = data?.requiredLevel as number | undefined;
   const reqItem = data?.requiredItem as string | undefined;
   const hasReqs = Boolean(reqLevel || reqItem);
 
-  // Build label parts
-  const parts: string[] = [];
-  if (reqLevel) parts.push(`Lv.${reqLevel}`);
-  if (reqItem) parts.push(reqItem);
-
   return (
     <>
       <BaseEdge id={id} path={edgePath} markerEnd={markerEnd} style={style} />
-      <EdgeLabelRenderer>
-        {/* Distance badge (spacer) */}
-        {_showSpacers && (
+      {hasReqs && (
+        <EdgeLabelRenderer>
           <div
             className="nodrag nopan"
             style={{
               position: 'absolute',
-              transform: `translate(-50%, -130%) translate(${labelX}px,${labelY}px)`,
-              zIndex: 10,
-              pointerEvents: 'none',
-            }}
-          >
-            <span
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                color: spacerColor,
-                background: 'var(--theme-bg)',
-                border: `1px solid ${spacerColor}40`,
-                borderRadius: 4,
-                padding: '1px 5px',
-                fontFamily: 'monospace',
-              }}
-            >
-              {dist}u
-            </span>
-          </div>
-        )}
-
-        {/* Requirement labels (below edge) */}
-        {hasReqs && (
-          <div
-            className="nodrag nopan"
-            style={{
-              position: 'absolute',
-              transform: `translate(-50%, 30%) translate(${labelX}px,${labelY}px)`,
+              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               zIndex: 10,
               pointerEvents: 'none',
             }}
@@ -250,7 +203,7 @@ function EditorEdgeInner(props: EdgeProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-                background: 'rgba(15,15,20,0.9)',
+                background: 'rgba(15,15,20,0.92)',
                 border: `1px solid ${evoType === 'jogress' ? '#ec4899' : '#60a5fa'}40`,
                 borderRadius: 6,
                 padding: '2px 7px',
@@ -258,27 +211,129 @@ function EditorEdgeInner(props: EdgeProps) {
               }}
             >
               {reqLevel && (
-                <span style={{ fontSize: 10, fontWeight: 600, color: '#fbbf24' }}>
-                  Lv.{reqLevel}
-                </span>
+                <span style={{ fontSize: 10, fontWeight: 600, color: '#fbbf24' }}>Lv.{reqLevel}</span>
               )}
               {reqLevel && reqItem && (
                 <span style={{ fontSize: 8, color: 'var(--theme-elevation-300)' }}>&bull;</span>
               )}
               {reqItem && (
-                <span style={{ fontSize: 10, fontWeight: 500, color: '#a5b4fc' }}>
-                  {reqItem}
-                </span>
+                <span style={{ fontSize: 10, fontWeight: 500, color: '#a5b4fc' }}>{reqItem}</span>
               )}
             </div>
           </div>
-        )}
-      </EdgeLabelRenderer>
+        </EdgeLabelRenderer>
+      )}
     </>
   );
 }
 
 const editorEdgeTypes = { smoothstep: React.memo(EditorEdgeInner) };
+
+/* ══════════════════════════════════════════════════════════════════════
+   Smart Alignment Guides + Gap Markers Overlay
+   ══════════════════════════════════════════════════════════════════════ */
+
+const SNAP_THRESHOLD = 5; // px threshold for showing alignment lines
+
+interface AlignGuide { type: 'h' | 'v'; pos: number; from: number; to: number }
+interface GapMarker { x: number; y: number; gap: number; dir: 'h' | 'v' }
+
+function AlignmentOverlay({ nodes, draggingId, showGaps }: { nodes: Node[]; draggingId: string | null; showGaps: boolean }) {
+  const guides: AlignGuide[] = [];
+  const gapMarkers: GapMarker[] = [];
+
+  if (draggingId) {
+    const drag = nodes.find((n) => n.id === draggingId);
+    if (drag) {
+      const dCx = drag.position.x + NODE_W / 2;
+      const dCy = drag.position.y + NODE_H / 2;
+      const dTop = drag.position.y;
+      const dBot = drag.position.y + NODE_H;
+      const dLeft = drag.position.x;
+      const dRight = drag.position.x + NODE_W;
+
+      for (const n of nodes) {
+        if (n.id === draggingId) continue;
+        const nCx = n.position.x + NODE_W / 2;
+        const nCy = n.position.y + NODE_H / 2;
+        const nTop = n.position.y;
+        const nBot = n.position.y + NODE_H;
+        const nLeft = n.position.x;
+        const nRight = n.position.x + NODE_W;
+
+        // Vertical center alignment
+        if (Math.abs(dCx - nCx) < SNAP_THRESHOLD) {
+          guides.push({ type: 'v', pos: nCx, from: Math.min(dTop, nTop) - 20, to: Math.max(dBot, nBot) + 20 });
+        }
+        // Horizontal center alignment
+        if (Math.abs(dCy - nCy) < SNAP_THRESHOLD) {
+          guides.push({ type: 'h', pos: nCy, from: Math.min(dLeft, nLeft) - 20, to: Math.max(dRight, nRight) + 20 });
+        }
+        // Top edge alignment
+        if (Math.abs(dTop - nTop) < SNAP_THRESHOLD) {
+          guides.push({ type: 'h', pos: nTop, from: Math.min(dLeft, nLeft) - 20, to: Math.max(dRight, nRight) + 20 });
+        }
+        // Bottom edge alignment
+        if (Math.abs(dBot - nBot) < SNAP_THRESHOLD) {
+          guides.push({ type: 'h', pos: nBot, from: Math.min(dLeft, nLeft) - 20, to: Math.max(dRight, nRight) + 20 });
+        }
+        // Left edge alignment
+        if (Math.abs(dLeft - nLeft) < SNAP_THRESHOLD) {
+          guides.push({ type: 'v', pos: nLeft, from: Math.min(dTop, nTop) - 20, to: Math.max(dBot, nBot) + 20 });
+        }
+        // Right edge alignment
+        if (Math.abs(dRight - nRight) < SNAP_THRESHOLD) {
+          guides.push({ type: 'v', pos: nRight, from: Math.min(dTop, nTop) - 20, to: Math.max(dBot, nBot) + 20 });
+        }
+      }
+    }
+  }
+
+  // Gap markers between connected nodes (always computed, toggled by showGaps)
+  if (showGaps && nodes.length > 1) {
+    const sorted = [...nodes].sort((a, b) => a.position.x - b.position.x);
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const a = sorted[i];
+      const b = sorted[i + 1];
+      const gap = Math.round(b.position.x - (a.position.x + NODE_W));
+      if (gap > 0 && gap < 800) {
+        gapMarkers.push({
+          x: a.position.x + NODE_W + gap / 2,
+          y: Math.min(a.position.y, b.position.y) + NODE_H / 2,
+          gap,
+          dir: 'h',
+        });
+      }
+    }
+  }
+
+  if (guides.length === 0 && gapMarkers.length === 0) return null;
+
+  return (
+    <svg
+      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 5, overflow: 'visible' }}
+    >
+      {/* Alignment guides */}
+      {guides.map((g, i) =>
+        g.type === 'h' ? (
+          <line key={`g${i}`} x1={g.from} y1={g.pos} x2={g.to} y2={g.pos} stroke="#ec4899" strokeWidth={1} strokeDasharray="4 3" opacity={0.8} />
+        ) : (
+          <line key={`g${i}`} x1={g.pos} y1={g.from} x2={g.pos} y2={g.to} stroke="#ec4899" strokeWidth={1} strokeDasharray="4 3" opacity={0.8} />
+        ),
+      )}
+      {/* Gap markers */}
+      {gapMarkers.map((m, i) => (
+        <g key={`m${i}`}>
+          <line x1={m.x - m.gap / 2 + 2} y1={m.y} x2={m.x + m.gap / 2 - 2} y2={m.y} stroke="#22c55e" strokeWidth={1} opacity={0.6} />
+          <line x1={m.x - m.gap / 2 + 2} y1={m.y - 4} x2={m.x - m.gap / 2 + 2} y2={m.y + 4} stroke="#22c55e" strokeWidth={1} opacity={0.6} />
+          <line x1={m.x + m.gap / 2 - 2} y1={m.y - 4} x2={m.x + m.gap / 2 - 2} y2={m.y + 4} stroke="#22c55e" strokeWidth={1} opacity={0.6} />
+          <rect x={m.x - 14} y={m.y - 8} width={28} height={14} rx={3} fill="rgba(0,0,0,0.8)" />
+          <text x={m.x} y={m.y + 3} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight={700} fill="#22c55e">{m.gap}px</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
 
 /* ══════════════════════════════════════════════════════════════════════
    Edge Type Picker Popup
@@ -395,44 +450,9 @@ const EvolutionEditor: React.FC = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
   const [dirty, setDirty] = useState(false);
 
-  /* ── Spacers toggle ─────────────────────────────────────────────── */
-  const [showSpacers, setShowSpacers] = useState(true);
-
-  // Sync module-level flag + inject _targetDist into edge data
-  useEffect(() => {
-    _showSpacers = showSpacers;
-    if (!showSpacers || edges.length === 0 || nodes.length === 0) return;
-
-    // Compute distance for each edge
-    const nodePos = new Map<string, { x: number; y: number }>();
-    for (const n of nodes) nodePos.set(n.id, n.position);
-
-    const dists: number[] = [];
-    for (const e of edges) {
-      const sp = nodePos.get(e.source);
-      const tp = nodePos.get(e.target);
-      if (!sp || !tp) continue;
-      const dx = Math.abs((tp.x) - (sp.x + NODE_W));
-      const dy = Math.abs(tp.y - sp.y);
-      dists.push(Math.round(Math.sqrt(dx * dx + dy * dy) / 10));
-    }
-
-    // Find most common distance
-    const freq = new Map<number, number>();
-    for (const d of dists) freq.set(d, (freq.get(d) || 0) + 1);
-    let modeDist = dists[0] ?? 0;
-    let modeCount = 0;
-    for (const [d, c] of freq) { if (c > modeCount) { modeDist = d; modeCount = c; } }
-
-    // Inject into edge data (only if changed)
-    setEdges((prev) =>
-      prev.map((e) => {
-        const cur = (e.data as any)?._targetDist;
-        if (cur === modeDist) return e;
-        return { ...e, data: { ...e.data, _targetDist: modeDist } };
-      }),
-    );
-  }, [showSpacers, nodes, edges.length]);
+  /* ── Guides + gap markers ─────────────────────────────────────────── */
+  const [showGaps, setShowGaps] = useState(false);
+  const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
 
   /* ── Edge popup ─────────────────────────────────────────────────── */
   const [edgePopup, setEdgePopup] = useState<{ id: string; x: number; y: number } | null>(null);
@@ -560,12 +580,16 @@ const EvolutionEditor: React.FC = () => {
     [edges, setEdges],
   );
 
-  /* ── Track drag changes as dirty ────────────────────────────────── */
+  /* ── Track drag changes as dirty + detect dragging node ─────────── */
   const handleNodesChange = useCallback(
     (changes: any) => {
       onNodesChange(changes);
-      if (changes.some((c: any) => c.type === 'position' && c.dragging)) {
+      const dragChange = changes.find((c: any) => c.type === 'position' && c.dragging);
+      if (dragChange) {
         setDirty(true);
+        setDraggingNodeId(dragChange.id);
+      } else if (changes.some((c: any) => c.type === 'position' && !c.dragging)) {
+        setDraggingNodeId(null);
       }
     },
     [onNodesChange],
@@ -975,19 +999,19 @@ const EvolutionEditor: React.FC = () => {
         </button>
 
         <button
-          onClick={() => { setShowSpacers((s) => !s); _showSpacers = !showSpacers; }}
+          onClick={() => setShowGaps((g) => !g)}
           style={{
             padding: '6px 16px',
             borderRadius: 6,
-            border: `1px solid ${showSpacers ? '#22c55e' : 'var(--theme-elevation-150)'}`,
-            background: showSpacers ? 'rgba(34,197,94,0.1)' : 'var(--theme-elevation-50)',
-            color: showSpacers ? '#22c55e' : 'var(--theme-text)',
+            border: `1px solid ${showGaps ? '#22c55e' : 'var(--theme-elevation-150)'}`,
+            background: showGaps ? 'rgba(34,197,94,0.1)' : 'var(--theme-elevation-50)',
+            color: showGaps ? '#22c55e' : 'var(--theme-text)',
             fontSize: 13,
             fontWeight: 500,
             cursor: 'pointer',
           }}
         >
-          {showSpacers ? '📏 Spacers ON' : '📏 Spacers OFF'}
+          {showGaps ? 'Gaps ON' : 'Gaps OFF'}
         </button>
 
         <button
@@ -1184,6 +1208,7 @@ const EvolutionEditor: React.FC = () => {
             snapToGrid
             snapGrid={[10, 10]}
           >
+            <AlignmentOverlay nodes={nodes} draggingId={draggingNodeId} showGaps={showGaps} />
             <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--theme-elevation-100)" />
             <Controls showInteractive={false} />
             <MiniMap

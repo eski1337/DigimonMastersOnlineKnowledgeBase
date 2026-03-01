@@ -62,6 +62,7 @@ function DigimonNodeInner({ data }: NodeProps) {
         cursor: isClickable ? 'pointer' : 'default',
         userSelect: 'none' as const,
         width: 150,
+        height: 160,
       }}
       className="evolution-node-card"
     >

@@ -266,64 +266,148 @@ function EditorEdgeInner(props: EdgeProps) {
 const editorEdgeTypes = { smoothstep: React.memo(EditorEdgeInner) };
 
 /* ══════════════════════════════════════════════════════════════════════
-   Alignment Guides — only closest match per axis, only while dragging
+   Alignment Guides + Gap Markers between node borders
    ══════════════════════════════════════════════════════════════════════ */
 
 const SNAP_PX = 5;
 
-function AlignmentOverlay({ nodes, draggingId }: { nodes: Node[]; draggingId: string | null }) {
-  if (!draggingId) return null;
-  const drag = nodes.find((n) => n.id === draggingId);
-  if (!drag) return null;
+interface GapLabel { x: number; y: number; gap: number; dir: 'h' | 'v'; x1: number; y1: number; x2: number; y2: number }
 
-  const dCy = drag.position.y + NODE_H / 2; // horizontal center
-  const dTop = drag.position.y;
+function AlignmentOverlay({ nodes, draggingId, showGaps }: { nodes: Node[]; draggingId: string | null; showGaps: boolean }) {
+  const guides: JSX.Element[] = [];
+  const gaps: GapLabel[] = [];
 
-  // Find closest horizontal alignment (top-edge match = same row)
-  let bestH: { pos: number; minX: number; maxX: number } | null = null;
-  let bestHDist = Infinity;
+  /* ── Alignment guides (only while dragging) ─────────────────────── */
+  if (draggingId) {
+    const drag = nodes.find((n) => n.id === draggingId);
+    if (drag) {
+      const dTop = drag.position.y;
+      let bestH: { pos: number; minX: number; maxX: number } | null = null;
+      let bestHDist = Infinity;
 
-  // Find closest vertical alignment (left-edge match = same column)
-  // Not needed for typical L→R graph, but let's do top-edge only for clean row alignment
-  for (const n of nodes) {
-    if (n.id === draggingId) continue;
-    const nTop = n.position.y;
-    const diff = Math.abs(dTop - nTop);
-    if (diff < SNAP_PX && diff < bestHDist) {
-      bestHDist = diff;
-      bestH = {
-        pos: nTop,
-        minX: Math.min(drag.position.x, n.position.x) - 20,
-        maxX: Math.max(drag.position.x + NODE_W, n.position.x + NODE_W) + 20,
-      };
-    }
-  }
-
-  // Extend the best line to cover ALL nodes at that row
-  if (bestH) {
-    for (const n of nodes) {
-      if (n.id === draggingId) continue;
-      if (Math.abs(n.position.y - bestH.pos) < SNAP_PX) {
-        bestH.minX = Math.min(bestH.minX, n.position.x - 20);
-        bestH.maxX = Math.max(bestH.maxX, n.position.x + NODE_W + 20);
+      for (const n of nodes) {
+        if (n.id === draggingId) continue;
+        const diff = Math.abs(dTop - n.position.y);
+        if (diff < SNAP_PX && diff < bestHDist) {
+          bestHDist = diff;
+          bestH = {
+            pos: n.position.y,
+            minX: Math.min(drag.position.x, n.position.x) - 20,
+            maxX: Math.max(drag.position.x + NODE_W, n.position.x + NODE_W) + 20,
+          };
+        }
+      }
+      if (bestH) {
+        for (const n of nodes) {
+          if (n.id === draggingId) continue;
+          if (Math.abs(n.position.y - bestH.pos) < SNAP_PX) {
+            bestH.minX = Math.min(bestH.minX, n.position.x - 20);
+            bestH.maxX = Math.max(bestH.maxX, n.position.x + NODE_W + 20);
+          }
+        }
+        guides.push(
+          <line key="al-t" x1={bestH.minX} y1={bestH.pos} x2={bestH.maxX} y2={bestH.pos} stroke="#22c55e" strokeWidth={1} strokeDasharray="6 4" opacity={0.7} />,
+          <line key="al-b" x1={bestH.minX} y1={bestH.pos + NODE_H} x2={bestH.maxX} y2={bestH.pos + NODE_H} stroke="#22c55e" strokeWidth={1} strokeDasharray="6 4" opacity={0.4} />,
+        );
       }
     }
   }
 
-  if (!bestH) return null;
+  /* ── Gap markers between all nearby node pairs ──────────────────── */
+  if (showGaps && nodes.length > 1) {
+    const seen = new Set<string>();
+    for (let i = 0; i < nodes.length; i++) {
+      const a = nodes[i];
+      const aR = a.position.x + NODE_W;
+      const aB = a.position.y + NODE_H;
+
+      for (let j = i + 1; j < nodes.length; j++) {
+        const b = nodes[j];
+        const bR = b.position.x + NODE_W;
+        const bB = b.position.y + NODE_H;
+        const key = [a.id, b.id].sort().join('-');
+        if (seen.has(key)) continue;
+
+        // Check horizontal adjacency (overlapping Y range)
+        const yOverlap = Math.min(aB, bB) - Math.max(a.position.y, b.position.y);
+        if (yOverlap > 10) {
+          // Horizontal gap: right edge of left node → left edge of right node
+          const left = a.position.x < b.position.x ? a : b;
+          const right = a.position.x < b.position.x ? b : a;
+          const hGap = Math.round(right.position.x - (left.position.x + NODE_W));
+          if (hGap > 5 && hGap < 1000) {
+            seen.add(key);
+            const midY = (Math.max(a.position.y, b.position.y) + Math.min(aB, bB)) / 2;
+            gaps.push({
+              x: left.position.x + NODE_W + hGap / 2,
+              y: midY,
+              gap: hGap,
+              dir: 'h',
+              x1: left.position.x + NODE_W,
+              y1: midY,
+              x2: right.position.x,
+              y2: midY,
+            });
+          }
+        }
+
+        // Check vertical adjacency (overlapping X range)
+        const xOverlap = Math.min(aR, bR) - Math.max(a.position.x, b.position.x);
+        if (xOverlap > 10) {
+          const top = a.position.y < b.position.y ? a : b;
+          const bot = a.position.y < b.position.y ? b : a;
+          const vGap = Math.round(bot.position.y - (top.position.y + NODE_H));
+          if (vGap > 5 && vGap < 1000) {
+            const vKey = key + '-v';
+            if (!seen.has(vKey)) {
+              seen.add(vKey);
+              const midX = (Math.max(a.position.x, b.position.x) + Math.min(aR, bR)) / 2;
+              gaps.push({
+                x: midX,
+                y: top.position.y + NODE_H + vGap / 2,
+                gap: vGap,
+                dir: 'v',
+                x1: midX,
+                y1: top.position.y + NODE_H,
+                x2: midX,
+                y2: bot.position.y,
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (guides.length === 0 && gaps.length === 0) return null;
 
   return (
     <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 5, overflow: 'visible' }}>
-      <line
-        x1={bestH.minX} y1={bestH.pos}
-        x2={bestH.maxX} y2={bestH.pos}
-        stroke="#22c55e" strokeWidth={1} strokeDasharray="6 4" opacity={0.7}
-      />
-      <line
-        x1={bestH.minX} y1={bestH.pos + NODE_H}
-        x2={bestH.maxX} y2={bestH.pos + NODE_H}
-        stroke="#22c55e" strokeWidth={1} strokeDasharray="6 4" opacity={0.4}
-      />
+      {guides}
+      {gaps.map((m, i) => {
+        const isH = m.dir === 'h';
+        return (
+          <g key={`gap${i}`}>
+            {/* Measurement line */}
+            <line x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2} stroke="#22c55e" strokeWidth={1} strokeDasharray="3 2" opacity={0.5} />
+            {/* End caps */}
+            {isH ? (
+              <>
+                <line x1={m.x1} y1={m.y1 - 6} x2={m.x1} y2={m.y1 + 6} stroke="#22c55e" strokeWidth={1} opacity={0.5} />
+                <line x1={m.x2} y1={m.y2 - 6} x2={m.x2} y2={m.y2 + 6} stroke="#22c55e" strokeWidth={1} opacity={0.5} />
+              </>
+            ) : (
+              <>
+                <line x1={m.x1 - 6} y1={m.y1} x2={m.x1 + 6} y2={m.y1} stroke="#22c55e" strokeWidth={1} opacity={0.5} />
+                <line x1={m.x2 - 6} y1={m.y2} x2={m.x2 + 6} y2={m.y2} stroke="#22c55e" strokeWidth={1} opacity={0.5} />
+              </>
+            )}
+            {/* Label */}
+            <rect x={m.x - 16} y={m.y - 8} width={32} height={15} rx={3} fill="rgba(0,0,0,0.85)" />
+            <text x={m.x} y={m.y + 4} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight={700} fill="#22c55e">{m.gap}px</text>
+          </g>
+        );
+      })}
     </svg>
   );
 }
@@ -1201,7 +1285,7 @@ const EvolutionEditor: React.FC = () => {
             snapToGrid
             snapGrid={[10, 10]}
           >
-            <AlignmentOverlay nodes={nodes} draggingId={draggingNodeId} />
+            <AlignmentOverlay nodes={nodes} draggingId={draggingNodeId} showGaps={showGaps} />
             <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--theme-elevation-100)" />
             <Controls showInteractive={false} />
             <MiniMap

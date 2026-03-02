@@ -1,23 +1,42 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Package, Sparkles, RotateCcw, ChevronLeft, ChevronRight, X, Info } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, X, Search } from 'lucide-react';
 import { BANNERS, type GachaItem, type GachaBanner } from './gacha-data';
 
 /* ── Constants ────────────────────────────────────────────────────────── */
 
-const RARITY_CONFIG: Record<number, { label: string; color: string; bg: string; glow: string; border: string }> = {
-  7: { label: '★★★★★★★', color: 'text-amber-300', bg: 'bg-amber-500/20', glow: 'shadow-amber-500/50', border: 'border-amber-400/60' },
-  6: { label: '★★★★★★', color: 'text-rose-400', bg: 'bg-rose-500/20', glow: 'shadow-rose-500/50', border: 'border-rose-400/60' },
-  5: { label: '★★★★★', color: 'text-orange-400', bg: 'bg-orange-500/20', glow: 'shadow-orange-500/50', border: 'border-orange-400/60' },
-  4: { label: '★★★★', color: 'text-purple-400', bg: 'bg-purple-500/20', glow: 'shadow-purple-500/50', border: 'border-purple-400/60' },
-  3: { label: '★★★', color: 'text-blue-400', bg: 'bg-blue-500/20', glow: 'shadow-blue-500/50', border: 'border-blue-400/60' },
-  2: { label: '★★', color: 'text-emerald-400', bg: 'bg-emerald-500/20', glow: 'shadow-emerald-500/40', border: 'border-emerald-400/60' },
-  1: { label: '★', color: 'text-gray-400', bg: 'bg-gray-500/20', glow: 'shadow-gray-500/30', border: 'border-gray-400/40' },
+const RARITY_BORDER: Record<number, string> = {
+  7: '#ffd700',
+  6: '#ff4466',
+  5: '#ff8c00',
+  4: '#a855f7',
+  3: '#3b82f6',
+  2: '#22c55e',
+  1: '#6b7280',
+};
+
+const RARITY_BG: Record<number, string> = {
+  7: 'rgba(255,215,0,0.15)',
+  6: 'rgba(255,68,102,0.12)',
+  5: 'rgba(255,140,0,0.12)',
+  4: 'rgba(168,85,247,0.1)',
+  3: 'rgba(59,130,246,0.1)',
+  2: 'rgba(34,197,94,0.08)',
+  1: 'rgba(107,114,128,0.08)',
+};
+
+const RARITY_VIDEO: Record<number, string> = {
+  7: '/gacha/loading-rarity-7.mp4',
+  6: '/gacha/loading-rarity-6.mp4',
+  5: '/gacha/loading-rarity-5.mp4',
+  3: '/gacha/loading-rarity-3.mp4',
+  1: '/gacha/loading-rarity-1.mp4',
 };
 
 type TabType = 'DATA_SUMMON' | 'DIGITAL_DRAW';
+type Phase = 'select' | 'video' | 'results';
 
 interface PullResult {
   item: GachaItem;
@@ -29,19 +48,13 @@ interface PullResult {
 function pullFromBanner(banner: GachaBanner, count: number): GachaItem[] {
   const results: GachaItem[] = [];
   const totalProb = banner.items.reduce((sum, item) => sum + item.probability, 0);
-
   for (let i = 0; i < count; i++) {
     let roll = Math.random() * totalProb;
     for (const item of banner.items) {
       roll -= item.probability;
-      if (roll <= 0) {
-        results.push(item);
-        break;
-      }
+      if (roll <= 0) { results.push(item); break; }
     }
-    if (results.length <= i) {
-      results.push(banner.items[banner.items.length - 1]);
-    }
+    if (results.length <= i) results.push(banner.items[banner.items.length - 1]);
   }
   return results;
 }
@@ -50,442 +63,477 @@ function getHighestRarity(items: GachaItem[]): number {
   return items.reduce((max, item) => Math.max(max, item.rarity), 0);
 }
 
+function getVideoForRarity(r: number): string {
+  if (r >= 7) return RARITY_VIDEO[7];
+  if (r >= 6) return RARITY_VIDEO[6];
+  if (r >= 5) return RARITY_VIDEO[5];
+  if (r >= 3) return RARITY_VIDEO[3];
+  return RARITY_VIDEO[1];
+}
+
 /* ── Component ────────────────────────────────────────────────────────── */
 
 export default function GachaSimulatorPage() {
   const [activeTab, setActiveTab] = useState<TabType>('DATA_SUMMON');
-  const [selectedBannerIdx, setSelectedBannerIdx] = useState(0);
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [phase, setPhase] = useState<Phase>('select');
   const [pullResults, setPullResults] = useState<PullResult[]>([]);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [showInventory, setShowInventory] = useState(false);
   const [inventory, setInventory] = useState<Record<string, number>>({});
   const [totalPulls, setTotalPulls] = useState(0);
-  const [showDetails, setShowDetails] = useState(false);
-  const resultRef = useRef<HTMLDivElement>(null);
+  const [showInventory, setShowInventory] = useState(false);
+  const [showRates, setShowRates] = useState(false);
+  const [invTab, setInvTab] = useState<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const filteredBanners = useMemo(
+  const banners = useMemo(
     () => BANNERS.filter((b) => b.type === activeTab && b.items.length > 0),
     [activeTab],
   );
-
-  const currentBanner = filteredBanners[selectedBannerIdx] || filteredBanners[0];
+  const banner = banners[selectedIdx] || banners[0];
 
   const handleTabChange = useCallback((tab: TabType) => {
     setActiveTab(tab);
-    setSelectedBannerIdx(0);
+    setSelectedIdx(0);
+    setPhase('select');
     setPullResults([]);
   }, []);
 
-  const navigateBanner = useCallback(
-    (dir: -1 | 1) => {
-      setSelectedBannerIdx((prev) => {
-        const next = prev + dir;
-        if (next < 0) return filteredBanners.length - 1;
-        if (next >= filteredBanners.length) return 0;
-        return next;
-      });
-      setPullResults([]);
-    },
-    [filteredBanners.length],
-  );
+  const nav = useCallback((dir: -1 | 1) => {
+    setSelectedIdx((p) => {
+      const n = p + dir;
+      return n < 0 ? banners.length - 1 : n >= banners.length ? 0 : n;
+    });
+    setPullResults([]);
+    setPhase('select');
+  }, [banners.length]);
 
-  const doPull = useCallback(
-    (count: number) => {
-      if (!currentBanner || isAnimating) return;
-      setIsAnimating(true);
-      setPullResults([]);
+  const doPull = useCallback((count: number) => {
+    if (!banner || phase === 'video') return;
+    const items = pullFromBanner(banner, count);
+    const highest = getHighestRarity(items);
+    const results: PullResult[] = items.map((item) => {
+      const key = `${banner.id}-${item.name}`;
+      return { item, isNew: !inventory[key] };
+    });
 
-      setTimeout(() => {
-        const items = pullFromBanner(currentBanner, count);
-        const results: PullResult[] = items.map((item) => {
-          const key = `${currentBanner.id}-${item.name}`;
-          const isNew = !inventory[key];
-          return { item, isNew };
-        });
+    const newInv = { ...inventory };
+    items.forEach((item) => {
+      const key = `${banner.id}-${item.name}`;
+      newInv[key] = (newInv[key] || 0) + 1;
+    });
+    setInventory(newInv);
+    setTotalPulls((p) => p + count);
+    setPullResults(results);
 
-        const newInv = { ...inventory };
-        items.forEach((item) => {
-          const key = `${currentBanner.id}-${item.name}`;
-          newInv[key] = (newInv[key] || 0) + 1;
-        });
+    setPhase('video');
+    const vid = getVideoForRarity(highest);
+    if (videoRef.current) {
+      videoRef.current.src = vid;
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(() => setPhase('results'));
+    }
+  }, [banner, phase, inventory]);
 
-        setInventory(newInv);
-        setTotalPulls((prev) => prev + count);
-        setPullResults(results);
-        setIsAnimating(false);
+  const skipVideo = useCallback(() => setPhase('results'), []);
 
-        setTimeout(() => {
-          resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
-      }, 600);
-    },
-    [currentBanner, isAnimating, inventory],
-  );
+  const handleVideoEnd = useCallback(() => setPhase('results'), []);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) { v.addEventListener('ended', handleVideoEnd); return () => v.removeEventListener('ended', handleVideoEnd); }
+  }, [handleVideoEnd]);
 
   const resetAll = useCallback(() => {
     setInventory({});
     setTotalPulls(0);
     setPullResults([]);
+    setPhase('select');
   }, []);
 
-  const inventoryItems = useMemo(() => {
-    const items: { bannerName: string; itemName: string; count: number; rarity: number }[] = [];
+  const invItems = useMemo(() => {
+    const items: { bannerId: number; bannerName: string; itemName: string; count: number; rarity: number }[] = [];
     Object.entries(inventory).forEach(([key, count]) => {
       if (count <= 0) return;
-      const dashIdx = key.indexOf('-');
-      const bannerId = parseInt(key.substring(0, dashIdx));
-      const itemName = key.substring(dashIdx + 1);
-      const banner = BANNERS.find((b) => b.id === bannerId);
-      const item = banner?.items.find((i) => i.name === itemName);
-      items.push({
-        bannerName: banner?.name || 'Unknown',
-        itemName,
-        count,
-        rarity: item?.rarity || 1,
-      });
+      const di = key.indexOf('-');
+      const bId = parseInt(key.substring(0, di));
+      const iName = key.substring(di + 1);
+      const b = BANNERS.find((x) => x.id === bId);
+      const it = b?.items.find((x) => x.name === iName);
+      items.push({ bannerId: bId, bannerName: b?.name || '', itemName: iName, count, rarity: it?.rarity || 1 });
     });
-    items.sort((a, b) => b.rarity - a.rarity || a.itemName.localeCompare(b.itemName));
+    items.sort((a, b) => b.rarity - a.rarity);
     return items;
   }, [inventory]);
 
-  const highestRarity = pullResults.length > 0 ? getHighestRarity(pullResults.map((r) => r.item)) : 0;
+  const invBanners = useMemo(() => {
+    const ids = new Set(invItems.map((i) => i.bannerId));
+    return banners.filter((b) => ids.has(b.id));
+  }, [invItems, banners]);
+
+  const filteredInv = invTab ? invItems.filter((i) => i.bannerId === invTab) : invItems;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
-      <div className="container py-8 max-w-5xl">
-        <Link
-          href="/tools"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white mb-6 transition-colors"
+    <div className="relative min-h-screen overflow-hidden" style={{ background: '#0a0a12' }}>
+      {/* Constellation background */}
+      <div className="pointer-events-none absolute inset-0 opacity-30" style={{
+        backgroundImage: `radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4), transparent),
+          radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3), transparent),
+          radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.4), transparent),
+          radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.3), transparent),
+          radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.2), transparent),
+          radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.3), transparent),
+          radial-gradient(1.5px 1.5px at 50% 50%, rgba(255,255,255,0.5), transparent)`,
+        backgroundSize: '200px 200px, 300px 300px, 250px 250px, 350px 350px, 400px 400px, 150px 150px, 500px 500px',
+      }} />
+      <svg className="pointer-events-none absolute inset-0 w-full h-full opacity-[0.06]">
+        <line x1="10%" y1="20%" x2="30%" y2="45%" stroke="white" strokeWidth="0.5" />
+        <line x1="30%" y1="45%" x2="50%" y2="30%" stroke="white" strokeWidth="0.5" />
+        <line x1="50%" y1="30%" x2="70%" y2="55%" stroke="white" strokeWidth="0.5" />
+        <line x1="70%" y1="55%" x2="90%" y2="35%" stroke="white" strokeWidth="0.5" />
+        <line x1="20%" y1="70%" x2="40%" y2="85%" stroke="white" strokeWidth="0.5" />
+        <line x1="40%" y1="85%" x2="60%" y2="70%" stroke="white" strokeWidth="0.5" />
+        <line x1="60%" y1="70%" x2="80%" y2="90%" stroke="white" strokeWidth="0.5" />
+      </svg>
+
+      {/* Video overlay */}
+      <video
+        ref={videoRef}
+        className={`fixed inset-0 z-50 w-full h-full object-cover bg-black ${phase === 'video' ? '' : 'hidden'}`}
+        playsInline
+        muted
+      />
+      {phase === 'video' && (
+        <button
+          onClick={skipVideo}
+          className="fixed top-4 right-4 z-[60] px-4 py-1.5 bg-black/60 border border-gray-600 text-gray-300 text-xs font-bold uppercase tracking-wider hover:bg-black/80 transition-all"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Tools
-        </Link>
+          SKIP
+        </button>
+      )}
 
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-amber-400 via-rose-400 to-purple-400 bg-clip-text text-transparent">
-            Gacha Simulator
-          </h1>
-          <p className="text-gray-400 text-sm">
-            Test your luck! Simulate DMO gacha pulls without spending real money.
-          </p>
-        </div>
+      {/* Main content */}
+      <div className={`relative z-10 ${phase === 'video' ? 'hidden' : ''}`}>
+        <div className="container py-6 max-w-5xl">
+          <Link href="/tools" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 mb-4 transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Back to Tools
+          </Link>
 
-        {/* Mode Tabs */}
-        <div className="flex justify-center gap-2 mb-8">
-          {([
-            ['DATA_SUMMON', 'Data Summon', Sparkles],
-            ['DIGITAL_DRAW', 'Digital Draw', Package],
-          ] as [TabType, string, typeof Sparkles][]).map(([type, label, Icon]) => (
-            <button
-              key={type}
-              onClick={() => handleTabChange(type)}
-              className={`
-                flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all border
-                ${activeTab === type
-                  ? 'bg-red-600 border-red-500 text-white shadow-lg shadow-red-500/25'
-                  : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600'
-                }
-              `}
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </button>
-          ))}
-        </div>
+          <h1 className="text-center text-xl font-bold text-gray-200 mb-1">Gacha Simulator</h1>
 
-        {/* Banner Selector */}
-        {filteredBanners.length > 0 && (
-          <div className="relative mb-8">
-            <div className="flex items-center justify-center gap-4">
-              <button
-                onClick={() => navigateBanner(-1)}
-                className="p-2 rounded-full bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
+          {phase === 'select' && (
+            <>
+              {/* Mode tabs */}
+              <div className="flex justify-center gap-1 mt-4 mb-6">
+                {([['DATA_SUMMON', 'Data Summon', '/gacha/gacha-symbol.jpg'], ['DIGITAL_DRAW', 'Digital Draw', '/gacha/gacha-symbol.jpg']] as [TabType, string, string][]).map(([type, label, icon]) => (
+                  <button
+                    key={type}
+                    onClick={() => handleTabChange(type)}
+                    className={`flex items-center gap-2 px-5 py-2 border-2 transition-all text-sm font-bold ${
+                      activeTab === type
+                        ? 'border-blue-500 bg-blue-500/20 text-white'
+                        : 'border-gray-700 text-gray-500 hover:border-blue-500/50 hover:bg-blue-500/10'
+                    }`}
+                  >
+                    <img src={icon} alt="" className="w-5 h-5" />
+                    {label}
+                  </button>
+                ))}
+              </div>
 
-              {/* Banner Cards Carousel */}
-              <div className="flex items-center gap-3 overflow-hidden max-w-3xl">
-                {filteredBanners.map((banner, idx) => {
-                  const isActive = idx === selectedBannerIdx;
-                  const distance = Math.abs(idx - selectedBannerIdx);
-                  if (distance > 2) return null;
+              <p className="text-center text-gray-400 text-sm mb-6">
+                {activeTab === 'DATA_SUMMON' ? 'Select the data to summon.' : 'Choose Digital Draw.'}
+              </p>
 
-                  return (
-                    <button
-                      key={banner.id}
-                      onClick={() => { setSelectedBannerIdx(idx); setPullResults([]); }}
-                      className={`
-                        flex-shrink-0 rounded-xl border-2 transition-all duration-300 overflow-hidden
-                        ${isActive
-                          ? 'w-48 h-64 border-red-500 shadow-lg shadow-red-500/20 scale-100 opacity-100'
-                          : distance === 1
-                            ? 'w-32 h-48 border-gray-700 opacity-60 hover:opacity-80 scale-95'
-                            : 'w-24 h-40 border-gray-800 opacity-30 scale-90'
-                        }
-                      `}
-                    >
-                      <div className={`w-full h-full flex flex-col items-center justify-center p-3 ${
-                        isActive
-                          ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-950'
-                          : 'bg-gray-900'
-                      }`}>
-                        <div className={`text-4xl mb-2 ${isActive ? 'animate-pulse' : ''}`}>
-                          {activeTab === 'DATA_SUMMON' ? '🎴' : '💎'}
+              {/* Banner carousel */}
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <button onClick={() => nav(-1)} className="text-blue-400 hover:text-blue-300 transition-colors p-1">
+                  <ChevronLeft className="h-6 w-6" strokeWidth={3} />
+                </button>
+
+                <div className="flex items-end gap-3 overflow-hidden">
+                  {banners.map((b, idx) => {
+                    const dist = idx - selectedIdx;
+                    const absDist = Math.abs(dist);
+                    if (absDist > 2) return null;
+                    const isActive = idx === selectedIdx;
+
+                    return (
+                      <button
+                        key={b.id}
+                        onClick={() => { setSelectedIdx(idx); }}
+                        className="flex-shrink-0 flex flex-col items-center transition-all duration-300"
+                        style={{
+                          opacity: isActive ? 1 : absDist === 1 ? 0.5 : 0.25,
+                          transform: `scale(${isActive ? 1 : 0.85})`,
+                        }}
+                      >
+                        <div className={`text-center mb-1 text-[10px] leading-tight ${isActive ? 'text-gray-300' : 'text-gray-600'}`} style={{ maxWidth: isActive ? 160 : 120 }}>
+                          {b.category && <div className="truncate">{b.category}</div>}
+                          <div className="font-bold truncate">{b.name}</div>
                         </div>
-                        <div className={`text-center font-semibold leading-tight ${
-                          isActive ? 'text-sm text-white' : 'text-[10px] text-gray-400'
-                        }`}>
-                          {banner.category && isActive && (
-                            <div className="text-[10px] text-red-400 mb-1">{banner.category}</div>
+                        <div
+                          className={`overflow-hidden transition-all duration-300 ${isActive ? 'border-2 border-red-500 shadow-lg shadow-red-500/30' : 'border border-gray-700'}`}
+                          style={{ width: isActive ? 160 : 120, aspectRatio: '1/0.91' }}
+                        >
+                          {b.image ? (
+                            <img src={b.image} alt={b.name} className="w-full h-full object-cover" draggable={false} />
+                          ) : (
+                            <div className="w-full h-full bg-gray-900 flex items-center justify-center text-2xl">
+                              {activeTab === 'DATA_SUMMON' ? '🎴' : '💎'}
+                            </div>
                           )}
-                          {banner.name}
                         </div>
                         {isActive && (
-                          <div className="mt-2 text-[10px] text-gray-500">
-                            {banner.items.length} items
-                          </div>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setShowRates(true); }}
+                            className="mt-1"
+                          >
+                            <Search className="h-4 w-4 text-blue-400 hover:text-blue-300" />
+                          </button>
                         )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                onClick={() => navigateBanner(1)}
-                className="p-2 rounded-full bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Banner Info */}
-            {currentBanner && (
-              <div className="text-center mt-3">
-                <button
-                  onClick={() => setShowDetails(!showDetails)}
-                  className="text-xs text-gray-500 hover:text-gray-300 transition-colors underline"
-                >
-                  {showDetails ? 'Hide drop rates' : 'View drop rates'}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Drop Rate Details */}
-        {showDetails && currentBanner && (
-          <div className="mb-6 rounded-xl border border-gray-800 bg-gray-900/80 p-4 max-w-2xl mx-auto">
-            <h3 className="font-semibold text-sm text-gray-300 mb-3">
-              {currentBanner.name} — Drop Rates
-            </h3>
-            <div className="space-y-1.5 max-h-64 overflow-y-auto pr-2">
-              {[...currentBanner.items]
-                .sort((a, b) => b.rarity - a.rarity)
-                .map((item, i) => {
-                  const rc = RARITY_CONFIG[item.rarity] || RARITY_CONFIG[1];
-                  return (
-                    <div key={i} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <span className={`${rc.color} font-mono text-[10px] w-16`}>{rc.label}</span>
-                        <span className="text-gray-300">{item.name}</span>
-                      </div>
-                      <span className="text-gray-500 tabular-nums">{item.probability}%</span>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-        )}
-
-        {/* Pull Buttons */}
-        {currentBanner && (
-          <div className="flex justify-center gap-3 mb-8">
-            {activeTab === 'DATA_SUMMON' ? (
-              <>
-                <button
-                  onClick={() => doPull(1)}
-                  disabled={isAnimating}
-                  className="px-8 py-3 rounded-lg font-bold text-sm bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40"
-                >
-                  1 time
-                </button>
-                <button
-                  onClick={() => doPull(10)}
-                  disabled={isAnimating}
-                  className="px-8 py-3 rounded-lg font-bold text-sm bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-500 hover:to-red-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-red-500/25 hover:shadow-red-500/40"
-                >
-                  10 times
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => doPull(11)}
-                disabled={isAnimating}
-                className="px-8 py-3 rounded-lg font-bold text-sm bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-500 hover:to-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
-              >
-                11 times Draw
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Animation */}
-        {isAnimating && (
-          <div className="flex justify-center mb-8">
-            <div className="relative w-32 h-32">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-500 via-rose-500 to-purple-500 animate-spin opacity-60 blur-xl" />
-              <div className="absolute inset-2 rounded-full bg-gray-950 flex items-center justify-center">
-                <Sparkles className="h-10 w-10 text-amber-400 animate-pulse" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Pull Results */}
-        {pullResults.length > 0 && !isAnimating && (
-          <div ref={resultRef} className="mb-8">
-            {/* Highest rarity flash */}
-            {highestRarity >= 5 && (
-              <div className="text-center mb-4">
-                <span className={`text-lg font-bold ${RARITY_CONFIG[highestRarity]?.color || 'text-white'} animate-pulse`}>
-                  {highestRarity === 7 ? '🌟 JACKPOT! 🌟' : highestRarity === 6 ? '✨ AMAZING! ✨' : '⭐ GREAT! ⭐'}
-                </span>
-              </div>
-            )}
-
-            <div className={`grid gap-3 ${
-              pullResults.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' :
-              pullResults.length <= 4 ? 'grid-cols-2 max-w-lg mx-auto' :
-              'grid-cols-3 sm:grid-cols-4 md:grid-cols-5 max-w-3xl mx-auto'
-            }`}>
-              {pullResults.map((result, i) => {
-                const rc = RARITY_CONFIG[result.item.rarity] || RARITY_CONFIG[1];
-                return (
-                  <div
-                    key={i}
-                    className={`
-                      rounded-xl border-2 p-3 text-center transition-all
-                      ${rc.border} ${rc.bg}
-                      ${result.item.rarity >= 5 ? `shadow-lg ${rc.glow}` : ''}
-                      animate-in fade-in slide-in-from-bottom-2
-                    `}
-                    style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both', animationDuration: '400ms' }}
-                  >
-                    <div className={`text-[10px] font-mono mb-1 ${rc.color}`}>{rc.label}</div>
-                    <div className="text-xs font-semibold text-white leading-tight mb-1">
-                      {result.item.name}
-                    </div>
-                    {result.isNew && (
-                      <span className="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 mt-1">
-                        NEW
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* No results placeholder */}
-        {pullResults.length === 0 && !isAnimating && (
-          <div className="text-center py-12 text-gray-600">
-            <Sparkles className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p>Select a banner and press pull to test your luck!</p>
-          </div>
-        )}
-
-        {/* Stats & Inventory Bar */}
-        <div className="flex items-center justify-between bg-gray-900/80 border border-gray-800 rounded-xl px-4 py-3 max-w-3xl mx-auto">
-          <div className="flex items-center gap-4 text-xs text-gray-400">
-            <span>Total Pulls: <strong className="text-white">{totalPulls}</strong></span>
-            <span>Unique Items: <strong className="text-white">{Object.keys(inventory).length}</strong></span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowInventory(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-400 text-xs font-medium hover:bg-blue-600/30 transition-all"
-            >
-              <Package className="h-3.5 w-3.5" />
-              Inventory
-            </button>
-            <button
-              onClick={resetAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-gray-400 text-xs font-medium hover:text-white hover:border-gray-600 transition-all"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              Reset
-            </button>
-          </div>
-        </div>
-
-        {/* Inventory Modal */}
-        {showInventory && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setShowInventory(false)}>
-            <div
-              className="w-full max-w-2xl max-h-[80vh] bg-gray-900 border border-gray-700 rounded-2xl overflow-hidden shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
-                <h2 className="font-bold text-lg text-white">Inventory</h2>
-                <button onClick={() => setShowInventory(false)} className="text-gray-400 hover:text-white">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="p-5 overflow-y-auto max-h-[calc(80vh-70px)]">
-                {inventoryItems.length === 0 ? (
-                  <p className="text-center text-gray-600 py-8">No items collected yet. Start pulling!</p>
-                ) : (
-                  <div className="space-y-2">
-                    {inventoryItems.map((item, i) => {
-                      const rc = RARITY_CONFIG[item.rarity] || RARITY_CONFIG[1];
-                      return (
-                        <div key={i} className={`flex items-center justify-between px-3 py-2 rounded-lg border ${rc.border} ${rc.bg}`}>
-                          <div className="flex items-center gap-2">
-                            <span className={`text-[10px] font-mono ${rc.color} w-14`}>{rc.label}</span>
-                            <div>
-                              <div className="text-sm font-medium text-white">{item.itemName}</div>
-                              <div className="text-[10px] text-gray-500">{item.bannerName}</div>
-                            </div>
-                          </div>
-                          <span className="text-xs font-bold text-gray-300 tabular-nums">×{item.count}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Inventory rarity summary */}
-              {inventoryItems.length > 0 && (
-                <div className="px-5 py-3 border-t border-gray-800 flex flex-wrap gap-2">
-                  {[7, 6, 5, 4, 3, 2, 1].map((r) => {
-                    const count = inventoryItems.filter((i) => i.rarity === r).reduce((sum, i) => sum + i.count, 0);
-                    if (count === 0) return null;
-                    const rc = RARITY_CONFIG[r];
-                    return (
-                      <span key={r} className={`text-[10px] px-2 py-0.5 rounded ${rc.bg} ${rc.color} ${rc.border} border`}>
-                        {rc.label} ×{count}
-                      </span>
+                      </button>
                     );
                   })}
                 </div>
-              )}
-            </div>
-          </div>
-        )}
 
-        {/* Info */}
-        <div className="flex items-start gap-2 text-xs text-gray-500 bg-gray-900/50 rounded-lg border border-gray-800 p-3 mt-6 max-w-3xl mx-auto">
-          <Info className="h-4 w-4 shrink-0 mt-0.5 text-blue-400/50" />
-          <span>
-            This simulator uses the same drop rates as the original DMO gacha system. Results are purely random and for entertainment only.
-            No real items or currency are used. Data sourced from dmo.greuta.org.
-          </span>
+                <button onClick={() => nav(1)} className="text-blue-400 hover:text-blue-300 transition-colors p-1">
+                  <ChevronRight className="h-6 w-6" strokeWidth={3} />
+                </button>
+              </div>
+
+              {/* Pull buttons */}
+              {banner && (
+                <div className="flex justify-center gap-3 mb-4">
+                  {activeTab === 'DATA_SUMMON' ? (
+                    <>
+                      <button onClick={() => doPull(1)} className="px-6 py-2 font-bold text-sm text-white text-shadow" style={{ background: 'linear-gradient(180deg, #2d8a4e 0%, #1a6636 100%)', border: '1px solid #3cb371' }}>
+                        1 time
+                      </button>
+                      <button onClick={() => doPull(10)} className="px-6 py-2 font-bold text-sm text-white text-shadow" style={{ background: 'linear-gradient(180deg, #c62828 0%, #8b1a1a 100%)', border: '1px solid #ef5350' }}>
+                        10 times
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={() => doPull(11)} className="px-6 py-2 font-bold text-sm text-white text-shadow" style={{ background: 'linear-gradient(180deg, #1565c0 0%, #0d47a1 100%)', border: '1px solid #42a5f5' }}>
+                      11 times Draw
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Results phase */}
+          {phase === 'results' && pullResults.length > 0 && (
+            <div className="mt-6">
+              {/* Obtained Items header */}
+              <div className="text-center mb-8">
+                <div className="inline-block relative">
+                  <div className="absolute left-0 right-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #c0a040, #e0c060, #c0a040, transparent)' }} />
+                  <h2 className="text-lg font-bold text-gray-200 py-2 px-12">Obtained Items</h2>
+                  <div className="absolute left-0 right-0 bottom-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #606060, transparent)' }} />
+                </div>
+              </div>
+
+              {/* Items grid - scattered layout like original */}
+              <div className="flex flex-wrap justify-center gap-4 max-w-2xl mx-auto mb-8">
+                {pullResults.map((result, i) => {
+                  const borderColor = RARITY_BORDER[result.item.rarity] || RARITY_BORDER[1];
+                  const bgColor = RARITY_BG[result.item.rarity] || RARITY_BG[1];
+                  return (
+                    <div
+                      key={i}
+                      className="relative group"
+                      style={{
+                        animationDelay: `${i * 100}ms`,
+                        animationFillMode: 'both',
+                        animationDuration: '400ms',
+                        animationName: 'fadeInUp',
+                      }}
+                    >
+                      <div
+                        className="w-16 h-16 flex items-center justify-center relative overflow-hidden"
+                        style={{
+                          border: `2px solid ${borderColor}`,
+                          background: bgColor,
+                          boxShadow: result.item.rarity >= 5 ? `0 0 12px ${borderColor}40` : 'none',
+                        }}
+                      >
+                        <div className="text-[10px] font-bold text-center text-gray-300 leading-tight px-0.5 break-words">
+                          {result.item.name.length > 15 ? result.item.name.substring(0, 15) + '…' : result.item.name}
+                        </div>
+                        {result.isNew && (
+                          <div className="absolute top-0 right-0 bg-amber-500 text-[7px] font-bold px-1 text-black">N</div>
+                        )}
+                      </div>
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-20 whitespace-nowrap bg-gray-900 border border-gray-700 px-2 py-1 text-[10px] text-gray-300">
+                        {result.item.name}
+                        <span className="ml-1" style={{ color: borderColor }}>★{result.item.rarity}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Confirm / Resummon */}
+              <div className="flex justify-center gap-3 mb-8">
+                <button
+                  onClick={() => setPhase('select')}
+                  className="px-6 py-2 font-bold text-sm text-white"
+                  style={{ background: 'linear-gradient(180deg, #1976d2 0%, #0d47a1 100%)', border: '1px solid #42a5f5' }}
+                >
+                  Confirm
+                </button>
+                <button
+                  onClick={() => {
+                    const count = activeTab === 'DATA_SUMMON' ? (pullResults.length > 1 ? 10 : 1) : 11;
+                    setPhase('select');
+                    setTimeout(() => doPull(count), 50);
+                  }}
+                  className="px-6 py-2 font-bold text-sm text-white"
+                  style={{ background: 'linear-gradient(180deg, #b71c1c 0%, #7f0000 100%)', border: '1px solid #ef5350' }}
+                >
+                  Resummon
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Inventory button - fixed bottom right */}
+          <button
+            onClick={() => { setShowInventory(true); setInvTab(null); }}
+            className="fixed bottom-6 right-6 z-30 w-12 h-12 flex items-center justify-center"
+            style={{ border: '2px solid #4488cc', background: 'linear-gradient(180deg, #1a3a5c 0%, #0d2137 100%)' }}
+            title="Inventory"
+          >
+            <img src="/gacha/inven.jpg" alt="Inventory" className="w-8 h-8" />
+          </button>
+
+          {/* Stats bar */}
+          <div className="fixed bottom-6 left-6 z-30 flex items-center gap-3 text-[10px] text-gray-500">
+            <span>Pulls: <b className="text-gray-300">{totalPulls}</b></span>
+            <span>Items: <b className="text-gray-300">{Object.keys(inventory).length}</b></span>
+            <button onClick={resetAll} className="text-gray-600 hover:text-red-400 transition-colors underline">Reset</button>
+          </div>
         </div>
       </div>
+
+      {/* Probability Information modal */}
+      {showRates && banner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowRates(false)}>
+          <div className="w-full max-w-lg mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()} style={{ border: '2px solid #4488cc', background: 'linear-gradient(180deg, #0d1b2a 0%, #0a1628 100%)' }}>
+            {/* Progress bar decoration */}
+            <div className="h-1 flex">
+              <div className="flex-1 bg-emerald-500" />
+              <div className="flex-1 bg-pink-500" />
+            </div>
+            <div className="flex items-center justify-between px-4 py-2">
+              <h3 className="text-sm font-bold text-amber-400">Probability Information</h3>
+              <button onClick={() => setShowRates(false)} className="text-gray-400 hover:text-white">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="text-center text-xs text-gray-400 pb-2">
+              {banner.category}<br />{banner.name}
+            </div>
+            <div className="px-4 pb-1 text-[10px] text-gray-500 border-b border-gray-700">Random Summon List</div>
+            <div className="max-h-80 overflow-y-auto px-4 py-2 space-y-1.5">
+              {[...banner.items].sort((a, b) => b.rarity - a.rarity).map((item, i) => (
+                <div key={i} className="flex items-center gap-2 text-xs">
+                  <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center" style={{ border: `1.5px solid ${RARITY_BORDER[item.rarity]}`, background: RARITY_BG[item.rarity] }}>
+                    <span className="text-[8px] font-bold" style={{ color: RARITY_BORDER[item.rarity] }}>★{item.rarity}</span>
+                  </div>
+                  <span className="flex-1 text-gray-300 truncate">{item.name}</span>
+                  <span className="text-gray-500 tabular-nums ml-2">{item.probability}%</span>
+                </div>
+              ))}
+            </div>
+            <div className="h-1 flex mt-2">
+              <div className="flex-1 bg-emerald-500" />
+              <div className="flex-1 bg-pink-500" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inventory modal */}
+      {showInventory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowInventory(false)}>
+          <div
+            className="w-full max-w-xl max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+            style={{ border: '2px solid #4488cc', background: 'linear-gradient(180deg, #0d2844 0%, #0a1e36 100%)' }}
+          >
+            <div className="flex items-center justify-between px-4 py-2 border-b border-blue-400/30">
+              <h2 className="font-bold text-sm text-gray-200">Inventory</h2>
+              <button onClick={() => setShowInventory(false)} className="text-amber-400 hover:text-amber-300 font-bold text-sm">✕</button>
+            </div>
+
+            {/* Banner tabs */}
+            <div className="flex flex-wrap gap-1 px-3 py-2 border-b border-blue-400/20">
+              {invBanners.map((b) => {
+                const count = invItems.filter((i) => i.bannerId === b.id).reduce((s, i) => s + i.count, 0);
+                return (
+                  <button
+                    key={b.id}
+                    onClick={() => setInvTab(invTab === b.id ? null : b.id)}
+                    className={`text-[10px] px-2 py-0.5 border transition-colors ${
+                      invTab === b.id ? 'border-amber-400 text-amber-400 bg-amber-400/10' : 'border-gray-600 text-gray-400 hover:border-gray-500'
+                    }`}
+                  >
+                    {b.name} <span className={invTab === b.id ? 'text-amber-300' : 'text-gray-600'}>{count}</span>
+                  </button>
+                );
+              })}
+              {invBanners.length === 0 && <span className="text-xs text-gray-600">No items yet</span>}
+            </div>
+
+            {/* Item grid */}
+            <div className="flex-1 overflow-y-auto p-3">
+              <div className="grid grid-cols-7 gap-1">
+                {filteredInv.map((item, i) => (
+                  <div key={i} className="relative group" title={`${item.itemName} ×${item.count}`}>
+                    <div
+                      className="w-full aspect-square flex items-center justify-center"
+                      style={{
+                        border: `2px solid ${RARITY_BORDER[item.rarity]}`,
+                        background: RARITY_BG[item.rarity],
+                      }}
+                    >
+                      <span className="text-[8px] text-center text-gray-300 leading-tight px-0.5 break-words">
+                        {item.itemName.length > 10 ? item.itemName.substring(0, 10) + '…' : item.itemName}
+                      </span>
+                    </div>
+                    {item.count > 1 && (
+                      <div className="absolute bottom-0 right-0 bg-black/80 text-[8px] text-gray-300 px-0.5">{item.count}</div>
+                    )}
+                  </div>
+                ))}
+                {/* Empty slots */}
+                {Array.from({ length: Math.max(0, 42 - filteredInv.length) }).map((_, i) => (
+                  <div key={`empty-${i}`} className="w-full aspect-square" style={{ border: '1px solid #1a3a5c', background: '#0a1628' }} />
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom decoration */}
+            <div className="h-1 flex">
+              <div className="flex-1 bg-emerald-500" />
+              <div className="flex-1 bg-pink-500" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fade-in keyframes */}
+      <style jsx global>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .text-shadow { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+      `}</style>
     </div>
   );
 }

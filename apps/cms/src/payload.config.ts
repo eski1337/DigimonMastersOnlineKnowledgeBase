@@ -129,6 +129,7 @@ export default buildConfig({
   i18n: {
     supportedLngs: ['en', 'zh'],
     fallbackLng: 'en',
+    load: 'languageOnly' as any, // normalizes zh-TW / zh-HK → zh
   },
   editor: slateEditor({}),
   collections: [

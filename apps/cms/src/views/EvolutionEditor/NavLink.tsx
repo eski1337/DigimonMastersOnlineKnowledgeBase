@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../lib/i18n/navLabels';
 
 const EvolutionEditorNavLink: React.FC = () => {
   return (
@@ -26,7 +27,7 @@ const EvolutionEditorNavLink: React.FC = () => {
           <line x1="16.5" y1="7.5" x2="13.5" y2="16" />
         </svg>
       </span>
-      <span>Digivolution Editor</span>
+      <span>{t('evolutionEditor')}</span>
     </a>
   );
 };

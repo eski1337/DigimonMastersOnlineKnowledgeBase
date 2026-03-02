@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../lib/i18n/navLabels';
 
 const KanbanNavLink: React.FC = () => {
   return (
@@ -23,7 +24,7 @@ const KanbanNavLink: React.FC = () => {
           <rect x="14" y="3" width="7" height="12" rx="1" />
         </svg>
       </span>
-      <span>Tasks Board</span>
+      <span>{t('tasksBoard')}</span>
     </a>
   );
 };

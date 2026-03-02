@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../lib/i18n/navLabels';
 
 const BackupsNavLink: React.FC = () => {
   return (
@@ -24,7 +25,7 @@ const BackupsNavLink: React.FC = () => {
           <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
       </span>
-      <span>Backups</span>
+      <span>{t('backups')}</span>
     </a>
   );
 };

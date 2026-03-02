@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../lib/i18n/navLabels';
 
 const ServerHealthNavLink: React.FC = () => {
   return (
@@ -24,7 +25,7 @@ const ServerHealthNavLink: React.FC = () => {
           <polyline points="8 16 10 14 12 16 14 14 16 16" />
         </svg>
       </span>
-      <span>Server Health</span>
+      <span>{t('serverHealth')}</span>
     </a>
   );
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../lib/i18n/navLabels';
 
 const LogViewerNavLink: React.FC = () => {
   return (
@@ -26,7 +27,7 @@ const LogViewerNavLink: React.FC = () => {
           <line x1="10" y1="9" x2="8" y2="9" />
         </svg>
       </span>
-      <span>Log Viewer</span>
+      <span>{t('logViewer')}</span>
     </a>
   );
 };

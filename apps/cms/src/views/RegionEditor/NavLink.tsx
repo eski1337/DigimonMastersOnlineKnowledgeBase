@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../lib/i18n/navLabels';
 
 const RegionEditorNavLink: React.FC = () => {
   return (
@@ -25,7 +26,7 @@ const RegionEditorNavLink: React.FC = () => {
           <line x1="19.5" y1="7" x2="4.5" y2="17" />
         </svg>
       </span>
-      <span>Region Editor</span>
+      <span>{t('regionEditor')}</span>
     </a>
   );
 };

@@ -13,6 +13,14 @@ const tools = [
   },
   {
     id: '2',
+    slug: 'monster-card-calculator',
+    title: 'Monster Card Calculator',
+    description: 'Calculate how many Highest Monster Cards you need to reach a target level.',
+    icon: TrendingUp,
+    type: 'calculator' as const,
+  },
+  {
+    id: '3',
     slug: 'raid-timer',
     title: 'Raid Timer',
     description: 'Track raid spawn times and set notifications.',
@@ -20,7 +28,7 @@ const tools = [
     type: 'utility' as const,
   },
   {
-    id: '3',
+    id: '4',
     slug: 'progress-tracker',
     title: 'Progress Tracker',
     description: 'Keep track of your collection and achievements.',
@@ -28,7 +36,7 @@ const tools = [
     type: 'tracker' as const,
   },
   {
-    id: '4',
+    id: '5',
     slug: 'gacha-simulator',
     title: 'Gacha Simulator',
     description: 'Simulate gacha pulls and calculate probabilities.',

@@ -118,72 +118,55 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Latest Updates Section */}
+      {/* Latest Patch Notes Section */}
       <section className="container space-y-6 py-8 md:py-12 lg:py-24 bg-muted/50">
         <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
           <h2 className="text-3xl font-bold leading-[1.1] sm:text-3xl md:text-5xl">
-            Latest Updates
+            Latest Patch Notes
           </h2>
           <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-            Stay informed with the latest patch notes and events
+            Stay up to date with the latest game changes
           </p>
         </div>
-        <div className="mx-auto grid gap-4 md:max-w-[64rem] md:grid-cols-2">
-          <div className="space-y-4">
-            <Badge variant="secondary" className="text-sm">Patch Notes</Badge>
-            {latestPatchNotes.length > 0 ? (
-              latestPatchNotes.map((patch) => (
-                <Card key={patch.id}>
-                  <CardHeader className="pb-2">
-                    <Link href={`/patch-notes/${patch.slug}`} className="hover:underline">
-                      <CardTitle className="text-lg">{patch.title}</CardTitle>
-                    </Link>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Calendar className="h-3 w-3" />
-                      <time dateTime={patch.publishedDate}>
-                        {new Date(patch.publishedDate).toLocaleDateString('en-US', {
-                          year: 'numeric', month: 'short', day: 'numeric',
-                        })}
-                      </time>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <CardDescription className="line-clamp-2 text-xs">
-                      {stripHTML(patch.htmlContent || patch.content || '').substring(0, 120)}...
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Coming Soon</CardTitle>
-                  <CardDescription>
-                    Latest patch notes will be automatically imported and displayed here.
-                  </CardDescription>
+        <div className="mx-auto grid gap-4 md:max-w-[64rem] sm:grid-cols-2 lg:grid-cols-3">
+          {latestPatchNotes.length > 0 ? (
+            latestPatchNotes.map((patch) => (
+              <Card key={patch.id}>
+                <CardHeader className="pb-2">
+                  <Link href={`/patch-notes/${patch.slug}`} className="hover:underline">
+                    <CardTitle className="text-lg">{patch.title}</CardTitle>
+                  </Link>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Calendar className="h-3 w-3" />
+                    <time dateTime={patch.publishedDate}>
+                      {new Date(patch.publishedDate).toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'short', day: 'numeric',
+                      })}
+                    </time>
+                  </div>
                 </CardHeader>
+                <CardContent className="pt-0">
+                  <CardDescription className="line-clamp-2 text-xs">
+                    {stripHTML(patch.htmlContent || patch.content || '').substring(0, 120)}...
+                  </CardDescription>
+                </CardContent>
               </Card>
-            )}
-            <Button asChild variant="outline" size="sm">
-              <Link href="/patch-notes">View All Patch Notes</Link>
-            </Button>
-          </div>
-          <Card>
-            <CardHeader>
-              <Badge variant="secondary" className="w-fit mb-2">
-                Events
-              </Badge>
-              <CardTitle>Coming Soon</CardTitle>
-              <CardDescription>
-                Active and upcoming events will be displayed here automatically.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/events">View All Events</Link>
-              </Button>
-            </CardContent>
-          </Card>
+            ))
+          ) : (
+            <Card className="sm:col-span-2 lg:col-span-3">
+              <CardHeader>
+                <CardTitle>No Patch Notes Yet</CardTitle>
+                <CardDescription>
+                  Patch notes will appear here once published.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )}
+        </div>
+        <div className="mx-auto flex justify-center">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/patch-notes">View All Patch Notes</Link>
+          </Button>
         </div>
       </section>
 

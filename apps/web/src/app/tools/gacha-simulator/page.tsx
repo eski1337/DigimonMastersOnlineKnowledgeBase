@@ -395,8 +395,8 @@ export default function GachaSimulatorPage() {
         /* ── Video ───────────────────────────────────────────────── */
         .gacha-video { position: fixed; inset: 0; z-index: 100; width: 100%; height: 100%; object-fit: cover; background: #000; display: none; }
         .gacha-video--active { display: block; }
-        .gacha-skip { position: fixed; top: 16px; right: 16px; z-index: 101; padding: 6px 18px; color: #ccc; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; border: none; cursor: pointer; }
-        .gacha-skip:hover { color: #fff; }
+        .gacha-skip { position: fixed; top: 24px; right: 24px; z-index: 101; padding: 10px 28px; color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0.1em; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; cursor: pointer; background: rgba(0,0,0,0.5); transition: background 0.2s, border-color 0.2s; }
+        .gacha-skip:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.6); }
 
         /* ── Back ────────────────────────────────────────────────── */
         .gacha-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #6b7280; transition: color 0.2s; text-decoration: none; }

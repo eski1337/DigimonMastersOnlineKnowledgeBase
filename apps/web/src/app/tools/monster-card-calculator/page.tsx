@@ -144,7 +144,7 @@ export default function MonsterCardCalculatorPage() {
     if (h1 + h2 + h3 === 0) return null;
 
     // Use cards from highest value first (HMC3, then HMC2, then HMC1)
-    let remaining = { 1: h1, 2: h2, 3: h3 };
+    const remaining = { 1: h1, 2: h2, 3: h3 };
     let totalExp = 0;
     let lvl = curLv;
 

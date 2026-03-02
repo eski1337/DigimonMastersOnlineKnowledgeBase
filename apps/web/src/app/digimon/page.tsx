@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { DigimonCard } from '@/components/digimon/digimon-card';
 import { DigimonFilters } from '@/components/digimon/digimon-filters';
@@ -48,6 +48,30 @@ export default function DigimonPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const shouldRestoreScroll = useRef(false);
+  const savedScrollY = useRef(0);
+
+  // On mount, check if we have a saved scroll position to restore
+  useEffect(() => {
+    const saved = sessionStorage.getItem('digimon-list-scroll');
+    if (saved) {
+      savedScrollY.current = parseInt(saved, 10);
+      shouldRestoreScroll.current = true;
+      sessionStorage.removeItem('digimon-list-scroll');
+    }
+  }, []);
+
+  // Save scroll position when navigating away (clicking a card)
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement).closest('a[href^="/digimon/"]');
+      if (link) {
+        sessionStorage.setItem('digimon-list-scroll', window.scrollY.toString());
+      }
+    };
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
 
   // Build query string from filters + page
   const buildQuery = useCallback((f: Filters, page: number) => {
@@ -81,7 +105,16 @@ export default function DigimonPage() {
       } catch (error) {
         console.error('Failed to fetch Digimon:', error);
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+          // Restore scroll position after data renders
+          if (shouldRestoreScroll.current) {
+            shouldRestoreScroll.current = false;
+            requestAnimationFrame(() => {
+              window.scrollTo(0, savedScrollY.current);
+            });
+          }
+        }
       }
     }
     fetchDigimon();

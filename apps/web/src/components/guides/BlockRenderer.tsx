@@ -109,6 +109,28 @@ const CURRENCY_ICONS = {
   B: '/guides/Currency_Bit.png',
 };
 
+/* Auto-match item names → icon paths (checked via substring match on cell value / line text) */
+const ITEM_ICON_MAP: [RegExp, string][] = [
+  [/Cherry Blossom.*Xros Loader/i, '/guides/xros-loader/Cherry_Blossom-Xros_Loader.png'],
+  [/Decidious.*Xros Loader/i, '/guides/xros-loader/Decidious-Xros_Loader.png'],
+  [/Digimon Xros Loader|Xros Loader Lv/i, '/guides/xros-loader/XrosLoader.png'],
+  [/Digicode Piece/i, '/guides/xros-loader/Digicode_Piece.png'],
+  [/Digicode/i, '/guides/xros-loader/Digicode.png'],
+  [/Option Change Stone/i, '/guides/xros-loader/Option_Change_Stone.png'],
+  [/Number Change Stone/i, '/guides/xros-loader/Number_Change_Stone.png'],
+  [/Adventure Goggles Box/i, '/guides/adventure-goggles/Adventure_goggles_box.png'],
+  [/Adventure Goggles|Goggles Lv/i, '/guides/adventure-goggles/Adventure_goggles1.png'],
+  [/Contaminated X-Antibody/i, '/guides/adventure-goggles/Contaminated_X-Antibody_-_CORE.png'],
+  [/^Money$/i, '/guides/xros-loader/Coin_Currency.png'],
+];
+
+function autoIcon(text: string): string | null {
+  for (const [re, url] of ITEM_ICON_MAP) {
+    if (re.test(text)) return url;
+  }
+  return null;
+}
+
 function formatCurrency(value: string): React.ReactNode {
   // Match numbers like "30,000,000" or "115,590,890"
   const raw = value.replace(/,/g, '');
@@ -128,7 +150,7 @@ function formatCurrency(value: string): React.ReactNode {
 }
 
 function renderCellContent(cell: TableCell, isFirstCol: boolean) {
-  const cellIcon = getIconUrl(cell.icon, cell.iconUrl);
+  const cellIcon = getIconUrl(cell.icon, cell.iconUrl) || autoIcon(cell.value || '');
   const hasLines = cell.lines && cell.lines.length > 0;
 
   if (hasLines) {
@@ -139,7 +161,7 @@ function renderCellContent(cell: TableCell, isFirstCol: boolean) {
       return (
         <div className="flex items-center gap-1 flex-wrap">
           {cell.lines!.map((line, k) => {
-            const lineIcon = getIconUrl(line.icon, line.iconUrl);
+            const lineIcon = getIconUrl(line.icon, line.iconUrl) || autoIcon(line.text || '');
             return (
               <span key={k} className="inline-flex items-center gap-0.5 whitespace-nowrap">
                 {line.text && <span className="tabular-nums font-semibold">{line.text}</span>}
@@ -154,7 +176,7 @@ function renderCellContent(cell: TableCell, isFirstCol: boolean) {
     return (
       <div className="space-y-1.5">
         {cell.lines!.map((line, k) => {
-          const lineIcon = getIconUrl(line.icon, line.iconUrl);
+          const lineIcon = getIconUrl(line.icon, line.iconUrl) || autoIcon(line.text || '');
           return (
             <div key={k} className="flex items-center gap-2">
               {lineIcon && (

@@ -86,22 +86,49 @@ interface CellLine {
   text?: string;
   amount?: string;
   icon?: { url: string } | null;
+  iconUrl?: string;
 }
 
 interface TableCell {
   value?: string;
   icon?: { url: string; alt?: string } | string | null;
+  iconUrl?: string;
   lines?: CellLine[];
 }
 
-function getIconUrl(icon: any): string | null {
+function getIconUrl(icon: any, iconUrl?: string): string | null {
+  if (iconUrl) return iconUrl;
   if (!icon) return null;
   if (typeof icon === 'object' && icon.url) return icon.url;
   return null;
 }
 
+const CURRENCY_ICONS = {
+  T: '/guides/Currency_Tera.png',
+  M: '/guides/Currency_Mega.png',
+  B: '/guides/Currency_Bit.png',
+};
+
+function formatCurrency(value: string): React.ReactNode {
+  // Match numbers like "30,000,000" or "115,590,890"
+  const raw = value.replace(/,/g, '');
+  if (!/^\d+$/.test(raw) || raw.length < 4) return null;
+  const num = parseInt(raw, 10);
+  if (num < 1000) return null;
+  const tera = Math.floor(num / 1_000_000);
+  const mega = Math.floor((num % 1_000_000) / 1_000);
+  const bit = num % 1_000;
+  const parts: React.ReactNode[] = [];
+  if (tera > 0) {
+    parts.push(<span key="t" className="inline-flex items-center gap-0.5"><span className="tabular-nums font-semibold">{tera}</span><img src={CURRENCY_ICONS.T} alt="T" className="w-4 h-4 object-contain inline" /></span>);
+  }
+  parts.push(<span key="m" className="inline-flex items-center gap-0.5"><span className="tabular-nums font-semibold">{String(mega).padStart(tera > 0 ? 3 : 1, '0')}</span><img src={CURRENCY_ICONS.M} alt="M" className="w-4 h-4 object-contain inline" /></span>);
+  parts.push(<span key="b" className="inline-flex items-center gap-0.5"><span className="tabular-nums font-semibold">{String(bit).padStart(3, '0')}</span><img src={CURRENCY_ICONS.B} alt="B" className="w-4 h-4 object-contain inline" /></span>);
+  return <span className="inline-flex items-center gap-1 flex-wrap">{parts}</span>;
+}
+
 function renderCellContent(cell: TableCell, isFirstCol: boolean) {
-  const cellIcon = getIconUrl(cell.icon);
+  const cellIcon = getIconUrl(cell.icon, cell.iconUrl);
   const hasLines = cell.lines && cell.lines.length > 0;
 
   if (hasLines) {
@@ -112,7 +139,7 @@ function renderCellContent(cell: TableCell, isFirstCol: boolean) {
       return (
         <div className="flex items-center gap-1 flex-wrap">
           {cell.lines!.map((line, k) => {
-            const lineIcon = getIconUrl(line.icon);
+            const lineIcon = getIconUrl(line.icon, line.iconUrl);
             return (
               <span key={k} className="inline-flex items-center gap-0.5 whitespace-nowrap">
                 {line.text && <span className="tabular-nums font-semibold">{line.text}</span>}
@@ -127,7 +154,7 @@ function renderCellContent(cell: TableCell, isFirstCol: boolean) {
     return (
       <div className="space-y-1.5">
         {cell.lines!.map((line, k) => {
-          const lineIcon = getIconUrl(line.icon);
+          const lineIcon = getIconUrl(line.icon, line.iconUrl);
           return (
             <div key={k} className="flex items-center gap-2">
               {lineIcon && (
@@ -145,12 +172,13 @@ function renderCellContent(cell: TableCell, isFirstCol: boolean) {
   }
 
   const value = cell.value || '';
+  const currency = formatCurrency(value);
   return (
     <div className="flex items-center gap-2">
       {cellIcon && (
         <img src={cellIcon} alt="" className="w-7 h-7 object-contain shrink-0" />
       )}
-      <span>{value}</span>
+      {currency || <span>{value}</span>}
     </div>
   );
 }
@@ -161,7 +189,8 @@ function TableBlock({ block }: { block: any }) {
     (r.cells || []).map((c: any) => ({
       value: c.value || '',
       icon: c.icon || null,
-      lines: c.lines || null,
+      iconUrl: c.iconUrl || undefined,
+      lines: c.lines?.map((l: any) => ({ ...l, iconUrl: l.iconUrl || undefined })) || null,
     }))
   );
 

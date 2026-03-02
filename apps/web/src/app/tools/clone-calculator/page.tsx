@@ -123,7 +123,7 @@ export default function CloneCalculatorPage() {
                       <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-px h-0.5 w-8 rounded-full ${CLONE_ACCENT[type]}`} />
                     )}
                     <TypeIcon className="h-5 w-5" />
-                    <span className="text-xs font-medium">{type}</span>
+                    <span className="text-xs font-medium">{{ Attack: 'AT', Critical: 'CT', Block: 'BL', Evasion: 'EV', Health: 'HP' }[type]}</span>
                   </button>
                 );
               })}

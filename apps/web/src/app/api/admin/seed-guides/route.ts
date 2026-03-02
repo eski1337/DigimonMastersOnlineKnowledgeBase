@@ -26,25 +26,33 @@ async function cmsLogin(): Promise<string> {
 }
 
 async function upsertGuide(token: string, guideData: any) {
+  // Delete existing guide first
   const check = await fetch(
     `${CMS_URL}/api/guides?where[slug][equals]=${guideData.slug}&limit=1`,
     { headers: { Authorization: `JWT ${token}` } },
   );
   const existing = await check.json();
   if (existing.docs?.length > 0) {
-    const res = await fetch(`${CMS_URL}/api/guides/${existing.docs[0].id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
-      body: JSON.stringify(guideData),
+    await fetch(`${CMS_URL}/api/guides/${existing.docs[0].id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `JWT ${token}` },
     });
-    return (await res.json()).doc;
   }
+  // Create fresh
   const res = await fetch(`${CMS_URL}/api/guides`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
     body: JSON.stringify(guideData),
   });
-  return (await res.json()).doc;
+  const data = await res.json();
+  if (!data.doc) return { error: JSON.stringify(data).substring(0, 500) };
+  // Verify iconUrl was stored
+  const verify = await fetch(`${CMS_URL}/api/guides/${data.doc.id}?depth=0`, {
+    headers: { Authorization: `JWT ${token}` },
+  });
+  const stored = await verify.json();
+  const firstCell = stored?.layout?.[4]?.rows?.[0]?.cells?.[0];
+  return { title: data.doc.title, slug: data.doc.slug, id: data.doc.id, iconUrlStored: firstCell?.iconUrl || 'NOT FOUND', firstCellKeys: firstCell ? Object.keys(firstCell) : [] };
 }
 
 function buildXrosLoader() {

@@ -85,6 +85,14 @@ export default function GachaSimulatorPage() {
   const [showRates, setShowRates] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  useEffect(() => {
+    Object.values(RARITY_VIDEO).forEach(src => {
+      const link = document.createElement('link');
+      link.rel = 'preload'; link.as = 'video'; link.href = src;
+      document.head.appendChild(link);
+    });
+  }, []);
+
   const banners = useMemo(() => BANNERS.filter(b => b.type === tab && b.items.length > 0), [tab]);
   const banner = banners[idx] || banners[0];
 
@@ -130,6 +138,30 @@ export default function GachaSimulatorPage() {
 
   return (
     <div className="gacha-root" style={{ background: S.bg, minHeight: '100vh', color: '#e6e1ce', fontFamily: "'Noto Sans', sans-serif" }}>
+      {/* Constellation background like original */}
+      <div className="gacha-bg-stars" />
+      <svg className="gacha-bg-lines" viewBox="0 0 1000 600" preserveAspectRatio="none">
+        <line x1="50" y1="100" x2="250" y2="250" />
+        <line x1="250" y1="250" x2="400" y2="150" />
+        <line x1="400" y1="150" x2="600" y2="300" />
+        <line x1="600" y1="300" x2="800" y2="180" />
+        <line x1="800" y1="180" x2="950" y2="350" />
+        <line x1="100" y1="400" x2="300" y2="500" />
+        <line x1="300" y1="500" x2="500" y2="380" />
+        <line x1="500" y1="380" x2="700" y2="520" />
+        <line x1="700" y1="520" x2="900" y2="450" />
+        <line x1="200" y1="50" x2="350" y2="200" />
+        <line x1="650" y1="80" x2="750" y2="250" />
+        <circle cx="50" cy="100" r="2" /><circle cx="250" cy="250" r="2" />
+        <circle cx="400" cy="150" r="2" /><circle cx="600" cy="300" r="2" />
+        <circle cx="800" cy="180" r="2" /><circle cx="950" cy="350" r="2" />
+        <circle cx="100" cy="400" r="2" /><circle cx="300" cy="500" r="2" />
+        <circle cx="500" cy="380" r="2" /><circle cx="700" cy="520" r="2" />
+        <circle cx="900" cy="450" r="2" /><circle cx="200" cy="50" r="2" />
+        <circle cx="350" cy="200" r="2" /><circle cx="650" cy="80" r="2" />
+        <circle cx="750" cy="250" r="2" />
+      </svg>
+
       {/* Video overlay */}
       <video ref={videoRef} playsInline muted className={`gacha-video ${phase === 'video' ? 'gacha-video--active' : ''}`} />
       {phase === 'video' && (
@@ -168,7 +200,7 @@ export default function GachaSimulatorPage() {
                 {banners.map((b, i) => {
                   const diff = i - idx;
                   const abs = Math.abs(diff);
-                  if (abs > 1) return null;
+                  if (abs > 2) return null;
                   const sel = i === idx;
                   return (
                     <div key={b.id} className="gacha-card-wrap" style={{ transform: sel ? 'scale(1.1)' : 'scale(1)', filter: sel ? '' : 'brightness(0.5)', zIndex: sel ? 2 : 1 }}>
@@ -276,6 +308,7 @@ export default function GachaSimulatorPage() {
               <h3>Probability Information</h3>
               <button onClick={() => setShowRates(false)}><X size={16} /></button>
             </div>
+            <div className="gacha-modal-bars"><div /><div /></div>
             <div className="gacha-modal-sub">{banner.category}<br />{banner.name}</div>
             <div className="gacha-modal-label">Random Summon List</div>
             <div className="gacha-modal-list">
@@ -290,6 +323,7 @@ export default function GachaSimulatorPage() {
                 );
               })}
             </div>
+            <div className="gacha-modal-bars"><div /><div /></div>
           </div>
         </div>
       )}
@@ -323,12 +357,28 @@ export default function GachaSimulatorPage() {
       <style jsx global>{`
         /* ── Page background ─────────────────────────────────────── */
         .gacha-root { position: relative; overflow: hidden; }
-        .gacha-root::before {
-          content: ''; position: absolute; inset: 0; z-index: 0;
-          background: radial-gradient(ellipse at 50% 0%, rgba(20,40,80,0.3) 0%, transparent 70%);
-          pointer-events: none;
-        }
         .gacha-root > * { position: relative; z-index: 1; }
+        .gacha-bg-stars {
+          position: fixed; inset: 0; z-index: 0; pointer-events: none;
+          background:
+            radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.4), transparent),
+            radial-gradient(1.5px 1.5px at 40% 65%, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1px 1px at 55% 20%, rgba(255,255,255,0.3), transparent),
+            radial-gradient(1px 1px at 70% 50%, rgba(255,255,255,0.4), transparent),
+            radial-gradient(1.5px 1.5px at 85% 30%, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,0.3), transparent),
+            radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.4), transparent),
+            radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,0.3), transparent),
+            radial-gradient(1.5px 1.5px at 45% 45%, rgba(255,255,255,0.5), transparent);
+          background-size: 200px 200px, 300px 250px, 250px 300px, 350px 200px, 280px 350px, 320px 280px, 400px 300px, 220px 400px, 300px 220px, 500px 500px;
+          opacity: 0.4;
+        }
+        .gacha-bg-lines {
+          position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.08;
+        }
+        .gacha-bg-lines line { stroke: white; stroke-width: 0.8; }
+        .gacha-bg-lines circle { fill: white; opacity: 0.8; }
 
         /* ── Video ───────────────────────────────────────────────── */
         .gacha-video { position: fixed; inset: 0; z-index: 100; width: 100%; height: 100%; object-fit: cover; background: #000; display: none; }
@@ -361,11 +411,11 @@ export default function GachaSimulatorPage() {
         .gacha-carousel { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
         .gacha-arrow { background: none; border: none; color: #6b7280; cursor: pointer; padding: 4px; transition: color 0.2s; }
         .gacha-arrow:hover { color: #fff; }
-        .gacha-cards { display: flex; align-items: center; justify-content: center; gap: 40px; overflow: hidden; min-height: 320px; }
+        .gacha-cards { display: flex; align-items: center; justify-content: center; gap: 40px; overflow: visible; min-height: 320px; }
         @media (max-width: 768px) { .gacha-cards { gap: 10px; } }
 
         /* ── Card ────────────────────────────────────────────────── */
-        .gacha-card-wrap { position: relative; width: 198px; flex-shrink: 0; transition: all 0.35s; border-radius: 8px; }
+        .gacha-card-wrap { position: relative; width: 198px; flex-shrink: 0; transition: all 0.35s ease; border-radius: 8px; }
         @media (max-width: 768px) { .gacha-card-wrap { width: 135px; } }
         .gacha-card { display: block; width: 100%; border: 1px solid transparent; border-radius: 8px; cursor: pointer; overflow: hidden; }
         .gacha-card-title { display: flex; flex-direction: column; align-items: center; gap: 0.4em; padding: 12px 8px; text-align: center; font-size: 13px; }
@@ -396,15 +446,19 @@ export default function GachaSimulatorPage() {
           border-top: 1px solid; border-bottom: 1px solid;
           border-image: linear-gradient(to left, transparent, #f9ca8b 20%, #f9ca8b 80%, transparent) 1;
         }
-        .gacha-results-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 700px; margin-bottom: 28px; }
+        .gacha-results-grid {
+          position: relative; display: flex; flex-wrap: wrap; justify-content: center;
+          gap: 16px; max-width: 750px; margin-bottom: 28px; padding: 20px 0;
+        }
         .gacha-result-item {
           position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
-          width: 110px; min-height: 70px; padding: 8px 6px; border-radius: 4px;
+          width: 80px; height: 80px; padding: 4px; border-radius: 0;
           animation: gacha-pop 0.3s ease-out both;
+          background: rgba(0,0,0,0.3);
         }
-        .gacha-result-stars { font-size: 10px; line-height: 1; }
-        .gacha-result-name { font-size: 11px; text-align: center; margin-top: 4px; color: #ddd; line-height: 1.2; word-break: break-word; }
-        .gacha-result-new { position: absolute; top: 2px; right: 2px; background: #deac00; color: #000; font-size: 8px; font-weight: 800; padding: 1px 3px; border-radius: 2px; }
+        .gacha-result-stars { font-size: 9px; line-height: 1; }
+        .gacha-result-name { font-size: 9px; text-align: center; margin-top: 2px; color: #ddd; line-height: 1.15; word-break: break-word; overflow: hidden; max-height: 3.5em; }
+        .gacha-result-new { position: absolute; top: -4px; right: -4px; background: #deac00; color: #000; font-size: 7px; font-weight: 800; padding: 1px 3px; border-radius: 2px; z-index: 1; }
 
         /* ── Action buttons ──────────────────────────────────────── */
         .gacha-action-btns { display: flex; gap: 10px; }
@@ -425,6 +479,9 @@ export default function GachaSimulatorPage() {
         /* ── Modals ──────────────────────────────────────────────── */
         .gacha-modal-bg { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); padding: 16px; }
         .gacha-modal { width: 100%; max-width: 480px; max-height: 80vh; display: flex; flex-direction: column; background: linear-gradient(to bottom, #0d1b2a, #0a1628); border: 1px solid #2a4a6a; border-radius: 4px; overflow: hidden; }
+        .gacha-modal-bars { display: flex; height: 4px; }
+        .gacha-modal-bars > div:first-child { flex: 1; background: linear-gradient(to right, #10b981, #34d399); }
+        .gacha-modal-bars > div:last-child { flex: 1; background: linear-gradient(to right, #ec4899, #f472b6); }
         .gacha-modal--inv { max-width: 520px; }
         .gacha-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #1a3a5a; }
         .gacha-modal-head h3 { font-size: 14px; font-weight: 700; color: #f9ca8b; }

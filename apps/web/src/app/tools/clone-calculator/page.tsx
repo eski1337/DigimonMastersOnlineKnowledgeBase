@@ -64,7 +64,7 @@ const CLONE_RANKS = [
 export default function CloneCalculatorPage() {
   const [cloneType, setCloneType] = useState<CloneType>('Attack');
   const [cloneLevel, setCloneLevel] = useState(15);
-  const [baseValue, setBaseValue] = useState<string>('1500');
+  const [baseValue, setBaseValue] = useState<string>('');
   const [showTable, setShowTable] = useState(false);
 
   const percentage = PERFECT_TABLE[cloneType][cloneLevel - 1];

@@ -278,8 +278,8 @@ export default function GachaSimulatorPage() {
                           {b.image ? (
                             <img src={b.image} alt={b.name} className="w-full h-full object-cover" draggable={false} />
                           ) : (
-                            <div className="w-full h-full bg-gray-900 flex items-center justify-center text-2xl">
-                              {activeTab === 'DATA_SUMMON' ? '🎴' : '💎'}
+                            <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: 'linear-gradient(180deg, #0f1b2d 0%, #0a1222 100%)' }}>
+                              <img src="/gacha/gacha-symbol.jpg" alt="" className="w-10 h-10 opacity-70" />
                             </div>
                           )}
                         </div>
@@ -335,41 +335,38 @@ export default function GachaSimulatorPage() {
                 </div>
               </div>
 
-              {/* Items grid - scattered layout like original */}
-              <div className="flex flex-wrap justify-center gap-4 max-w-2xl mx-auto mb-8">
+              {/* Items grid */}
+              <div className={`grid gap-3 max-w-3xl mx-auto mb-8 ${pullResults.length === 1 ? 'grid-cols-1 max-w-[200px]' : pullResults.length <= 5 ? 'grid-cols-5' : 'grid-cols-5 sm:grid-cols-5'}`}>
                 {pullResults.map((result, i) => {
                   const borderColor = RARITY_BORDER[result.item.rarity] || RARITY_BORDER[1];
                   const bgColor = RARITY_BG[result.item.rarity] || RARITY_BG[1];
                   return (
                     <div
                       key={i}
-                      className="relative group"
+                      className="relative"
                       style={{
-                        animationDelay: `${i * 100}ms`,
+                        animationDelay: `${i * 80}ms`,
                         animationFillMode: 'both',
                         animationDuration: '400ms',
                         animationName: 'fadeInUp',
                       }}
                     >
                       <div
-                        className="w-16 h-16 flex items-center justify-center relative overflow-hidden"
+                        className="flex flex-col items-center justify-center p-2 relative"
                         style={{
                           border: `2px solid ${borderColor}`,
                           background: bgColor,
-                          boxShadow: result.item.rarity >= 5 ? `0 0 12px ${borderColor}40` : 'none',
+                          boxShadow: result.item.rarity >= 5 ? `0 0 15px ${borderColor}50` : 'none',
+                          minHeight: 80,
                         }}
                       >
-                        <div className="text-[10px] font-bold text-center text-gray-300 leading-tight px-0.5 break-words">
-                          {result.item.name.length > 15 ? result.item.name.substring(0, 15) + '…' : result.item.name}
+                        <div className="text-[10px] font-bold text-center leading-tight px-1" style={{ color: borderColor }}>{'★'.repeat(result.item.rarity)}</div>
+                        <div className="text-[11px] font-semibold text-center text-gray-200 leading-tight mt-1 px-1">
+                          {result.item.name}
                         </div>
                         {result.isNew && (
-                          <div className="absolute top-0 right-0 bg-amber-500 text-[7px] font-bold px-1 text-black">N</div>
+                          <div className="absolute top-0.5 right-0.5 bg-amber-500 text-[7px] font-bold px-1 py-px text-black rounded-sm">NEW</div>
                         )}
-                      </div>
-                      {/* Tooltip */}
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block z-20 whitespace-nowrap bg-gray-900 border border-gray-700 px-2 py-1 text-[10px] text-gray-300">
-                        {result.item.name}
-                        <span className="ml-1" style={{ color: borderColor }}>★{result.item.rarity}</span>
                       </div>
                     </div>
                   );
@@ -489,32 +486,25 @@ export default function GachaSimulatorPage() {
               {invBanners.length === 0 && <span className="text-xs text-gray-600">No items yet</span>}
             </div>
 
-            {/* Item grid */}
-            <div className="flex-1 overflow-y-auto p-3">
-              <div className="grid grid-cols-7 gap-1">
-                {filteredInv.map((item, i) => (
-                  <div key={i} className="relative group" title={`${item.itemName} ×${item.count}`}>
-                    <div
-                      className="w-full aspect-square flex items-center justify-center"
-                      style={{
-                        border: `2px solid ${RARITY_BORDER[item.rarity]}`,
-                        background: RARITY_BG[item.rarity],
-                      }}
-                    >
-                      <span className="text-[8px] text-center text-gray-300 leading-tight px-0.5 break-words">
-                        {item.itemName.length > 10 ? item.itemName.substring(0, 10) + '…' : item.itemName}
-                      </span>
+            {/* Item list */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-1">
+              {filteredInv.length === 0 ? (
+                <p className="text-center text-gray-600 py-8 text-xs">No items collected yet.</p>
+              ) : (
+                filteredInv.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 px-3 py-1.5"
+                    style={{ border: `1px solid ${RARITY_BORDER[item.rarity]}30`, background: RARITY_BG[item.rarity] }}
+                  >
+                    <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center" style={{ border: `1.5px solid ${RARITY_BORDER[item.rarity]}`, background: RARITY_BG[item.rarity] }}>
+                      <span className="text-[7px] font-bold" style={{ color: RARITY_BORDER[item.rarity] }}>★{item.rarity}</span>
                     </div>
-                    {item.count > 1 && (
-                      <div className="absolute bottom-0 right-0 bg-black/80 text-[8px] text-gray-300 px-0.5">{item.count}</div>
-                    )}
+                    <span className="flex-1 text-xs text-gray-300 truncate">{item.itemName}</span>
+                    <span className="text-xs font-bold tabular-nums" style={{ color: RARITY_BORDER[item.rarity] }}>×{item.count}</span>
                   </div>
-                ))}
-                {/* Empty slots */}
-                {Array.from({ length: Math.max(0, 42 - filteredInv.length) }).map((_, i) => (
-                  <div key={`empty-${i}`} className="w-full aspect-square" style={{ border: '1px solid #1a3a5c', background: '#0a1628' }} />
-                ))}
-              </div>
+                ))
+              )}
             </div>
 
             {/* Bottom decoration */}

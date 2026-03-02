@@ -1,5 +1,5 @@
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calculator, Timer, TrendingUp, Dices } from 'lucide-react';
+import { Calculator, Timer, TrendingUp, Dices, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 const tools = [
@@ -21,6 +21,14 @@ const tools = [
   },
   {
     id: '3',
+    slug: 'seal-calculator',
+    title: 'Seal Calculator',
+    description: 'Find the most cost-efficient seal combination to reach your target stat.',
+    icon: Shield,
+    type: 'calculator' as const,
+  },
+  {
+    id: '4',
     slug: 'raid-timer',
     title: 'Raid Timer',
     description: 'Track raid spawn times and set notifications.',
@@ -28,7 +36,7 @@ const tools = [
     type: 'utility' as const,
   },
   {
-    id: '4',
+    id: '5',
     slug: 'progress-tracker',
     title: 'Progress Tracker',
     description: 'Keep track of your collection and achievements.',
@@ -36,7 +44,7 @@ const tools = [
     type: 'tracker' as const,
   },
   {
-    id: '5',
+    id: '6',
     slug: 'gacha-simulator',
     title: 'Gacha Simulator',
     description: 'Simulate gacha pulls and calculate probabilities.',

@@ -15,6 +15,36 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    date: 'March 2, 2026',
+    version: '1.6.0',
+    changes: [
+      { type: 'added', text: 'CMS admin panel now supports Traditional Chinese (繁體中文) — language selector available in the admin UI.' },
+      { type: 'fixed', text: 'Scroll position is now restored when navigating back from a Digimon profile to the Digimon list page.' },
+      { type: 'fixed', text: 'CMS i18n locale keys corrected (zhTw → zh) so all collection labels and group names properly display in Chinese.' },
+    ],
+  },
+  {
+    date: 'March 1, 2026',
+    version: '1.5.0',
+    changes: [
+      { type: 'added', text: 'Visual Evolution Editor — fully interactive graph editor with drag-and-drop nodes, click-to-connect edges, and one-click save to the database.' },
+      { type: 'added', text: 'Edit button on Digivolution Graph (visible to editors/admins) links directly to the CMS editor with the line preselected.' },
+      { type: 'added', text: 'Edge popup in the editor for setting evolution type, required level, and required item per connection.' },
+      { type: 'added', text: 'Armor evolution type added to the editor dropdown.' },
+      { type: 'added', text: 'Bridge visualization on evolution graphs — edges now show clear gaps at crossings so overlapping lines are distinguishable.' },
+      { type: 'added', text: 'Smart alignment guides and toggleable gap markers in the evolution editor for precise node placement.' },
+      { type: 'added', text: 'Top/bottom handles on editor nodes for vertical connections in complex evolution trees.' },
+      { type: 'changed', text: 'Evolution graph on Digimon profiles rewritten to use new evolution-edges + evolution-lines collections with React Flow.' },
+      { type: 'changed', text: 'Edge routing upgraded — auto-assigns handles based on relative node positions for clean connections.' },
+      { type: 'changed', text: 'Profile evolution nodes use smooth-step routing for angled connections, straight lines for horizontal same-height connections.' },
+      { type: 'fixed', text: 'Phantom Digimon no longer appear in the editor — edges pointing outside the current line are filtered out on load.' },
+      { type: 'fixed', text: 'Duplicate edges no longer appear after saving and reloading — bidirectional deduplication on connect, load, and save.' },
+      { type: 'fixed', text: 'Edge popup in the editor now reliably appears on click (event propagation fix).' },
+      { type: 'fixed', text: 'Evolution graph edges now render correctly on Digimon profile pages (ConnectionMode.Loose fix).' },
+      { type: 'fixed', text: 'Edge handle positions (top/bottom/left/right) persist correctly across save and reload.' },
+    ],
+  },
+  {
     date: 'February 26, 2026',
     version: '1.4.0',
     changes: [

@@ -2,29 +2,19 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ChevronLeft, ChevronRight, X, Search } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { BANNERS, type GachaItem, type GachaBanner } from './gacha-data';
 
-/* ── Constants ────────────────────────────────────────────────────────── */
+/* ── Rarity colors ───────────────────────────────────────────────────── */
 
-const RARITY_BORDER: Record<number, string> = {
-  7: '#ffd700',
-  6: '#ff4466',
-  5: '#ff8c00',
-  4: '#a855f7',
-  3: '#3b82f6',
-  2: '#22c55e',
-  1: '#6b7280',
-};
-
-const RARITY_BG: Record<number, string> = {
-  7: 'rgba(255,215,0,0.15)',
-  6: 'rgba(255,68,102,0.12)',
-  5: 'rgba(255,140,0,0.12)',
-  4: 'rgba(168,85,247,0.1)',
-  3: 'rgba(59,130,246,0.1)',
-  2: 'rgba(34,197,94,0.08)',
-  1: 'rgba(107,114,128,0.08)',
+const RC: Record<number, { border: string; bg: string; text: string }> = {
+  7: { border: '#deac00', bg: 'rgba(222,172,0,0.15)', text: '#ffd700' },
+  6: { border: '#ff4466', bg: 'rgba(255,68,102,0.12)', text: '#ff6688' },
+  5: { border: '#ff8c00', bg: 'rgba(255,140,0,0.12)', text: '#ffaa33' },
+  4: { border: '#a855f7', bg: 'rgba(168,85,247,0.1)', text: '#c084fc' },
+  3: { border: '#3b82f6', bg: 'rgba(59,130,246,0.1)', text: '#60a5fa' },
+  2: { border: '#22c55e', bg: 'rgba(34,197,94,0.08)', text: '#4ade80' },
+  1: { border: '#6b7280', bg: 'rgba(107,114,128,0.08)', text: '#9ca3af' },
 };
 
 const RARITY_VIDEO: Record<number, string> = {
@@ -38,16 +28,11 @@ const RARITY_VIDEO: Record<number, string> = {
 type TabType = 'DATA_SUMMON' | 'DIGITAL_DRAW';
 type Phase = 'select' | 'video' | 'results';
 
-interface PullResult {
-  item: GachaItem;
-  isNew: boolean;
-}
-
 /* ── Helpers ──────────────────────────────────────────────────────────── */
 
 function pullFromBanner(banner: GachaBanner, count: number): GachaItem[] {
   const results: GachaItem[] = [];
-  const totalProb = banner.items.reduce((sum, item) => sum + item.probability, 0);
+  const totalProb = banner.items.reduce((s, i) => s + i.probability, 0);
   for (let i = 0; i < count; i++) {
     let roll = Math.random() * totalProb;
     for (const item of banner.items) {
@@ -59,11 +44,11 @@ function pullFromBanner(banner: GachaBanner, count: number): GachaItem[] {
   return results;
 }
 
-function getHighestRarity(items: GachaItem[]): number {
-  return items.reduce((max, item) => Math.max(max, item.rarity), 0);
+function highestRarity(items: GachaItem[]): number {
+  return items.reduce((m, i) => Math.max(m, i.rarity), 0);
 }
 
-function getVideoForRarity(r: number): string {
+function videoForRarity(r: number): string {
   if (r >= 7) return RARITY_VIDEO[7];
   if (r >= 6) return RARITY_VIDEO[6];
   if (r >= 5) return RARITY_VIDEO[5];
@@ -71,458 +56,393 @@ function getVideoForRarity(r: number): string {
   return RARITY_VIDEO[1];
 }
 
+const rc = (r: number) => RC[r] || RC[1];
+
+/* ── Styles matching original site exactly ────────────────────────────── */
+
+const S = {
+  bg: 'linear-gradient(to bottom, #082036, #071C30)',
+  card: { background: 'linear-gradient(to bottom right, #1c1b36aa, #0c0b17aa 50%, #070711aa 51%)', boxShadow: 'inset 2px 2px 3px #312d59' },
+  cardSel: { background: 'linear-gradient(to bottom right, #302a2eaa, #201b13aa 50%, #1c170daa 51%)', boxShadow: 'inset 2px 2px 3px #40374d' },
+  btn1: { background: 'linear-gradient(to bottom right, #307B6B, #01F388)', borderTop: '1px solid #266960', boxShadow: 'inset 1px 1px 2px #3db196' },
+  btn10: { background: 'linear-gradient(to bottom right, #833767, #CF0557)', borderTop: '1px solid #6C2953', boxShadow: 'inset 1px 1px 2px #b14f92' },
+  btnConfirm: { background: 'linear-gradient(to bottom right, #32678B, #0587B5)', borderTop: '1px solid #2A5678', boxShadow: 'inset 1px 1px 2px #5485a8' },
+  btnRetry: { background: 'linear-gradient(to bottom right, #6D424A, #97200C)', borderTop: '1px solid #4B1E29', boxShadow: 'inset 1px 1px 2px #825767' },
+  btnSkip: { background: 'linear-gradient(to bottom right, #4d5666, #494a5b 30%, #323940 55%)', boxShadow: 'inset 1px 1px 2px #666a78' },
+  goldNeon: 'drop-shadow(0 0 10px rgba(222,173,0,0.3)) sepia(0.2)',
+};
+
 /* ── Component ────────────────────────────────────────────────────────── */
 
 export default function GachaSimulatorPage() {
-  const [activeTab, setActiveTab] = useState<TabType>('DATA_SUMMON');
-  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [tab, setTab] = useState<TabType>('DATA_SUMMON');
+  const [idx, setIdx] = useState(0);
   const [phase, setPhase] = useState<Phase>('select');
-  const [pullResults, setPullResults] = useState<PullResult[]>([]);
-  const [inventory, setInventory] = useState<Record<string, number>>({});
-  const [totalPulls, setTotalPulls] = useState(0);
-  const [showInventory, setShowInventory] = useState(false);
+  const [results, setResults] = useState<{ item: GachaItem; isNew: boolean }[]>([]);
+  const [inv, setInv] = useState<Record<string, number>>({});
+  const [pulls, setPulls] = useState(0);
+  const [showInv, setShowInv] = useState(false);
   const [showRates, setShowRates] = useState(false);
-  const [invTab, setInvTab] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const banners = useMemo(
-    () => BANNERS.filter((b) => b.type === activeTab && b.items.length > 0),
-    [activeTab],
-  );
-  const banner = banners[selectedIdx] || banners[0];
+  const banners = useMemo(() => BANNERS.filter(b => b.type === tab && b.items.length > 0), [tab]);
+  const banner = banners[idx] || banners[0];
 
-  const handleTabChange = useCallback((tab: TabType) => {
-    setActiveTab(tab);
-    setSelectedIdx(0);
-    setPhase('select');
-    setPullResults([]);
-  }, []);
+  const switchTab = useCallback((t: TabType) => { setTab(t); setIdx(0); setPhase('select'); setResults([]); }, []);
 
-  const nav = useCallback((dir: -1 | 1) => {
-    setSelectedIdx((p) => {
-      const n = p + dir;
-      return n < 0 ? banners.length - 1 : n >= banners.length ? 0 : n;
-    });
-    setPullResults([]);
-    setPhase('select');
+  const nav = useCallback((d: -1 | 1) => {
+    setIdx(p => { const n = p + d; return n < 0 ? banners.length - 1 : n >= banners.length ? 0 : n; });
+    setResults([]); setPhase('select');
   }, [banners.length]);
 
   const doPull = useCallback((count: number) => {
     if (!banner || phase === 'video') return;
     const items = pullFromBanner(banner, count);
-    const highest = getHighestRarity(items);
-    const results: PullResult[] = items.map((item) => {
-      const key = `${banner.id}-${item.name}`;
-      return { item, isNew: !inventory[key] };
-    });
-
-    const newInv = { ...inventory };
-    items.forEach((item) => {
-      const key = `${banner.id}-${item.name}`;
-      newInv[key] = (newInv[key] || 0) + 1;
-    });
-    setInventory(newInv);
-    setTotalPulls((p) => p + count);
-    setPullResults(results);
-
+    const hr = highestRarity(items);
+    const res = items.map(item => ({ item, isNew: !inv[`${banner.id}-${item.name}`] }));
+    const ni = { ...inv };
+    items.forEach(item => { const k = `${banner.id}-${item.name}`; ni[k] = (ni[k] || 0) + 1; });
+    setInv(ni); setPulls(p => p + count); setResults(res);
     setPhase('video');
-    const vid = getVideoForRarity(highest);
-    if (videoRef.current) {
-      videoRef.current.src = vid;
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => setPhase('results'));
-    }
-  }, [banner, phase, inventory]);
+    const v = videoRef.current;
+    if (v) { v.src = videoForRarity(hr); v.currentTime = 0; v.play().catch(() => setPhase('results')); }
+  }, [banner, phase, inv]);
 
-  const skipVideo = useCallback(() => setPhase('results'), []);
-
-  const handleVideoEnd = useCallback(() => setPhase('results'), []);
+  const skip = useCallback(() => setPhase('results'), []);
+  const onEnd = useCallback(() => setPhase('results'), []);
 
   useEffect(() => {
     const v = videoRef.current;
-    if (v) { v.addEventListener('ended', handleVideoEnd); return () => v.removeEventListener('ended', handleVideoEnd); }
-  }, [handleVideoEnd]);
+    if (v) { v.addEventListener('ended', onEnd); return () => v.removeEventListener('ended', onEnd); }
+  }, [onEnd]);
 
-  const resetAll = useCallback(() => {
-    setInventory({});
-    setTotalPulls(0);
-    setPullResults([]);
-    setPhase('select');
-  }, []);
+  const reset = useCallback(() => { setInv({}); setPulls(0); setResults([]); setPhase('select'); }, []);
 
   const invItems = useMemo(() => {
-    const items: { bannerId: number; bannerName: string; itemName: string; count: number; rarity: number }[] = [];
-    Object.entries(inventory).forEach(([key, count]) => {
-      if (count <= 0) return;
-      const di = key.indexOf('-');
-      const bId = parseInt(key.substring(0, di));
-      const iName = key.substring(di + 1);
-      const b = BANNERS.find((x) => x.id === bId);
-      const it = b?.items.find((x) => x.name === iName);
-      items.push({ bannerId: bId, bannerName: b?.name || '', itemName: iName, count, rarity: it?.rarity || 1 });
-    });
-    items.sort((a, b) => b.rarity - a.rarity);
-    return items;
-  }, [inventory]);
+    return Object.entries(inv).filter(([, c]) => c > 0).map(([key, count]) => {
+      const di = key.indexOf('-'); const bId = parseInt(key.substring(0, di)); const name = key.substring(di + 1);
+      const b = BANNERS.find(x => x.id === bId); const it = b?.items.find(x => x.name === name);
+      return { bannerId: bId, bannerName: b?.name || '', name, count, rarity: it?.rarity || 1 };
+    }).sort((a, b) => b.rarity - a.rarity);
+  }, [inv]);
 
-  const invBanners = useMemo(() => {
-    const ids = new Set(invItems.map((i) => i.bannerId));
-    return banners.filter((b) => ids.has(b.id));
-  }, [invItems, banners]);
-
-  const filteredInv = invTab ? invItems.filter((i) => i.bannerId === invTab) : invItems;
+  /* ── Render ─────────────────────────────────────────────────────────── */
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ background: '#0a0a12' }}>
-      {/* Constellation background */}
-      <div className="pointer-events-none absolute inset-0 opacity-30" style={{
-        backgroundImage: `radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4), transparent),
-          radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3), transparent),
-          radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.4), transparent),
-          radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.3), transparent),
-          radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.2), transparent),
-          radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.3), transparent),
-          radial-gradient(1.5px 1.5px at 50% 50%, rgba(255,255,255,0.5), transparent)`,
-        backgroundSize: '200px 200px, 300px 300px, 250px 250px, 350px 350px, 400px 400px, 150px 150px, 500px 500px',
-      }} />
-      <svg className="pointer-events-none absolute inset-0 w-full h-full opacity-[0.06]">
-        <line x1="10%" y1="20%" x2="30%" y2="45%" stroke="white" strokeWidth="0.5" />
-        <line x1="30%" y1="45%" x2="50%" y2="30%" stroke="white" strokeWidth="0.5" />
-        <line x1="50%" y1="30%" x2="70%" y2="55%" stroke="white" strokeWidth="0.5" />
-        <line x1="70%" y1="55%" x2="90%" y2="35%" stroke="white" strokeWidth="0.5" />
-        <line x1="20%" y1="70%" x2="40%" y2="85%" stroke="white" strokeWidth="0.5" />
-        <line x1="40%" y1="85%" x2="60%" y2="70%" stroke="white" strokeWidth="0.5" />
-        <line x1="60%" y1="70%" x2="80%" y2="90%" stroke="white" strokeWidth="0.5" />
-      </svg>
-
+    <div className="gacha-root" style={{ background: S.bg, minHeight: '100vh', color: '#e6e1ce', fontFamily: "'Noto Sans', sans-serif" }}>
       {/* Video overlay */}
-      <video
-        ref={videoRef}
-        className={`fixed inset-0 z-50 w-full h-full object-cover bg-black ${phase === 'video' ? '' : 'hidden'}`}
-        playsInline
-        muted
-      />
+      <video ref={videoRef} playsInline muted className={`gacha-video ${phase === 'video' ? 'gacha-video--active' : ''}`} />
       {phase === 'video' && (
-        <button
-          onClick={skipVideo}
-          className="fixed top-4 right-4 z-[60] px-4 py-1.5 bg-black/60 border border-gray-600 text-gray-300 text-xs font-bold uppercase tracking-wider hover:bg-black/80 transition-all"
-        >
-          SKIP
-        </button>
+        <button onClick={skip} className="gacha-skip" style={S.btnSkip}>SKIP</button>
       )}
 
-      {/* Main content */}
-      <div className={`relative z-10 ${phase === 'video' ? 'hidden' : ''}`}>
-        <div className="container py-6 max-w-5xl">
-          <Link href="/tools" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 mb-4 transition-colors">
-            <ArrowLeft className="h-4 w-4" /> Back to Tools
+      <div className={phase === 'video' ? 'hidden' : ''}>
+        {/* Back link */}
+        <div style={{ padding: '16px 24px' }}>
+          <Link href="/tools" className="gacha-back">
+            <ArrowLeft size={16} /> Back to Tools
           </Link>
+        </div>
 
-          <h1 className="text-center text-xl font-bold text-gray-200 mb-1">Gacha Simulator</h1>
-
-          {phase === 'select' && (
-            <>
-              {/* Mode tabs */}
-              <div className="flex justify-center gap-1 mt-4 mb-6">
-                {([['DATA_SUMMON', 'Data Summon', '/gacha/gacha-symbol.jpg'], ['DIGITAL_DRAW', 'Digital Draw', '/gacha/gacha-symbol.jpg']] as [TabType, string, string][]).map(([type, label, icon]) => (
-                  <button
-                    key={type}
-                    onClick={() => handleTabChange(type)}
-                    className={`flex items-center gap-2 px-5 py-2 border-2 transition-all text-sm font-bold ${
-                      activeTab === type
-                        ? 'border-blue-500 bg-blue-500/20 text-white'
-                        : 'border-gray-700 text-gray-500 hover:border-blue-500/50 hover:bg-blue-500/10'
-                    }`}
-                  >
-                    <img src={icon} alt="" className="w-5 h-5" />
-                    {label}
-                  </button>
-                ))}
-              </div>
-
-              <p className="text-center text-gray-400 text-sm mb-6">
-                {activeTab === 'DATA_SUMMON' ? 'Select the data to summon.' : 'Choose Digital Draw.'}
-              </p>
-
-              {/* Banner carousel */}
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <button onClick={() => nav(-1)} className="text-blue-400 hover:text-blue-300 transition-colors p-1">
-                  <ChevronLeft className="h-6 w-6" strokeWidth={3} />
+        {phase === 'select' && (
+          <section className="gacha-select">
+            {/* Tab buttons */}
+            <div className="gacha-tabs">
+              {(['DATA_SUMMON', 'DIGITAL_DRAW'] as TabType[]).map(t => (
+                <button key={t} onClick={() => switchTab(t)} className={`gacha-tab ${tab === t ? 'gacha-tab--active' : ''}`}>
+                  <img src="/gacha/gacha-symbol.jpg" alt="" width={22} height={23} style={{ width: '1.2em' }} />
+                  <span>{t === 'DATA_SUMMON' ? 'Data Summon' : 'Digital Draw'}</span>
                 </button>
+              ))}
+            </div>
 
-                <div className="flex items-end gap-3 overflow-hidden">
-                  {banners.map((b, idx) => {
-                    const dist = idx - selectedIdx;
-                    const absDist = Math.abs(dist);
-                    if (absDist > 2) return null;
-                    const isActive = idx === selectedIdx;
+            {/* Title */}
+            <h2 className="gacha-title">
+              {tab === 'DATA_SUMMON' ? 'Select the data to summon.' : 'Choose Digital Draw.'}
+            </h2>
 
-                    return (
-                      <button
-                        key={b.id}
-                        onClick={() => { setSelectedIdx(idx); }}
-                        className="flex-shrink-0 flex flex-col items-center transition-all duration-300"
-                        style={{
-                          opacity: isActive ? 1 : absDist === 1 ? 0.5 : 0.25,
-                          transform: `scale(${isActive ? 1 : 0.85})`,
-                        }}
-                      >
-                        <div className={`text-center mb-1 text-[10px] leading-tight ${isActive ? 'text-gray-300' : 'text-gray-600'}`} style={{ maxWidth: isActive ? 160 : 120 }}>
-                          {b.category && <div className="truncate">{b.category}</div>}
-                          <div className="font-bold truncate">{b.name}</div>
-                        </div>
-                        <div
-                          className={`overflow-hidden transition-all duration-300 ${isActive ? 'border-2 border-red-500 shadow-lg shadow-red-500/30' : 'border border-gray-700'}`}
-                          style={{ width: isActive ? 160 : 120, aspectRatio: '1/0.91' }}
-                        >
+            {/* Card carousel */}
+            <div className="gacha-carousel">
+              <button onClick={() => nav(-1)} className="gacha-arrow"><ChevronLeft size={28} /></button>
+              <div className="gacha-cards">
+                {banners.map((b, i) => {
+                  const diff = i - idx;
+                  const abs = Math.abs(diff);
+                  if (abs > 1) return null;
+                  const sel = i === idx;
+                  return (
+                    <div key={b.id} className="gacha-card-wrap" style={{ transform: sel ? 'scale(1.1)' : 'scale(1)', filter: sel ? '' : 'brightness(0.5)', zIndex: sel ? 2 : 1 }}>
+                      <button onClick={() => { setIdx(i); }} className="gacha-card" style={sel ? S.cardSel : S.card}>
+                        {/* Card title */}
+                        <h3 className="gacha-card-title">
+                          {b.category && <span className="gacha-card-cat">{b.category}</span>}
+                          <span className="gacha-card-name">{b.name}</span>
+                        </h3>
+                        {/* Card image */}
+                        <div className="gacha-card-img">
                           {b.image ? (
-                            <img src={b.image} alt={b.name} className="w-full h-full object-cover" draggable={false} />
+                            <img src={b.image} alt={b.name} draggable={false} style={{ width: '100%', display: 'block' }} />
                           ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: 'linear-gradient(180deg, #0f1b2d 0%, #0a1222 100%)' }}>
-                              <img src="/gacha/gacha-symbol.jpg" alt="" className="w-10 h-10 opacity-70" />
+                            <div className="gacha-card-placeholder">
+                              <img src="/gacha/gacha-symbol.jpg" alt="" style={{ width: 40, opacity: 0.6 }} />
                             </div>
                           )}
                         </div>
-                        {isActive && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setShowRates(true); }}
-                            className="mt-1"
-                          >
-                            <Search className="h-4 w-4 text-blue-400 hover:text-blue-300" />
-                          </button>
-                        )}
                       </button>
-                    );
-                  })}
-                </div>
-
-                <button onClick={() => nav(1)} className="text-blue-400 hover:text-blue-300 transition-colors p-1">
-                  <ChevronRight className="h-6 w-6" strokeWidth={3} />
-                </button>
-              </div>
-
-              {/* Pull buttons */}
-              {banner && (
-                <div className="flex justify-center gap-3 mb-4">
-                  {activeTab === 'DATA_SUMMON' ? (
-                    <>
-                      <button onClick={() => doPull(1)} className="px-6 py-2 font-bold text-sm text-white text-shadow" style={{ background: 'linear-gradient(180deg, #2d8a4e 0%, #1a6636 100%)', border: '1px solid #3cb371' }}>
-                        1 time
-                      </button>
-                      <button onClick={() => doPull(10)} className="px-6 py-2 font-bold text-sm text-white text-shadow" style={{ background: 'linear-gradient(180deg, #c62828 0%, #8b1a1a 100%)', border: '1px solid #ef5350' }}>
-                        10 times
-                      </button>
-                    </>
-                  ) : (
-                    <button onClick={() => doPull(11)} className="px-6 py-2 font-bold text-sm text-white text-shadow" style={{ background: 'linear-gradient(180deg, #1565c0 0%, #0d47a1 100%)', border: '1px solid #42a5f5' }}>
-                      11 times Draw
-                    </button>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Results phase */}
-          {phase === 'results' && pullResults.length > 0 && (
-            <div className="mt-6">
-              {/* Obtained Items header */}
-              <div className="text-center mb-8">
-                <div className="inline-block relative">
-                  <div className="absolute left-0 right-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #c0a040, #e0c060, #c0a040, transparent)' }} />
-                  <h2 className="text-lg font-bold text-gray-200 py-2 px-12">Obtained Items</h2>
-                  <div className="absolute left-0 right-0 bottom-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #606060, transparent)' }} />
-                </div>
-              </div>
-
-              {/* Items grid */}
-              <div className={`grid gap-3 max-w-3xl mx-auto mb-8 ${pullResults.length === 1 ? 'grid-cols-1 max-w-[200px]' : pullResults.length <= 5 ? 'grid-cols-5' : 'grid-cols-5 sm:grid-cols-5'}`}>
-                {pullResults.map((result, i) => {
-                  const borderColor = RARITY_BORDER[result.item.rarity] || RARITY_BORDER[1];
-                  const bgColor = RARITY_BG[result.item.rarity] || RARITY_BG[1];
-                  return (
-                    <div
-                      key={i}
-                      className="relative"
-                      style={{
-                        animationDelay: `${i * 80}ms`,
-                        animationFillMode: 'both',
-                        animationDuration: '400ms',
-                        animationName: 'fadeInUp',
-                      }}
-                    >
-                      <div
-                        className="flex flex-col items-center justify-center p-2 relative"
-                        style={{
-                          border: `2px solid ${borderColor}`,
-                          background: bgColor,
-                          boxShadow: result.item.rarity >= 5 ? `0 0 15px ${borderColor}50` : 'none',
-                          minHeight: 80,
-                        }}
-                      >
-                        <div className="text-[10px] font-bold text-center leading-tight px-1" style={{ color: borderColor }}>{'★'.repeat(result.item.rarity)}</div>
-                        <div className="text-[11px] font-semibold text-center text-gray-200 leading-tight mt-1 px-1">
-                          {result.item.name}
-                        </div>
-                        {result.isNew && (
-                          <div className="absolute top-0.5 right-0.5 bg-amber-500 text-[7px] font-bold px-1 py-px text-black rounded-sm">NEW</div>
-                        )}
+                      {/* View items button */}
+                      <div className="gacha-view-items">
+                        <button onClick={(e) => { e.stopPropagation(); setShowRates(true); }} title="Check Reward Items" className="gacha-view-btn">
+                          <img src="/gacha/view-items.jpg" alt="" width={25} height={25} className="gacha-view-default" />
+                          <img src="/gacha/view-items-hover.jpg" alt="" width={25} height={25} className="gacha-view-hover" />
+                        </button>
                       </div>
+                      {/* Gold neon on selected */}
+                      {sel && <div className="gacha-neon" />}
                     </div>
                   );
                 })}
               </div>
-
-              {/* Confirm / Resummon */}
-              <div className="flex justify-center gap-3 mb-8">
-                <button
-                  onClick={() => setPhase('select')}
-                  className="px-6 py-2 font-bold text-sm text-white"
-                  style={{ background: 'linear-gradient(180deg, #1976d2 0%, #0d47a1 100%)', border: '1px solid #42a5f5' }}
-                >
-                  Confirm
-                </button>
-                <button
-                  onClick={() => {
-                    const count = activeTab === 'DATA_SUMMON' ? (pullResults.length > 1 ? 10 : 1) : 11;
-                    setPhase('select');
-                    setTimeout(() => doPull(count), 50);
-                  }}
-                  className="px-6 py-2 font-bold text-sm text-white"
-                  style={{ background: 'linear-gradient(180deg, #b71c1c 0%, #7f0000 100%)', border: '1px solid #ef5350' }}
-                >
-                  Resummon
-                </button>
-              </div>
+              <button onClick={() => nav(1)} className="gacha-arrow"><ChevronRight size={28} /></button>
             </div>
-          )}
 
-          {/* Inventory button - fixed bottom right */}
-          <button
-            onClick={() => { setShowInventory(true); setInvTab(null); }}
-            className="fixed bottom-6 right-6 z-30 w-12 h-12 flex items-center justify-center"
-            style={{ border: '2px solid #4488cc', background: 'linear-gradient(180deg, #1a3a5c 0%, #0d2137 100%)' }}
-            title="Inventory"
-          >
-            <img src="/gacha/inven.jpg" alt="Inventory" className="w-8 h-8" />
-          </button>
+            {/* Pull buttons */}
+            {banner && (
+              <div className="gacha-pull-btns">
+                {tab === 'DATA_SUMMON' ? (
+                  <>
+                    <button onClick={() => doPull(1)} className="gacha-pull-btn" style={S.btn1}>1 time</button>
+                    <button onClick={() => doPull(10)} className="gacha-pull-btn" style={S.btn10}>10 times</button>
+                  </>
+                ) : (
+                  <button onClick={() => doPull(11)} className="gacha-pull-btn" style={S.btnConfirm}>11 times Draw</button>
+                )}
+              </div>
+            )}
+          </section>
+        )}
 
-          {/* Stats bar */}
-          <div className="fixed bottom-6 left-6 z-30 flex items-center gap-3 text-[10px] text-gray-500">
-            <span>Pulls: <b className="text-gray-300">{totalPulls}</b></span>
-            <span>Items: <b className="text-gray-300">{Object.keys(inventory).length}</b></span>
-            <button onClick={resetAll} className="text-gray-600 hover:text-red-400 transition-colors underline">Reset</button>
-          </div>
+        {/* Results phase */}
+        {phase === 'results' && results.length > 0 && (
+          <section className="gacha-results">
+            <h2 className="gacha-results-title">Obtained Items</h2>
+
+            <div className="gacha-results-grid">
+              {results.map((r, i) => {
+                const c = rc(r.item.rarity);
+                const best = r.item.rarity >= 6;
+                return (
+                  <div key={i} className="gacha-result-item" style={{
+                    border: `1px solid ${c.border}`,
+                    background: c.bg,
+                    filter: best ? `drop-shadow(0 0 5px ${c.border})` : 'none',
+                    animationDelay: `${i * 60}ms`,
+                  }}>
+                    <div className="gacha-result-stars" style={{ color: c.text }}>{'★'.repeat(r.item.rarity)}</div>
+                    <div className="gacha-result-name">{r.item.name}</div>
+                    {r.isNew && <div className="gacha-result-new">NEW</div>}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="gacha-action-btns">
+              <button onClick={() => setPhase('select')} className="gacha-action-btn" style={S.btnConfirm}>Confirm</button>
+              <button onClick={() => {
+                const c = tab === 'DATA_SUMMON' ? (results.length > 1 ? 10 : 1) : 11;
+                setPhase('select'); setTimeout(() => doPull(c), 50);
+              }} className="gacha-action-btn" style={S.btnRetry}>Resummon</button>
+            </div>
+          </section>
+        )}
+
+        {/* Inventory button */}
+        <button onClick={() => setShowInv(true)} className="gacha-inv-btn" title="Open Inventory">
+          <img src="/gacha/inven.jpg" alt="Inventory" style={{ width: '100%', height: '100%' }} />
+        </button>
+
+        {/* Stats */}
+        <div className="gacha-stats">
+          <span>Pulls: <b>{pulls}</b></span>
+          <span>Items: <b>{Object.keys(inv).length}</b></span>
+          <button onClick={reset} className="gacha-reset">Reset</button>
         </div>
       </div>
 
-      {/* Probability Information modal */}
+      {/* Probability modal */}
       {showRates && banner && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowRates(false)}>
-          <div className="w-full max-w-lg mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()} style={{ border: '2px solid #4488cc', background: 'linear-gradient(180deg, #0d1b2a 0%, #0a1628 100%)' }}>
-            {/* Progress bar decoration */}
-            <div className="h-1 flex">
-              <div className="flex-1 bg-emerald-500" />
-              <div className="flex-1 bg-pink-500" />
+        <div className="gacha-modal-bg" onClick={() => setShowRates(false)}>
+          <div className="gacha-modal" onClick={e => e.stopPropagation()}>
+            <div className="gacha-modal-head">
+              <h3>Probability Information</h3>
+              <button onClick={() => setShowRates(false)}><X size={16} /></button>
             </div>
-            <div className="flex items-center justify-between px-4 py-2">
-              <h3 className="text-sm font-bold text-amber-400">Probability Information</h3>
-              <button onClick={() => setShowRates(false)} className="text-gray-400 hover:text-white">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="text-center text-xs text-gray-400 pb-2">
-              {banner.category}<br />{banner.name}
-            </div>
-            <div className="px-4 pb-1 text-[10px] text-gray-500 border-b border-gray-700">Random Summon List</div>
-            <div className="max-h-80 overflow-y-auto px-4 py-2 space-y-1.5">
-              {[...banner.items].sort((a, b) => b.rarity - a.rarity).map((item, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs">
-                  <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center" style={{ border: `1.5px solid ${RARITY_BORDER[item.rarity]}`, background: RARITY_BG[item.rarity] }}>
-                    <span className="text-[8px] font-bold" style={{ color: RARITY_BORDER[item.rarity] }}>★{item.rarity}</span>
+            <div className="gacha-modal-sub">{banner.category}<br />{banner.name}</div>
+            <div className="gacha-modal-label">Random Summon List</div>
+            <div className="gacha-modal-list">
+              {[...banner.items].sort((a, b) => b.rarity - a.rarity).map((item, i) => {
+                const c = rc(item.rarity);
+                return (
+                  <div key={i} className="gacha-modal-row">
+                    <span className="gacha-modal-stars" style={{ color: c.text }}>{'★'.repeat(item.rarity)}</span>
+                    <span className="gacha-modal-name">{item.name}</span>
+                    <span className="gacha-modal-prob">{item.probability}%</span>
                   </div>
-                  <span className="flex-1 text-gray-300 truncate">{item.name}</span>
-                  <span className="text-gray-500 tabular-nums ml-2">{item.probability}%</span>
-                </div>
-              ))}
-            </div>
-            <div className="h-1 flex mt-2">
-              <div className="flex-1 bg-emerald-500" />
-              <div className="flex-1 bg-pink-500" />
+                );
+              })}
             </div>
           </div>
         </div>
       )}
 
       {/* Inventory modal */}
-      {showInventory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowInventory(false)}>
-          <div
-            className="w-full max-w-xl max-h-[80vh] overflow-hidden flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-            style={{ border: '2px solid #4488cc', background: 'linear-gradient(180deg, #0d2844 0%, #0a1e36 100%)' }}
-          >
-            <div className="flex items-center justify-between px-4 py-2 border-b border-blue-400/30">
-              <h2 className="font-bold text-sm text-gray-200">Inventory</h2>
-              <button onClick={() => setShowInventory(false)} className="text-amber-400 hover:text-amber-300 font-bold text-sm">✕</button>
+      {showInv && (
+        <div className="gacha-modal-bg" onClick={() => setShowInv(false)}>
+          <div className="gacha-modal gacha-modal--inv" onClick={e => e.stopPropagation()}>
+            <div className="gacha-modal-head">
+              <h3>Inventory</h3>
+              <button onClick={() => setShowInv(false)}><X size={16} /></button>
             </div>
-
-            {/* Banner tabs */}
-            <div className="flex flex-wrap gap-1 px-3 py-2 border-b border-blue-400/20">
-              {invBanners.map((b) => {
-                const count = invItems.filter((i) => i.bannerId === b.id).reduce((s, i) => s + i.count, 0);
+            <div className="gacha-modal-list">
+              {invItems.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 32, color: '#555' }}>No items collected yet.</div>
+              ) : invItems.map((item, i) => {
+                const c = rc(item.rarity);
                 return (
-                  <button
-                    key={b.id}
-                    onClick={() => setInvTab(invTab === b.id ? null : b.id)}
-                    className={`text-[10px] px-2 py-0.5 border transition-colors ${
-                      invTab === b.id ? 'border-amber-400 text-amber-400 bg-amber-400/10' : 'border-gray-600 text-gray-400 hover:border-gray-500'
-                    }`}
-                  >
-                    {b.name} <span className={invTab === b.id ? 'text-amber-300' : 'text-gray-600'}>{count}</span>
-                  </button>
+                  <div key={i} className="gacha-modal-row">
+                    <span className="gacha-modal-stars" style={{ color: c.text }}>{'★'.repeat(item.rarity)}</span>
+                    <span className="gacha-modal-name">{item.name}</span>
+                    <span className="gacha-modal-prob" style={{ color: c.text }}>×{item.count}</span>
+                  </div>
                 );
               })}
-              {invBanners.length === 0 && <span className="text-xs text-gray-600">No items yet</span>}
-            </div>
-
-            {/* Item list */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-1">
-              {filteredInv.length === 0 ? (
-                <p className="text-center text-gray-600 py-8 text-xs">No items collected yet.</p>
-              ) : (
-                filteredInv.map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-2 px-3 py-1.5"
-                    style={{ border: `1px solid ${RARITY_BORDER[item.rarity]}30`, background: RARITY_BG[item.rarity] }}
-                  >
-                    <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center" style={{ border: `1.5px solid ${RARITY_BORDER[item.rarity]}`, background: RARITY_BG[item.rarity] }}>
-                      <span className="text-[7px] font-bold" style={{ color: RARITY_BORDER[item.rarity] }}>★{item.rarity}</span>
-                    </div>
-                    <span className="flex-1 text-xs text-gray-300 truncate">{item.itemName}</span>
-                    <span className="text-xs font-bold tabular-nums" style={{ color: RARITY_BORDER[item.rarity] }}>×{item.count}</span>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Bottom decoration */}
-            <div className="h-1 flex">
-              <div className="flex-1 bg-emerald-500" />
-              <div className="flex-1 bg-pink-500" />
             </div>
           </div>
         </div>
       )}
 
-      {/* Fade-in keyframes */}
       <style jsx global>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+        /* ── Page background ─────────────────────────────────────── */
+        .gacha-root { position: relative; overflow: hidden; }
+        .gacha-root::before {
+          content: ''; position: absolute; inset: 0; z-index: 0;
+          background: radial-gradient(ellipse at 50% 0%, rgba(20,40,80,0.3) 0%, transparent 70%);
+          pointer-events: none;
         }
-        .text-shadow { text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .gacha-root > * { position: relative; z-index: 1; }
+
+        /* ── Video ───────────────────────────────────────────────── */
+        .gacha-video { position: fixed; inset: 0; z-index: 100; width: 100%; height: 100%; object-fit: cover; background: #000; display: none; }
+        .gacha-video--active { display: block; }
+        .gacha-skip { position: fixed; top: 16px; right: 16px; z-index: 101; padding: 6px 18px; color: #ccc; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; border: none; cursor: pointer; }
+        .gacha-skip:hover { color: #fff; }
+
+        /* ── Back ────────────────────────────────────────────────── */
+        .gacha-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #6b7280; transition: color 0.2s; text-decoration: none; }
+        .gacha-back:hover { color: #ccc; }
+
+        /* ── Select section ──────────────────────────────────────── */
+        .gacha-select { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 0 16px 40px; }
+
+        /* ── Tabs ────────────────────────────────────────────────── */
+        .gacha-tabs { display: flex; max-width: 500px; width: 100%; background: rgba(59,130,246,0.08); }
+        .gacha-tab { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 0; border: 1px solid transparent; font-size: 14px; font-weight: 400; color: #9ca3af; background: none; cursor: pointer; transition: all 0.2s; }
+        .gacha-tab:hover { border-color: rgba(59,130,246,0.5); background: rgba(59,130,246,0.1); }
+        .gacha-tab--active { border-color: #3b82f6; background: rgba(59,130,246,0.2); color: #fff; font-weight: 700; }
+
+        /* ── Title ───────────────────────────────────────────────── */
+        .gacha-title {
+          max-width: 400px; width: 100%; text-align: center; padding: 10px 0; font-size: 14px; font-weight: 700;
+          border-top: 1px solid; border-bottom: 1px solid;
+          border-image: linear-gradient(to left, transparent, #f9ca8b 20%, #f9ca8b 80%, transparent) 1;
+          color: #e6e1ce;
+        }
+
+        /* ── Carousel ────────────────────────────────────────────── */
+        .gacha-carousel { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .gacha-arrow { background: none; border: none; color: #6b7280; cursor: pointer; padding: 4px; transition: color 0.2s; }
+        .gacha-arrow:hover { color: #fff; }
+        .gacha-cards { display: flex; align-items: center; justify-content: center; gap: 40px; overflow: hidden; min-height: 320px; }
+        @media (max-width: 768px) { .gacha-cards { gap: 10px; } }
+
+        /* ── Card ────────────────────────────────────────────────── */
+        .gacha-card-wrap { position: relative; width: 198px; flex-shrink: 0; transition: all 0.35s; border-radius: 8px; }
+        @media (max-width: 768px) { .gacha-card-wrap { width: 135px; } }
+        .gacha-card { display: block; width: 100%; border: 1px solid transparent; border-radius: 8px; cursor: pointer; overflow: hidden; }
+        .gacha-card-title { display: flex; flex-direction: column; align-items: center; gap: 0.4em; padding: 12px 8px; text-align: center; font-size: 13px; }
+        .gacha-card-cat { font-size: 12px; opacity: 0.7; }
+        .gacha-card-name { font-weight: 600; white-space: nowrap; }
+        .gacha-card-img { aspect-ratio: 1/0.9078; background: rgba(0,0,0,0.3); overflow: hidden; }
+        .gacha-card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .gacha-neon { position: absolute; inset: -1px; border-radius: 8px; border: 2px solid #deac00; pointer-events: none; filter: ${S.goldNeon}; }
+
+        /* ── View items btn ──────────────────────────────────────── */
+        .gacha-view-items { display: flex; padding: 8px; }
+        .gacha-view-btn { margin-left: auto; width: 25px; height: 25px; cursor: pointer; background: none; border: none; }
+        @media (min-width: 1024px) { .gacha-view-btn { width: 30px; height: 30px; } }
+        .gacha-view-default { display: block; width: 100%; height: 100%; }
+        .gacha-view-hover { display: none; width: 100%; height: 100%; }
+        .gacha-view-btn:hover .gacha-view-default { display: none; }
+        .gacha-view-btn:hover .gacha-view-hover { display: block; }
+
+        /* ── Pull buttons ────────────────────────────────────────── */
+        .gacha-pull-btns { display: flex; justify-content: center; gap: 8px; width: 110%; max-width: 440px; margin: 16px auto 0; }
+        .gacha-pull-btn { flex: 1; max-width: 200px; padding: 8px 0; font-size: 14px; font-weight: 700; color: #fff; text-shadow: 1px 1px 2px black; border: none; cursor: pointer; transition: filter 0.2s; }
+        .gacha-pull-btn:hover { filter: brightness(1.15); }
+
+        /* ── Results ─────────────────────────────────────────────── */
+        .gacha-results { display: flex; flex-direction: column; align-items: center; padding: 24px 16px 40px; }
+        .gacha-results-title {
+          max-width: 400px; width: 100%; text-align: center; padding: 10px 0; margin-bottom: 24px; font-size: 16px; font-weight: 700;
+          border-top: 1px solid; border-bottom: 1px solid;
+          border-image: linear-gradient(to left, transparent, #f9ca8b 20%, #f9ca8b 80%, transparent) 1;
+        }
+        .gacha-results-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 700px; margin-bottom: 28px; }
+        .gacha-result-item {
+          position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          width: 110px; min-height: 70px; padding: 8px 6px; border-radius: 4px;
+          animation: gacha-pop 0.3s ease-out both;
+        }
+        .gacha-result-stars { font-size: 10px; line-height: 1; }
+        .gacha-result-name { font-size: 11px; text-align: center; margin-top: 4px; color: #ddd; line-height: 1.2; word-break: break-word; }
+        .gacha-result-new { position: absolute; top: 2px; right: 2px; background: #deac00; color: #000; font-size: 8px; font-weight: 800; padding: 1px 3px; border-radius: 2px; }
+
+        /* ── Action buttons ──────────────────────────────────────── */
+        .gacha-action-btns { display: flex; gap: 10px; }
+        .gacha-action-btn { padding: 8px 32px; font-size: 14px; font-weight: 700; color: #fff; text-shadow: 1px 1px 2px black; border: none; cursor: pointer; transition: filter 0.2s; }
+        .gacha-action-btn:hover { filter: brightness(1.15); }
+
+        /* ── Inventory button ────────────────────────────────────── */
+        .gacha-inv-btn { position: fixed; bottom: 16px; right: 16px; z-index: 30; width: 34px; height: 34px; background: none; border: 1px solid #3b6d99; cursor: pointer; padding: 0; transition: opacity 0.2s; }
+        @media (min-width: 1024px) { .gacha-inv-btn { bottom: 8px; right: 32px; border: 1px solid #3b6d99; background: #0f2640; padding: 4px; width: 42px; height: 42px; } }
+        .gacha-inv-btn:hover { opacity: 0.8; }
+
+        /* ── Stats ───────────────────────────────────────────────── */
+        .gacha-stats { position: fixed; bottom: 16px; left: 16px; z-index: 30; display: flex; gap: 12px; font-size: 11px; color: #6b7280; }
+        .gacha-stats b { color: #ccc; }
+        .gacha-reset { background: none; border: none; color: #555; cursor: pointer; text-decoration: underline; font-size: 11px; }
+        .gacha-reset:hover { color: #f44; }
+
+        /* ── Modals ──────────────────────────────────────────────── */
+        .gacha-modal-bg { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); padding: 16px; }
+        .gacha-modal { width: 100%; max-width: 480px; max-height: 80vh; display: flex; flex-direction: column; background: linear-gradient(to bottom, #0d1b2a, #0a1628); border: 1px solid #2a4a6a; border-radius: 4px; overflow: hidden; }
+        .gacha-modal--inv { max-width: 520px; }
+        .gacha-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #1a3a5a; }
+        .gacha-modal-head h3 { font-size: 14px; font-weight: 700; color: #f9ca8b; }
+        .gacha-modal-head button { background: none; border: none; color: #888; cursor: pointer; }
+        .gacha-modal-head button:hover { color: #fff; }
+        .gacha-modal-sub { text-align: center; font-size: 12px; color: #888; padding: 8px 16px 4px; }
+        .gacha-modal-label { font-size: 11px; color: #666; padding: 4px 16px 6px; border-bottom: 1px solid #1a3a5a; }
+        .gacha-modal-list { flex: 1; overflow-y: auto; padding: 8px 16px; }
+        .gacha-modal-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .gacha-modal-stars { flex-shrink: 0; font-size: 10px; min-width: 50px; }
+        .gacha-modal-name { flex: 1; color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .gacha-modal-prob { flex-shrink: 0; color: #888; font-variant-numeric: tabular-nums; min-width: 45px; text-align: right; }
+
+        /* ── Animations ──────────────────────────────────────────── */
+        @keyframes gacha-pop {
+          from { opacity: 0; transform: scale(0.8) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
       `}</style>
     </div>
   );

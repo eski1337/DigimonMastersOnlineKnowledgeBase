@@ -4,7 +4,7 @@ const Events: CollectionConfig = {
   slug: 'events',
   admin: {
     useAsTitle: 'title',
-    group: { en: 'Content', zh: '內容' },
+    group: { en: 'Content', zhTw: '內容' },
   },
   access: {
     read: () => true,

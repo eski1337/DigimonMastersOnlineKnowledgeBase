@@ -5,7 +5,7 @@ const Tools: CollectionConfig = {
   slug: 'tools',
   admin: {
     useAsTitle: 'title',
-    group: { en: 'Content', zh: '內容' },
+    group: { en: 'Content', zhTw: '內容' },
   },
   access: {
     read: () => true,

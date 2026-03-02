@@ -30,7 +30,7 @@ const Digimon: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'form', 'rank', 'element', 'attribute', 'published'],
-    group: { en: 'Game Data', zh: '遊戲資料' },
+    group: { en: 'Game Data', zhTw: '遊戲資料' },
     components: {
       BeforeListTable: [ImportButton],
     },

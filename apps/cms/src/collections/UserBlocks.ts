@@ -19,7 +19,7 @@ const UserBlocks: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'id',
-    group: { en: 'Social', zh: '社交' },
+    group: { en: 'Social', zhTw: '社交' },
     defaultColumns: ['blocker', 'blocked', 'createdAt'],
   },
   timestamps: true,

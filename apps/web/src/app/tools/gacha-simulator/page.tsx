@@ -57,6 +57,7 @@ function videoForRarity(r: number): string {
 }
 
 const rc = (r: number) => RC[r] || RC[1];
+const itemIcon = (id: number | null) => id ? `/gacha/items/item-${id}.jpg` : null;
 
 /* ── Styles matching original site exactly ────────────────────────────── */
 
@@ -130,7 +131,7 @@ export default function GachaSimulatorPage() {
     return Object.entries(inv).filter(([, c]) => c > 0).map(([key, count]) => {
       const di = key.indexOf('-'); const bId = parseInt(key.substring(0, di)); const name = key.substring(di + 1);
       const b = BANNERS.find(x => x.id === bId); const it = b?.items.find(x => x.name === name);
-      return { bannerId: bId, bannerName: b?.name || '', name, count, rarity: it?.rarity || 1 };
+      return { bannerId: bId, bannerName: b?.name || '', name, count, rarity: it?.rarity || 1, itemId: it?.itemId || null };
     }).sort((a, b) => b.rarity - a.rarity);
   }, [inv]);
 
@@ -263,14 +264,16 @@ export default function GachaSimulatorPage() {
                 const c = rc(r.item.rarity);
                 const best = r.item.rarity >= 6;
                 return (
-                  <div key={i} className="gacha-result-item" style={{
+                  <div key={i} className={`gacha-result-item ${best ? 'gacha-result-best' : ''}`} style={{
                     border: `1px solid ${c.border}`,
                     background: c.bg,
-                    filter: best ? `drop-shadow(0 0 5px ${c.border})` : 'none',
                     animationDelay: `${i * 60}ms`,
                   }}>
-                    <div className="gacha-result-stars" style={{ color: c.text }}>{'★'.repeat(r.item.rarity)}</div>
-                    <div className="gacha-result-name">{r.item.name}</div>
+                    {itemIcon(r.item.itemId) ? (
+                      <img src={itemIcon(r.item.itemId)!} alt={r.item.name} className="gacha-result-icon" />
+                    ) : (
+                      <div className="gacha-result-stars" style={{ color: c.text }}>{'★'.repeat(r.item.rarity)}</div>
+                    )}
                     {r.isNew && <div className="gacha-result-new">NEW</div>}
                   </div>
                 );
@@ -316,7 +319,11 @@ export default function GachaSimulatorPage() {
                 const c = rc(item.rarity);
                 return (
                   <div key={i} className="gacha-modal-row">
-                    <span className="gacha-modal-stars" style={{ color: c.text }}>{'★'.repeat(item.rarity)}</span>
+                    {itemIcon(item.itemId) ? (
+                      <img src={itemIcon(item.itemId)!} alt="" className="gacha-modal-icon" />
+                    ) : (
+                      <span className="gacha-modal-stars" style={{ color: c.text }}>{'★'.repeat(item.rarity)}</span>
+                    )}
                     <span className="gacha-modal-name">{item.name}</span>
                     <span className="gacha-modal-prob">{item.probability}%</span>
                   </div>
@@ -343,7 +350,11 @@ export default function GachaSimulatorPage() {
                 const c = rc(item.rarity);
                 return (
                   <div key={i} className="gacha-modal-row">
-                    <span className="gacha-modal-stars" style={{ color: c.text }}>{'★'.repeat(item.rarity)}</span>
+                    {itemIcon(item.itemId) ? (
+                      <img src={itemIcon(item.itemId)!} alt="" className="gacha-modal-icon" />
+                    ) : (
+                      <span className="gacha-modal-stars" style={{ color: c.text }}>{'★'.repeat(item.rarity)}</span>
+                    )}
                     <span className="gacha-modal-name">{item.name}</span>
                     <span className="gacha-modal-prob" style={{ color: c.text }}>×{item.count}</span>
                   </div>
@@ -456,8 +467,9 @@ export default function GachaSimulatorPage() {
           animation: gacha-pop 0.3s ease-out both;
           background: rgba(0,0,0,0.3);
         }
+        .gacha-result-icon { width: 100%; height: 100%; object-fit: contain; }
         .gacha-result-stars { font-size: 9px; line-height: 1; }
-        .gacha-result-name { font-size: 9px; text-align: center; margin-top: 2px; color: #ddd; line-height: 1.15; word-break: break-word; overflow: hidden; max-height: 3.5em; }
+        .gacha-result-best { filter: drop-shadow(0px 0px 5px rgba(255,255,255,0.8)); }
         .gacha-result-new { position: absolute; top: -4px; right: -4px; background: #deac00; color: #000; font-size: 7px; font-weight: 800; padding: 1px 3px; border-radius: 2px; z-index: 1; }
 
         /* ── Action buttons ──────────────────────────────────────── */
@@ -491,6 +503,7 @@ export default function GachaSimulatorPage() {
         .gacha-modal-label { font-size: 11px; color: #666; padding: 4px 16px 6px; border-bottom: 1px solid #1a3a5a; }
         .gacha-modal-list { flex: 1; overflow-y: auto; padding: 8px 16px; }
         .gacha-modal-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .gacha-modal-icon { width: 36px; height: 36px; flex-shrink: 0; object-fit: contain; border-radius: 2px; }
         .gacha-modal-stars { flex-shrink: 0; font-size: 10px; min-width: 50px; }
         .gacha-modal-name { flex: 1; color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .gacha-modal-prob { flex-shrink: 0; color: #888; font-variant-numeric: tabular-nums; min-width: 45px; text-align: right; }

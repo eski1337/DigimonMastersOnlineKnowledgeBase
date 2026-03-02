@@ -459,12 +459,12 @@ export default function GachaSimulatorPage() {
           border-image: linear-gradient(to left, transparent, #f9ca8b 20%, #f9ca8b 80%, transparent) 1;
         }
         .gacha-results-grid {
-          position: relative; display: flex; flex-wrap: wrap; justify-content: center;
-          gap: 16px; max-width: 750px; margin-bottom: 28px; padding: 20px 0;
+          display: grid; grid-template-columns: repeat(4, 68px); justify-content: center;
+          gap: 24px 48px; max-width: 600px; margin-bottom: 28px; padding: 20px 0;
         }
         .gacha-result-item {
           position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
-          width: 80px; height: 80px; padding: 4px; border-radius: 0;
+          width: 68px; height: 68px; padding: 2px; border-radius: 0;
           animation: gacha-pop 0.3s ease-out both;
           background: rgba(0,0,0,0.3);
         }

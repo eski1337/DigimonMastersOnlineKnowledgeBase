@@ -213,26 +213,30 @@ export default function CloneCalculatorPage() {
         {/* ── Right: Reference ────────────────────────────────── */}
         <div className="space-y-6">
           {/* Clone Rank Reference */}
-          <div className="rounded-xl border bg-card p-5">
-            <h3 className="font-semibold mb-3 text-sm">Clone Ranks</h3>
-            <div className="space-y-2">
-              {CLONE_RANKS.map((r) => (
-                <div key={r.rank} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className={`font-bold ${r.color}`}>{r.rank}</span>
-                    <span className="text-muted-foreground text-xs">Lv {r.levels}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs">
-                    <span className="text-green-400">{r.success}%</span>
-                    <span className="text-red-400">{r.drop > 0 ? `↓${r.drop}%` : '—'}</span>
-                  </div>
-                </div>
-              ))}
+          <div className="rounded-xl border bg-card overflow-hidden">
+            <div className="px-4 pt-4 pb-2">
+              <h3 className="font-semibold text-sm">Clone Ranks</h3>
             </div>
-            <div className="flex justify-between text-xs text-muted-foreground mt-3 pt-3 border-t">
-              <span>Success rate</span>
-              <span>Drop chance</span>
-            </div>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-xs text-muted-foreground">
+                  <th className="px-4 py-2 text-left font-medium">Rank</th>
+                  <th className="px-4 py-2 text-left font-medium">Levels</th>
+                  <th className="px-4 py-2 text-right font-medium">Success</th>
+                  <th className="px-4 py-2 text-right font-medium">Drop</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CLONE_RANKS.map((r) => (
+                  <tr key={r.rank} className="border-b last:border-0">
+                    <td className={`px-4 py-2.5 font-bold ${r.color}`}>{r.rank}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">{r.levels}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-green-400">{r.success}%</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-red-400">{r.drop > 0 ? `${r.drop}%` : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
           {/* Stat Tips */}

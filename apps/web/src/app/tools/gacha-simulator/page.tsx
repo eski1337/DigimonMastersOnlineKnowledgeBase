@@ -62,7 +62,7 @@ const itemIcon = (id: number | null) => id ? `/gacha/items/item-${id}.jpg` : nul
 /* ── Styles matching original site exactly ────────────────────────────── */
 
 const S = {
-  bg: 'linear-gradient(to bottom, #082036, #071C30)',
+  bg: 'linear-gradient(to bottom, #0d0d0f, #111114)',
   card: { background: 'linear-gradient(to bottom right, #1c1b36aa, #0c0b17aa 50%, #070711aa 51%)', boxShadow: 'inset 2px 2px 3px #312d59' },
   cardSel: { background: 'linear-gradient(to bottom right, #302a2eaa, #201b13aa 50%, #1c170daa 51%)', boxShadow: 'inset 2px 2px 3px #40374d' },
   btn1: { background: 'linear-gradient(to bottom right, #307B6B, #01F388)', borderTop: '1px solid #266960', boxShadow: 'inset 1px 1px 2px #3db196' },
@@ -104,7 +104,7 @@ export default function GachaSimulatorPage() {
     let raf = 0;
     const PARTICLE_COUNT = 120;
     const CONNECT_DIST = 150;
-    const SPEED = 0.15;
+    const SPEED = 0.1125;
     let w = 0, h = 0;
     interface P { x: number; y: number; vx: number; vy: number; r: number; }
     let particles: P[] = [];

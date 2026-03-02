@@ -85,6 +85,7 @@ export default function GachaSimulatorPage() {
   const [showInv, setShowInv] = useState(false);
   const [showRates, setShowRates] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     Object.values(RARITY_VIDEO).forEach(src => {
@@ -92,6 +93,70 @@ export default function GachaSimulatorPage() {
       link.rel = 'preload'; link.as = 'video'; link.href = src;
       document.head.appendChild(link);
     });
+  }, []);
+
+  /* Constellation canvas animation */
+  useEffect(() => {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const ctx = cv.getContext('2d');
+    if (!ctx) return;
+    let raf = 0;
+    const PARTICLE_COUNT = 120;
+    const CONNECT_DIST = 150;
+    const SPEED = 0.15;
+    let w = 0, h = 0;
+    interface P { x: number; y: number; vx: number; vy: number; r: number; }
+    let particles: P[] = [];
+
+    function resize() {
+      w = cv!.width = window.innerWidth;
+      h = cv!.height = window.innerHeight;
+    }
+    function init() {
+      resize();
+      particles = [];
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * SPEED * 2,
+          vy: (Math.random() - 0.5) * SPEED * 2,
+          r: Math.random() * 1.5 + 0.5,
+        });
+      }
+    }
+    function draw() {
+      ctx!.clearRect(0, 0, w, h);
+      for (let i = 0; i < particles.length; i++) {
+        const a = particles[i];
+        a.x += a.vx; a.y += a.vy;
+        if (a.x < 0) a.x = w; if (a.x > w) a.x = 0;
+        if (a.y < 0) a.y = h; if (a.y > h) a.y = 0;
+        ctx!.beginPath();
+        ctx!.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+        ctx!.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx!.fill();
+        for (let j = i + 1; j < particles.length; j++) {
+          const b = particles[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECT_DIST) {
+            ctx!.beginPath();
+            ctx!.moveTo(a.x, a.y);
+            ctx!.lineTo(b.x, b.y);
+            ctx!.strokeStyle = `rgba(255,255,255,${0.15 * (1 - dist / CONNECT_DIST)})`;
+            ctx!.lineWidth = 0.6;
+            ctx!.stroke();
+          }
+        }
+      }
+      raf = requestAnimationFrame(draw);
+    }
+    init();
+    draw();
+    window.addEventListener('resize', resize);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
   }, []);
 
   const banners = useMemo(() => BANNERS.filter(b => b.type === tab && b.items.length > 0), [tab]);
@@ -139,29 +204,8 @@ export default function GachaSimulatorPage() {
 
   return (
     <div className="gacha-root" style={{ background: S.bg, minHeight: '100vh', color: '#e6e1ce', fontFamily: "'Noto Sans', sans-serif" }}>
-      {/* Constellation background like original */}
-      <div className="gacha-bg-stars" />
-      <svg className="gacha-bg-lines" viewBox="0 0 1000 600" preserveAspectRatio="none">
-        <line x1="50" y1="100" x2="250" y2="250" />
-        <line x1="250" y1="250" x2="400" y2="150" />
-        <line x1="400" y1="150" x2="600" y2="300" />
-        <line x1="600" y1="300" x2="800" y2="180" />
-        <line x1="800" y1="180" x2="950" y2="350" />
-        <line x1="100" y1="400" x2="300" y2="500" />
-        <line x1="300" y1="500" x2="500" y2="380" />
-        <line x1="500" y1="380" x2="700" y2="520" />
-        <line x1="700" y1="520" x2="900" y2="450" />
-        <line x1="200" y1="50" x2="350" y2="200" />
-        <line x1="650" y1="80" x2="750" y2="250" />
-        <circle cx="50" cy="100" r="2" /><circle cx="250" cy="250" r="2" />
-        <circle cx="400" cy="150" r="2" /><circle cx="600" cy="300" r="2" />
-        <circle cx="800" cy="180" r="2" /><circle cx="950" cy="350" r="2" />
-        <circle cx="100" cy="400" r="2" /><circle cx="300" cy="500" r="2" />
-        <circle cx="500" cy="380" r="2" /><circle cx="700" cy="520" r="2" />
-        <circle cx="900" cy="450" r="2" /><circle cx="200" cy="50" r="2" />
-        <circle cx="350" cy="200" r="2" /><circle cx="650" cy="80" r="2" />
-        <circle cx="750" cy="250" r="2" />
-      </svg>
+      {/* Constellation canvas background */}
+      <canvas ref={canvasRef} className="gacha-constellation" />
 
       {/* Video overlay */}
       <video ref={videoRef} playsInline muted className={`gacha-video ${phase === 'video' ? 'gacha-video--active' : ''}`} />
@@ -370,27 +414,9 @@ export default function GachaSimulatorPage() {
         /* ── Page background ─────────────────────────────────────── */
         .gacha-root { position: relative; overflow: hidden; }
         .gacha-root > * { position: relative; z-index: 1; }
-        .gacha-bg-stars {
-          position: fixed; inset: 0; z-index: 0; pointer-events: none;
-          background:
-            radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5), transparent),
-            radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.4), transparent),
-            radial-gradient(1.5px 1.5px at 40% 65%, rgba(255,255,255,0.6), transparent),
-            radial-gradient(1px 1px at 55% 20%, rgba(255,255,255,0.3), transparent),
-            radial-gradient(1px 1px at 70% 50%, rgba(255,255,255,0.4), transparent),
-            radial-gradient(1.5px 1.5px at 85% 30%, rgba(255,255,255,0.5), transparent),
-            radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,0.3), transparent),
-            radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.4), transparent),
-            radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,0.3), transparent),
-            radial-gradient(1.5px 1.5px at 45% 45%, rgba(255,255,255,0.5), transparent);
-          background-size: 200px 200px, 300px 250px, 250px 300px, 350px 200px, 280px 350px, 320px 280px, 400px 300px, 220px 400px, 300px 220px, 500px 500px;
-          opacity: 0.4;
+        .gacha-constellation {
+          position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none;
         }
-        .gacha-bg-lines {
-          position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.08;
-        }
-        .gacha-bg-lines line { stroke: white; stroke-width: 0.8; }
-        .gacha-bg-lines circle { fill: white; opacity: 0.8; }
 
         /* ── Video ───────────────────────────────────────────────── */
         .gacha-video { position: fixed; inset: 0; z-index: 100; width: 100%; height: 100%; object-fit: cover; background: #000; display: none; }

@@ -101,6 +101,7 @@ const Guides: CollectionConfig = {
                   fields: [
                     { name: 'value', type: 'text' },
                     { name: 'icon', type: 'upload', relationTo: 'media', admin: { description: 'Optional inline icon for this cell' } },
+                    { name: 'iconUrl', type: 'text', admin: { description: 'External icon URL (if not using media upload)' } },
                     {
                       name: 'lines',
                       type: 'array',
@@ -109,6 +110,7 @@ const Guides: CollectionConfig = {
                         { name: 'text', type: 'text' },
                         { name: 'amount', type: 'text' },
                         { name: 'icon', type: 'upload', relationTo: 'media' },
+                        { name: 'iconUrl', type: 'text', admin: { description: 'External icon URL (if not using media upload)' } },
                       ],
                     },
                   ],

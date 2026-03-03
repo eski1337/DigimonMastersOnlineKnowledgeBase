@@ -1,0 +1,791 @@
+
+
+######## Monster Card ########
+
+[H2] List of monster cards
+  - Monster Card Lv1
+  - Monster Card Lv2
+  - Monster Card Lv3
+  - Monster Card Lv4
+  - Monster Card Lv5
+  - Monster Card Lv6
+  - Monster Card Lv7
+  - Random Monster Card
+  - High Rank Monster Card Lv1
+  - High Rank Monster Card Lv2
+  - High Rank Monster Card Lv3
+  - High Rank Monster Card Lv4
+  - High Rank Monster Card Lv5
+  - High Rank Monster Card Lv6
+  - High Rank Monster Card Lv7
+  - Highest Monster Card Lv1
+  - Highest Monster Card Lv2
+  - Highest Monster Card Lv3
+
+[H2] Old Version [2009 ~ July 2018]
+  - Monster Card Lv1
+  - Monster Card Lv2
+  - Monster Card Lv3
+  - Monster Card Lv4
+  - Monster Card Lv5
+  - Monster Card Lv6
+  - Monster Card Boss
+  - Monster Card Lv7
+  - Random Monster Card
+
+
+######## Monster Card Lv1 ########
+
+[H2] Base Experience
+[P] 3,307
+
+[H2] Card Lv.1 Summon Digimon
+
+[TABLE]
+  Patamon
+   |  |  |  | HP: | 9840 | Level(s): | 30
+
+[TABLE]
+  Renamon
+   |  |  |  | HP: | 9840 | Level(s): | 30
+
+[TABLE]
+  Guilmon
+   |  |  |  | HP: | 9840 | Level(s): | 30
+
+[TABLE]
+  Veemon
+   |  |  |  | HP: | 9840 | Level(s): | 30
+
+[TABLE]
+  Drimogemon
+   |  |  |  | HP: | 9840 | Level(s): | 30
+
+[H2] Drops
+
+[TABLE]
+   | 220 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Chicken Combo | Restore HP 1600 & DS 1200
+   | Gold Banana | Restore HP 2000 & DS 2000
+   | Monster Card Lv2 | Summons random monsters
+   | DigiClone [D] | Reinforcement material that can be used for level 1~3
+   | Digimon Seal | Patamon / Renamon / Guilmon / Veemon / Drimogemon
+   | Mercenary DigiEggs | Drimogemon / Patamon / Guilmon / Renamon / Veemon (ExV-mon line)
+   | Low Class DATA DigiEggs | Beast
+   | High Class Dragon DigiEgg | Rank 6 / High Class
+   | DigiEgg (for return) Class 1 | Refund Amount 25
+   | Attributes Rank A | HP / DS / Attack / Defense Attributes
+   | MS Attribute Rank A | 1 ~ 2% Speed Attribute
+   | Seal Exchange Ticket | Ticket that can be exchanged to various seals. Exchange - Digitamamon DATS Center
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | Mode Selector | Item that can expand the riding function of digimon with the option.
+   | Mystery Digi-Egg Box | Grants a random Armor digi-egg item. (100% sucess rate)
+
+
+######## Monster Card Lv2 ########
+
+[H2] Base Experience
+[P] 4,907
+
+[H2] Card Lv.2 Summon Digimon
+
+[TABLE]
+  Goblimon
+   |  |  |  | HP: | 13,680 | Level(s): | 40
+
+[TABLE]
+  Keramon
+   |  |  |  | HP: | 13,680 | Level(s): | 40
+
+[TABLE]
+  Mushroomon
+   |  |  |  | HP: | 13,680 | Level(s): | 40
+
+[TABLE]
+  Tentomon
+   |  |  |  | HP: | 13,680 | Level(s): | 40
+
+[TABLE]
+  Dracmon
+   |  |  |  | HP: | 13,680 | Level(s): | 40
+
+[H2] Drops
+
+[TABLE]
+   | 327 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Chicken Combo | Restore HP 1600 & DS 1200
+   | Gold Banana | Restore HP 2000 & DS 2000
+   | Monster Card Lv3 | Summons random monsters
+   | DigiClone [D] | Reinforcement material that can be used for level 1~3
+   | Digimon Seal | Mushroomon / Tentomon / Dracmon / Keramon / Goblimon
+   | Mercenary DigiEggs | Dracmon / Goblimon / Mushroomon / Tentomon / Keramon
+   | Low Class DATA DigiEggs | Insectoid / Devil
+   | High Class Plant DigiEgg | Rank 1 / High Class
+   | DigiEgg (for return) Class 1 | Refund Amount 25
+   | Attributes Rank A | HP / DS / Attack / Defense Attributes
+   | MS Attribute Rank A | 1 ~ 2% Speed Attribute
+   | Seal Exchange Ticket | Ticket that can be exchanged to various seals. Exchange - Digitamamon DATS Center
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | Mode Selector | Item that can expand the riding function of digimon with the option.
+   | Mystery Digi-Egg Box | Grants a random Armor digi-egg item. (100% sucess rate)
+
+[H2] Drop chances
+
+[TABLE]
+  MC2 used | 4,600 | 100
+  Dracmon Seal | 579 | 13
+  Goblimon Seal | 1,116 | 24
+  Keramon Seal | 783 | 17
+  Mushroomon Seal | 1,111 | 24
+  Tentomon Seal | 1,130 | 25
+  Dracmon DigiEgg | 332 | 7
+  Goblimon DigiEgg | 370 | 8
+  Keramon DigiEgg | 282 | 6
+  Mushroomon DigiEgg | 382 | 8
+  Tentomon DigiEgg | 381 | 8
+  Devil Rank1/Data | 2,450 | 53
+  Insect Rank1/Data | 873 | 19
+  Plant Rank1/High Class | 913 | 20
+  DigiEgg (for return) | 5,639 | 123
+  Digiclone[D] | 499 | 11
+  Seal Exchange Ticket | 124 | 3
+  Monster Card Lv3 | 474 | 10
+  Chicken Combo [Event] | 8,999 | 196
+  Gold Banana [Event] | 1,935 | 42
+  Mysterious Digi-egg Box | 516 | 11
+  ModeSelector | 126 | 3
+  Evoluter | 1392 | 30
+  Bit Drops | 3T569M610B | 77M600B
+
+
+######## Monster Card Lv3 ########
+
+[H2] Base Experience
+[P] 6,475
+
+[H2] Card Lv.3 Summon Digimon
+
+[TABLE]
+  Woodmon
+   |  |  |  | HP: | 21,720 | Level(s): | 50
+
+[TABLE]
+  Sangloupmon
+   |  |  |  | HP: | 21,720 | Level(s): | 50
+
+[TABLE]
+  Waspmon
+   |  |  |  | HP: | 21,720 | Level(s): | 50
+
+[TABLE]
+  Flymon
+   |  |  |  | HP: | 21,720 | Level(s): | 50
+
+[TABLE]
+  Veedramon
+   |  |  |  | HP: | 21,720 | Level(s): | 50
+
+[H2] Drops
+
+[TABLE]
+   | 431 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Chicken Combo | Restore HP 1600 & DS 1200
+   | Gold Banana | Restore HP 2000 & DS 2000
+   | Monster Card Lv4 | Summons random monsters
+   | DigiClone [D] | Reinforcement material that can be used for level 1~3
+   | Digimon Seal | Woodmon / Waspmon / Sangloupmon / Veedramon / Flymon
+   | Mysterious Top Quality Egg | Gives Digicore, Evoluter or Amplification Booster+200%
+   | Mercenary DigiEggs | Dracmon / Woodmon / Kunemon / Kiwimon / Veedramon
+   | Low Class DATA DigiEggs | Plant / Devil / Rock / Insect
+   | DigiEgg (for return) Class 2 | Refund Amount 100
+   | Attributes Rank B | HP / DS / Attack / Defense Attributes
+   | MS Attribute Rank A | 1 ~ 3% Speed Attribute
+   | Seal Exchange Ticket | Ticket that can be exchanged to various seals. Exchange - Digitamamon DATS Center
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | Mode Selector | Item that can expand the riding function of digimon with the option.
+   | Mystery Digi-Egg Box | Grants a random Armor digi-egg item. (100% sucess rate)
+
+
+######## Monster Card Lv4 ########
+
+[H2] Base Experience
+[P] 8,435
+
+[H2] Card Lv.4 Summon Digimon
+
+[TABLE]
+  Centarumon
+   |  |  |  | HP: | 34,560 | Level(s): | 60
+
+[TABLE]
+  Devimon
+   |  |  |  | HP: | 34,560 | Level(s): | 60
+
+[TABLE]
+  Kyubimon
+   |  |  |  | HP: | 34,560 | Level(s): | 60
+
+[TABLE]
+  Leomon
+   |  |  |  | HP: | 34,560 | Level(s): | 60
+
+[TABLE]
+  Meramon
+   |  |  |  | HP: | 34,560 | Level(s): | 60
+
+[H2] Drops
+
+[TABLE]
+   | 562 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Chicken Combo | Restore HP 1600 & DS 1200
+   | Gold Banana | Restore HP 2000 & DS 2000
+   | Monster Card Lv5 | Summons random monsters
+   | DigiClone [C] | Reinforcement material that can be used for level 4~6
+   | Digimon Seal | Kentarumon / Devimon / Kyubimon / Leomon / Meramon
+   | Mysterious Top Quality Egg | Unknown DigiEgg
+   | Mercenary DigiEggs | Tsukaimon / Renamon / Elecmon / DemiMeramon
+   | High Class Dragon DigiEgg | Rank 6 / High Class
+   | Low Class DATA DigiEggs | Fire / Beast / Devil
+   | DigiEgg (for return) Class 2 | Refund Amount 100
+   | Attributes Rank B | HP / DS / Attack / Defense Attributes
+   | MS Attribute Rank A | 1 ~ 2% Speed Attribute
+   | Seal Exchange Ticket | Ticket that can be exchanged to various seals. Exchange - Digitamamon DATS Center
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | Mode Selector | Item that can expand the riding function of digimon with the option.
+   | Mystery Digi-Egg Box | Grants a random Armor digi-egg item. (100% sucess rate)
+
+[H2] Drops per 100 cards
+
+[TABLE]
+  Item | Amount
+  Beast Digiegg Rank1/Data | 56
+  Devil Digiegg Rank1/Data | 29
+  Fire Digiegg Rank1/Data | 19
+  Mysterious Digi-egg Box | 8
+  Seal Exchange Ticket | 4
+  ModeSelector | 4
+  Evoluter | 37
+  DigiEgg (for return) | 198
+  Renamon | 7
+  Tsukaimon | 8
+  DemiMeramon | 7
+  Elecmon | 6
+  Kyubimon Seal | 16
+  Meramon Seal | 26
+  Centalmon Seal | 27
+  Leomon Seal | 26
+  Devimon Seal | 24
+  Monster Card 5 | 12
+  Gold Banana [Event] | 36
+  Chicken Combo [Event] | 188
+  Digiclone[C] | 10
+  Mysterious Top Quality Egg | 7
+  Bit Drops | ~212M
+  - 100 card average is taken from 300 cards
+  - I've excluded Spirit summon cards and Attributes.
+
+
+######## Monster Card Lv5 ########
+
+[H2] Base Experience
+[P] 20,465
+
+[H2] Card Lv.5 Summon Digimon
+
+[TABLE]
+  Cherrymon
+   |  |  |  | HP: | 60,360 | Level(s): | 70
+
+[TABLE]
+  Sinduramon
+   |  |  |  | HP: | 60,360 | Level(s): | 70
+
+[TABLE]
+  Knightmon
+   |  |  |  | HP: | 60,360 | Level(s): | 70
+
+[TABLE]
+  WaruMonzaemon
+   |  |  |  | HP: | 60,360 | Level(s): | 70
+
+[TABLE]
+  NeoDevimon
+   |  |  |  | HP: | 60,360 | Level(s): | 70
+
+[H2] Drops
+
+[TABLE]
+   | 1 364 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Chicken Combo | Restore HP 1600 & DS 1200
+   | Gold Banana | Restore HP 2000 & DS 2000
+   | Monster Card Lv6 | Summons random monsters
+   | DigiClone [B] | Reinforcement material that can be used for level 7~9
+   | Digimon Seal | Cherrymon / Sinduramon / Knightmon / WaruMonzaemon / NeoDevimon
+   | Mysterious Top Quality Egg | Gives Digicore, Evoluter or Amplification Booster+200%
+   | Mercenary DigiEggs | Tsukaimon / Gladimon / Woodmon / Kiwimon
+   | Low Class DATA DigiEggs | Plant / Devil / Rock
+   | DigiEgg (for return) Class 3 | Refund Amount 150
+   | Attributes Rank B | HP / DS / Attack / Defense Attributes
+   | MS Attribute Rank A | 1 ~ 3% Speed Attribute
+   | Seal Exchange Ticket | Ticket that can be exchanged to various seals. Exchange - Digitamamon DATS Center
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | Mode Selector | Item that can expand the riding function of digimon with the option.
+   | BM Random Box | You can get Burst Mode item randomly
+   | Random Riding Box | You can get Riding Mode item randomly
+
+
+######## Monster Card Lv6 ########
+
+[H2] Base Experience
+[P] 22,495
+
+[H2] Card Lv.6 Summon Digimon
+
+[TABLE]
+  Marin Devimon
+   |  |  |  | HP: | 99,240 | Level(s): | 80
+
+[TABLE]
+  Etemon
+   |  |  |  | HP: | 99,240 | Level(s): | 80
+
+[TABLE]
+  Giromon
+   |  |  |  | HP: | 99,240 | Level(s): | 80
+
+[TABLE]
+  WereGarurumon
+   |  |  |  | HP: | 99,240 | Level(s): | 80
+
+[TABLE]
+  SkullGreymon
+   |  |  |  | HP: | 99,240 | Level(s): | 80
+
+[H2] Drops
+
+[TABLE]
+   | 833 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Chicken Combo | Restore HP 1600 & DS 1200
+   | Gold Banana | Restore HP 2000 & DS 2000
+   | Monster Card Lv7 | Summons random monsters
+   | DigiClone [B] | Reinforcement material that can be used for level 7~9
+   | Digimon Seal | Marin Devimon / Etemon / Giromon / WereGarurumon / SkullGreymon
+   | Mysterious Top Quality Egg | Gives Digicore, Evoluter or Amplification Booster+200%
+   | Mercenary DigiEggs | Drimogemon / Goblimon / Syakomon / Gabumon
+   | Low Class DATA DigiEggs | Beast / Devil / Rock
+   | High Class Aquatic DigiEgg | Rank 1 / High Class
+   | DigiEgg (for return) Class 4 | Refund Amount 200
+   | Attributes Rank C | HP / DS / Attack / Defense Attributes
+   | MS Attribute Rank B | 2 ~ 4% Speed Attribute
+   | Seal Exchange Ticket | Ticket that can be exchanged to various seals. Exchange - Digitamamon DATS Center
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | BM Random Box | You can get Burst Mode item randomly
+   | Random Riding Box | You can get Riding Mode item randomly
+
+
+######## Monster Card Lv7 ########
+
+[H2] Base Experience
+[P] 24,525
+
+[H2] Card Lv.7 Summon Digimon
+
+[TABLE]
+  Kimeramon
+   |  |  |  | HP: | 170,760 | Level(s): | 90
+
+[TABLE]
+  Diablomon
+   |  |  |  | HP: | 170,760 | Level(s): | 90
+
+[TABLE]
+  Parasimon
+   |  |  |  | HP: | 170,760 | Level(s): | 90
+
+[TABLE]
+  DexDoruGreymon
+   |  |  |  | HP: | 170,760 | Level(s): | 90
+
+[TABLE]
+  SaberLeomon
+   |  |  |  | HP: | 170,760 | Level(s): | 90
+
+[H2] Drops
+
+[TABLE]
+   | 1 635 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Chicken Combo | Restore HP 1600 & DS 1200
+   | Gold Banana | Restore HP 2000 & DS 2000
+   | Monster Card Lv7 | Summons random monsters
+   | DigiClone [A] | Reinforcement material that can be used for level 10~12
+   | Digimon Seal | Chimairamon / SaberLeomon / DexDoruGreymon / Parasimon / Diablomon
+   | Mercenary DigiEggs | Keramon / Dokunemon / Elecmon / DexDorugamon / Gazimon (Millenniumon line)
+   | Low Class DATA DigiEggs | Beast / Devil / Insectoid
+   | DigiEgg (for return) Class 5 | Refund Amount 250
+   | Attributes Rank D | HP / DS / Attack / Defense Attributes
+   | MS Attribute Rank B | 2 ~ 4% Speed Attribute
+   | Seal Exchange Ticket | Ticket that can be exchanged to various seals. Exchange - Digitamamon DATS Center
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | BM Random Box | You can get Burst Mode item randomly
+   | Random Riding Box | You can get Riding Mode item randomly
+
+
+######## High Rank Monster Card Lv1 ########
+
+[H2] Base Experience
+[P] 73,520
+
+[H2] Card Lv.1 Summon Digimon
+
+[TABLE]
+  Anubismon
+   |  |  |  | HP: | 183 800 | Level(s): | 98 - 100
+
+[TABLE]
+  MetalEtemon
+   |  |  |  | HP: | 183 800 | Level(s): | 98 - 100
+
+[TABLE]
+  Boltmon
+   |  |  |  | HP: | 183 800 | Level(s): | 98 - 100
+
+[TABLE]
+  GrandKuwagamon
+   |  |  |  | HP: | 183 800 | Level(s): | 98 - 100
+
+[TABLE]
+  DinoTigermon
+   |  |  |  | HP: | 183 800 | Level(s): | 98 - 100
+
+[H2] Drops
+
+[TABLE]
+   | 4 901 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Double Chicken Combo | Restore HP 2000 & DS 1600
+   | Sweet Gold Banana | Restore Hp and DS 4000
+   | High Rank Monster Card Lv2 | Summons random monsters
+   | DigiClone [A] | Reinforcement material that can be used for level 9~12
+   | Mercenary DigiEggs | Kunemon / Gotsumon / Doggymon / DemiMeramon / Bearmon
+   | Low Class DigiEggs | Beast/Devil/Rock/Insec/Fire
+   | DigiEgg (for return) | Refund Amount 200
+   | Attributes | HP / DS / Attack / Defense Attributes (Rank A Lv4)
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | BM Random Box | You can get Burst Mode item randomly
+   | Random Riding Box | You can get Riding Mode item randomly
+
+
+######## High Rank Monster Card Lv2 ########
+
+[H2] Base Experience
+[P] 98,360
+
+[H2] Card Lv.2 Summon Digimon
+
+[TABLE]
+  HiAndromon
+   |  |  |  | HP: | 245 900 | Level(s): | 108-110
+
+[TABLE]
+  Brakedramon
+   |  |  |  | HP: | 245 900 | Level(s): | 108-110
+
+[TABLE]
+  Gryphonmon
+   |  |  |  | HP: | 245 900 | Level(s): | 108-110
+
+[TABLE]
+  Slayerdramon
+   |  |  |  | HP: | 245 900 | Level(s): | 108-110
+
+[TABLE]
+  TigerVespamon
+   |  |  |  | HP: | 245 900 | Level(s): | 108-110
+
+[H2] Drops
+
+[TABLE]
+   | 6 557 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Double Chicken Combo | Restore HP 2000 & DS 1600
+   | High Rank Monster Card Lv3 | Summons random monsters
+   | DigiClone [A] | Reinforcement material that can be used for level 9~12
+   | Mercenary DigiEggs | Drimogemon / Dracomon[Type:Green] / Kiwimon / Dracomon[Type:Blue] / Fanbeemon
+   | Low Class DigiEggs | 
+   | DigiEgg (for return) | Refund Amount 250
+   | Attributes | HP / DS / Attack / Defense Attributes
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | BM Random Box | You can get Burst Mode item randomly
+   | Random Riding Box | You can get Riding Mode item randomly
+
+
+######## High Rank Monster Card Lv3 ########
+
+[H2] Base Experience
+[P] 128,120
+
+[H2] Card Lv.3 Summon Digimon
+
+[TABLE]
+  Vikemon
+   |  |  |  | HP: | 320,300 | Level(s): | 118-120
+
+[TABLE]
+  Justimon
+   |  |  |  | HP: | 320,300 | Level(s): | 118-120
+
+[TABLE]
+  GrandisKuwagamon
+   |  |  |  | HP: | 320,300 | Level(s): | 118-120
+
+[TABLE]
+  GranDracmon
+   |  |  |  | HP: | 320,300 | Level(s): | 118-120
+
+[TABLE]
+  HerculesKabuterimon
+   |  |  |  | HP: | 320,300 | Level(s): | 118-120
+
+[H2] Drops
+
+[TABLE]
+   | 8 541 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Double Chicken Combo | Restore HP 2000 & DS 1600
+   | Sweet Gold Banana | Restore Hp and DS 4000
+   | High Rank Monster Card Lv4 | Summons random monsters
+   | DigiClone [S] | Reinforcement material that can be used for level 13~15
+   | Mercenary DigiEggs | Gomamon / Monodramon / Wormmon / Dracmon / Tentomon
+   | Low Class DigiEggs | 
+   | DigiEgg (for return) | Refund Amount 250
+   | Attributes | HP / DS / Attack / Defense Attributes
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | BM Random Box | You can get Burst Mode item randomly
+   | Random Riding Box | You can get Riding Mode item randomly
+
+
+######## High Rank Monster Card Lv4 ########
+
+[H2] Base Experience
+[P] 163,280
+
+[H2] Card Lv.4 Summon Digimon
+
+[TABLE]
+  Piedmon
+   |  |  |  | HP: | 408 200 | Level(s): | 130+
+
+[TABLE]
+  Mugendramon
+   |  |  |  | HP: | 408 200 | Level(s): | 130+
+
+[TABLE]
+  VenomMyotismon
+   |  |  |  | HP: | 408 200 | Level(s): | 130+
+
+[TABLE]
+  Puppetmon
+   |  |  |  | HP: | 408 200 | Level(s): | 130+
+
+[TABLE]
+  MetalSeadramon
+   |  |  |  | HP: | 408 200 | Level(s): | 130+
+
+[H2] Drops
+
+[TABLE]
+   | 10 201 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Double Chicken Combo | Restore HP 2000 & DS 1600
+   | Sweet Gold Banana | Restore Hp and DS 4000
+   | High Rank Monster Card Lv5 | Summons random monsters
+   | DigiClone [S] | Reinforcement material that can be used for level 13~15
+   | Mercenary DigiEggs | Woodmon / Mechanorimon / Betamon
+   | Low Class DigiEggs | 
+   | DigiEgg (for return) | Refund Amount 250
+   | Attributes | HP / DS / Attack / Defense Attributes
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | BM Random Box | You can get Burst Mode item randomly
+   | Random Riding Box | You can get Riding Mode item randomly
+
+
+######## High Rank Monster Card Lv5 ########
+
+[H2] Base Experience
+[P] 204,320
+
+[H2] Card Lv.5 Summon Digimon
+
+[TABLE]
+  DexDorugoramon
+   |  |  |  | HP: | 490 446 | Level(s): | 140+
+
+[TABLE]
+  Seraphimon
+   |  |  |  | HP: | 490 446 | Level(s): | 140+
+
+[TABLE]
+  Cherubimon_(White)
+   |  |  |  | HP: | 490 446 | Level(s): | 140+
+
+[H2] Drops
+
+[TABLE]
+   | 13 621 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Double Chicken Combo | Restore HP 2000 & DS 1600
+   | Sweet Gold Banana | Restore Hp and DS 4000
+   | High Rank Monster Card Lv6 | Summons random monsters
+   | DigiClone [S] | Reinforcement material that can be used for level 13~15
+   | Mercenary DigiEggs | Patamon / Lopmon / Dorumon (DexDorugamon)
+   | Low Class DigiEggs | Beast
+   | DigiEgg (for return) | Refund Amount 300
+   | Attributes | HP / DS / Attack / Defense Attributes
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | BM Random Box | You can get Burst Mode item randomly
+   | Random Riding Box | You can get Riding Mode item randomly
+
+
+######## High Rank Monster Card Lv6 ########
+
+[H2] Base Experience
+[P] 251,640
+
+[H2] Card Lv.6 Summon Digimon
+
+[TABLE]
+  Lilithmon
+  File:Lilithmon Search Icon.png |  |  |  | HP: | 629 100 | Level(s): | 150+
+
+[TABLE]
+  Daemon
+  File:Daemon Search Icon.png |  |  |  | HP: | 629 100 | Level(s): | 150+
+
+[TABLE]
+  Leviamon
+   |  |  |  | HP: | 629 100 | Level(s): | 150+
+
+[H2] Drops
+
+[TABLE]
+   | 16 776 | Game Currency
+   | Evoluter | Force Expand Digimon's Evolution Slot
+   | Double Chicken Combo | Restore HP 2000 & DS 1600
+   | Sweet Gold Banana | Restore Hp and DS 4000
+   | High Rank Monster Card Lv6 | Summons random monsters
+   | DigiClone [S] | Reinforcement material that can be used for level 13~15
+   | Mercenary DigiEggs | 
+   | Low Class DigiEggs | 
+   | DigiEgg (for return) | Refund Amount 450
+   | Attributes | HP / DS / Attack / Defense Attributes
+   | Spirit Summon Card | Summon a Spirit Digimon with the same elemental attribute of the Digimon previously defeated.
+   | BM Random Box | You can get Burst Mode item randomly
+   | Random Riding Box | You can get Riding Mode item randomly
+
+
+######## Highest Monster Card Lv1 ########
+
+[H2] Base Experience
+[P] Solo: 3,308,400
+[P] Party:
+
+[H2] Card Lv.1 Summon Digimon
+
+[TABLE]
+  MarineDevimon
+   |  |  |  | HP: | 1,838,000 | Level(s): | 100
+
+[TABLE]
+  LadyDevimon
+   |  |  |  | HP: | 1,838,000 | Level(s): | 100
+
+[TABLE]
+  MaloMyotismon
+  File:MaloMyotismon Search Icon.png |  |  |  | HP: | 1,838,000 | Level(s): | 100
+
+[TABLE]
+  Demon
+  File:Demon Search Icon.png |  |  |  | HP: | 1,838,000 | Level(s): | 100
+
+[TABLE]
+  SkullSatamon
+   |  |  |  | HP: | 1,838,000 | Level(s): | 100
+
+[H2] Drops
+
+[TABLE]
+   | 77 | Game Currency
+
+
+######## Highest Monster Card Lv2 ########
+
+[H2] Base Experience
+[P] Solo: 4426200
+[P] Party:
+
+[H2] Card Lv.2 Summon Digimon
+
+[TABLE]
+  LordKnightmon
+   |  |  |  | HP: | 2,459,000 | Level(s): | 115
+
+[TABLE]
+  Dynasmon
+   |  |  |  | HP: | 2,459,000 | Level(s): | 115
+
+[TABLE]
+  Cherubimon
+   |  |  |  | HP: | 2,459,000 | Level(s): | 115
+
+[TABLE]
+  Lucemon Satan Mode
+   |  |  |  | HP: | 2,459,000 | Level(s): | 115
+
+[TABLE]
+  Susanoomon
+   |  |  |  | HP: | 4,918,000 | Level(s): | 115
+
+[H2] Drops
+
+[TABLE]
+   | 231 | Game Currency
+
+
+######## Highest Monster Card Lv3 ########
+
+[H2] Base Experience
+[P] Solo:
+[P] Party:
+
+[H2] Card Lv.3 Summon Digimon
+
+[TABLE]
+  Sakuyamon
+   |  |  |  | HP: |  | Level(s): | 130
+
+[H2] Drops
+
+[TABLE]
+   | 346 | Game Currency
+
+
+######## Random Monster Card ########
+[P] Random Monster Card can be dropped in Server Continent Pyramid.
+
+[H2] Scanning Items
+
+[TABLE]
+   | Item | Amount | Desc
+   | Monster Card Lv1 | 1 | Summons a random monster. Recommended Level [Lv 10 - Lv 20]
+   | Monster Card Lv2 | 1 | Summons a random monster. Recommended Level [Lv 21 - Lv 30]
+   | Monster Card Lv3 | 1 | Summons a random monster. Recommended Level [Lv 31 - Lv 40]
+   | Monster Card Lv4 | 1 | Summons a random monster. Recommended Level [Lv 41 - Lv 50]
+   | Monster Card Lv5 | 1 | Summons a random monster. Recommended Level [Lv 51 - Lv 60]
+   | Monster Card Lv6 | 1 | Summons a random monster. Recommended Level [Lv 61 - Lv 70]

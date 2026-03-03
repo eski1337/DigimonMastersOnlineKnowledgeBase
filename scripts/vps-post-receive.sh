@@ -8,6 +8,11 @@ git --work-tree=/home/deploy/app --git-dir=/home/deploy/dmo-kb.git checkout -f m
 
 cd /home/deploy/app
 
+# Auto-update the hook from repo so future deploys use the latest version
+echo '>>> Updating post-receive hook...'
+cp /home/deploy/app/scripts/vps-post-receive.sh /home/deploy/dmo-kb.git/hooks/post-receive 2>/dev/null || true
+chmod +x /home/deploy/dmo-kb.git/hooks/post-receive 2>/dev/null || true
+
 echo '>>> Installing dependencies...'
 pnpm install 2>&1
 

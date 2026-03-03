@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "cp /home/deploy/app/scripts/vps-post-receive.sh /home/deploy/dmo-kb.git/hooks/post-receive 2>/dev/null; chmod +x /home/deploy/dmo-kb.git/hooks/post-receive 2>/dev/null; mongosh mongodb://localhost:27017/dmo-kb /home/deploy/app/scripts/seed-systems.js 2>&1 || true",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"

@@ -69,8 +69,8 @@ function DigimonNodeInner({ data }: NodeProps) {
       {/* Image container */}
       <div
         style={{
-          width: 96,
-          height: 96,
+          width: 80,
+          height: 80,
           borderRadius: '8px',
           overflow: 'hidden',
           background: 'rgba(17,24,39,0.6)',
@@ -85,10 +85,10 @@ function DigimonNodeInner({ data }: NodeProps) {
           <Image
             src={d.icon!}
             alt={d.label}
-            width={88}
-            height={88}
+            width={72}
+            height={72}
             className="object-contain"
-            style={{ width: 88, height: 88, objectFit: 'contain' }}
+            style={{ width: 72, height: 72, objectFit: 'contain' }}
             loading="lazy"
             unoptimized
           />
@@ -100,16 +100,17 @@ function DigimonNodeInner({ data }: NodeProps) {
       {/* Name */}
       <span
         style={{
-          fontSize: '13px',
+          fontSize: '14px',
           fontWeight: 700,
-          lineHeight: 1.25,
+          lineHeight: 1.2,
           textAlign: 'center',
           color: isCurrent ? '#fb923c' : '#e5e7eb',
-          maxWidth: 168,
+          maxWidth: 170,
           overflow: 'hidden',
           display: '-webkit-box',
           WebkitLineClamp: 3,
           WebkitBoxOrient: 'vertical',
+          wordBreak: 'break-word' as const,
         }}
       >
         {d.label}
@@ -119,9 +120,9 @@ function DigimonNodeInner({ data }: NodeProps) {
       {d.level && (
         <span
           style={{
-            fontSize: '9px',
+            fontSize: '11px',
             fontWeight: 600,
-            padding: '1px 6px',
+            padding: '2px 8px',
             borderRadius: '8px',
             backgroundColor: 'rgba(156,163,175,0.12)',
             color: BADGE_COLOR,

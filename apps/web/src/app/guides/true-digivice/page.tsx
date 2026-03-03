@@ -114,7 +114,7 @@ const craftingSteps: CraftStep[] = [
   },
   {
     product: 'Digivice of Beginning Lv. 2',
-    materials: ['Digivice of Beginning Lv. 1', 'Essence of Evolution x211', 'Piece of Evolution x11', "Myotismon's Digicore x6"],
+    materials: ['Digivice of Beginning Lv. 1', 'Essence of Evolution x211', 'Piece of Evolution x11', "Myotismon's Digicore x8"],
     cost: '600M',
     rate: '100%',
   },
@@ -193,7 +193,7 @@ const totalItems: TotalItem[] = [
   { item: 'Essence of Evolution', amount: '1,573' },
   { item: 'Fragment of Evolution', amount: '23' },
   { item: 'Piece of Evolution', amount: '26' },
-  { item: "Myotismon's Digicore", amount: '19' },
+  { item: "Myotismon's Digicore", amount: '21' },
   { item: 'Infective Virus', amount: '17' },
   { item: "Digimon's Bionic Energy", amount: '7' },
   { item: 'Digital Energy', amount: '7' },
@@ -370,7 +370,7 @@ export default function TrueDigivicePage() {
                   <div className="text-xs text-muted-foreground mt-1">Max Digimon Attribute</div>
                 </div>
                 <div className="bg-secondary/20 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-primary">15%</div>
+                  <div className="text-2xl font-bold text-primary">16%</div>
                   <div className="text-xs text-muted-foreground mt-1">Max Digimon Element</div>
                 </div>
               </div>

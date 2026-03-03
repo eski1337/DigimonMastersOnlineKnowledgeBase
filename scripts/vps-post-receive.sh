@@ -17,9 +17,9 @@ cd /home/deploy/app/apps/cms && pnpm build 2>&1
 echo '>>> Building web...'
 cd /home/deploy/app/apps/web && pnpm build 2>&1
 
-echo '>>> Running post-deploy seed (direct MongoDB, one-shot)...'
+echo '>>> Seeding systems collection via mongosh...'
 cd /home/deploy/app
-node scripts/post-deploy-seed.mjs 2>&1 || echo '(seed script failed, non-fatal)'
+mongosh mongodb://localhost:27017/dmo-kb scripts/seed-systems.js 2>&1 || echo '(seed skipped or failed, non-fatal)'
 
 echo '>>> Restarting PM2...'
 cd /home/deploy/app

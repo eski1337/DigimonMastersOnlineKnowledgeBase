@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Info } from 'lucide-react';
+import { ArrowLeft, Info, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
@@ -15,33 +15,35 @@ export const metadata: Metadata = {
 const IMG = '/images/guides/d-ark-limited-edition';
 
 const itemIcon: Record<string, string> = {
-  'D-Ark Prototype Lv. 1': `${IMG}/D-Ark_Prototype_Lv1.png`,
-  'D-Ark Proto Type Lv. 2': `${IMG}/D-Ark_Proto_Type_Lv2.png`,
-  'D-Ark Proto Type Lv. 3': `${IMG}/D-Ark_Proto_Type_Lv3.png`,
-  'D-Ark Complete Type Lv. 1': `${IMG}/D-Ark_Complete_Type_Lv1.png`,
-  'D-Ark Complete Type Lv. 2': `${IMG}/D-Ark_Complete_Type_Lv2.png`,
-  'D-Ark Complete Type Lv. 3': `${IMG}/D-Ark_Complete_Type_Lv3.png`,
+  'D-Ark Prototype Lv. 1': `${IMG}/D-Ark_Proto_Type_Lv1-2.png`,
+  'D-Ark Proto Type Lv. 2': `${IMG}/D-Ark_Proto_Type_Lv1-2.png`,
+  'D-Ark Proto Type Lv. 3': `${IMG}/D-Ark_Proto_Type_Lv2-3.png`,
+  'D-Ark Complete Type Lv. 1': `${IMG}/D-Ark_Complete_Lv2-3.png`,
+  'D-Ark Complete Type Lv. 2': `${IMG}/D-Ark_Complete_Lv2-3.png`,
+  'D-Ark Complete Type Lv. 3': `${IMG}/D-Ark_Complete_Lv2-3.png`,
   'D-Ark Limited Edition': `${IMG}/D-Ark_Limited_Edition.png`,
   'Enhanced Memory Card': `${IMG}/Enhanced_Memory_Card.png`,
-  "D-Reaper's Data": `${IMG}/D-Reapers_Data.png`,
-  "D-Reaper's True Data": `${IMG}/D-Reapers_True_Data.png`,
-  "D-Reaper's Enriched Data": `${IMG}/D-Reapers_Enriched_Data.png`,
+  "D-Reaper's Data": `${IMG}/D-Reaper's_Data.png`,
+  "D-Reaper's True Data": `${IMG}/D-Reaper's_True_Data.png`,
+  "D-Reaper's Enriched Data": `${IMG}/D-Reaper's_Enriched_Data.png`,
   'Matrix Energy': `${IMG}/Matrix_Energy.png`,
   'Safe Energy': `${IMG}/Safe_Energy.png`,
-  'D-Ark: SAINT': `${IMG}/D-Ark_SAINT.png`,
-  'D-Ark: SAKUYA': `${IMG}/D-Ark_SAKUYA.png`,
-  'D-Ark: HAZARD': `${IMG}/D-Ark_HAZARD.png`,
-  'D-Ark: DESTINY': `${IMG}/D-Ark_DESTINY.png`,
-  'D-Ark: JUSTICE': `${IMG}/D-Ark_JUSTICE.png`,
+  'Option Change Stone': `${IMG}/Option_Change_Stone.png`,
+  'Number Change Stone': `${IMG}/Number_Change_Stone.png`,
+  'D-Ark: SAINT': `${IMG}/D-Ark-Item-Saint.png`,
+  'D-Ark: SAKUYA': `${IMG}/D-Ark-Item-Sakuya.png`,
+  'D-Ark: HAZARD': `${IMG}/D-Ark-Item-Hazard.png`,
+  'D-Ark: DESTINY': `${IMG}/D-Ark-Item-DESTINY.png`,
+  'D-Ark: JUSTICE': `${IMG}/D-Ark-Item-JUSTICE.png`,
   'Money': `${IMG}/Coin_Currency.png`,
 };
 
 const auraImage: Record<string, string> = {
-  'SAINT': `${IMG}/D-Ark_SAINT_aura.png`,
-  'SAKUYA': `${IMG}/D-Ark_SAKUYA_aura.png`,
-  'HAZARD': `${IMG}/D-Ark_HAZARD_aura.png`,
-  'DESTINY': `${IMG}/D-Ark_DESTINY_aura.png`,
-  'JUSTICE': `${IMG}/D-Ark_JUSTICE_aura.png`,
+  'SAINT': `${IMG}/D-Ark-Saint.png`,
+  'SAKUYA': `${IMG}/D-Ark-Sakuya.png`,
+  'HAZARD': `${IMG}/D-Ark-Hazard.png`,
+  'DESTINY': `${IMG}/D-Ark-DESTINY.png`,
+  'JUSTICE': `${IMG}/D-Ark-JUSTICE.png`,
 };
 
 function ItemImg({ name, size = 24 }: { name: string; size?: number }) {
@@ -233,6 +235,7 @@ export default function DArkLimitedEditionPage() {
               { href: '#attributes', label: 'Digivice Attributes' },
               { href: '#auras', label: 'Aura Types' },
               { href: '#items', label: 'Item Preview' },
+              { href: '#tour', label: 'D-Ark Tour Guide' },
               { href: '#crafting', label: 'Crafting D-Ark Limited Edition' },
               { href: '#locations', label: 'Material Locations' },
               { href: '#totals', label: 'Total Items Required' },
@@ -253,8 +256,8 @@ export default function DArkLimitedEditionPage() {
               <p>
                 All versions of D-Ark Limited Edition come with <strong className="text-foreground">2 options</strong>.
                 They work similarly to Rings, Necklaces, Earrings, and Bracelets &mdash; options can be changed with
-                <strong className="text-foreground"> Option Change Stone</strong> and
-                <strong className="text-foreground"> Number Change Stone</strong>,
+                {' '}<ItemImg name="Option Change Stone" size={20} /> <strong className="text-foreground">Option Change Stone</strong> and
+                {' '}<ItemImg name="Number Change Stone" size={20} /> <strong className="text-foreground">Number Change Stone</strong>,
                 upgraded to 200% with <strong className="text-foreground">Digitary Power Stone</strong>,
                 and renewed with <strong className="text-foreground">Renewal Increase Stone</strong>.
               </p>
@@ -341,6 +344,48 @@ export default function DArkLimitedEditionPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </Section>
+
+        <Separator />
+
+        {/* D-Ark Tour Guide */}
+        <Section id="tour" title="D-Ark Tour Guide">
+          <p className="text-sm text-muted-foreground mb-4">
+            Raid bosses that drop crafting materials can be found in <strong className="text-foreground">West Shinjuku (D-Reaper)</strong> and <strong className="text-foreground">East Shinjuku (D-Reaper)</strong>.
+            Use the maps below to locate them.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="overflow-hidden border-primary/20">
+              <CardHeader className="py-3 bg-secondary/30">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  West Shinjuku (D-Reaper)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <img
+                  src={`${IMG}/Tour-West-Shinjuku.png`}
+                  alt="West Shinjuku (D-Reaper) Tour Map"
+                  className="w-full h-auto"
+                />
+              </CardContent>
+            </Card>
+            <Card className="overflow-hidden border-primary/20">
+              <CardHeader className="py-3 bg-secondary/30">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  East Shinjuku (D-Reaper)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <img
+                  src={`${IMG}/Tour-East-Shinjuku.png`}
+                  alt="East Shinjuku (D-Reaper) Tour Map"
+                  className="w-full h-auto"
+                />
+              </CardContent>
+            </Card>
           </div>
         </Section>
 

@@ -8,6 +8,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
+        REGISTRATION_SECRET: 'DmokbReg2026!SecureKey#X9pL',
       },
       instances: 2,
       exec_mode: 'cluster',
@@ -24,6 +25,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3001,
+        REGISTRATION_SECRET: 'DmokbReg2026!SecureKey#X9pL',
       },
       instances: 1,
       exec_mode: 'fork',

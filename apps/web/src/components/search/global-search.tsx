@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { CmsImage } from '@/components/ui/cms-image';
 
 interface SearchResult {
-  type: 'digimon' | 'guide' | 'quest' | 'map' | 'tool' | 'user';
+  type: 'digimon' | 'guide' | 'quest' | 'map' | 'tool' | 'item' | 'system' | 'patch-note' | 'user';
   id: string;
   title: string;
   slug: string;
@@ -100,6 +100,12 @@ export function GlobalSearch() {
         return `/maps/${result.slug}`;
       case 'tool':
         return `/tools/${result.slug}`;
+      case 'item':
+        return `/items/${result.slug}`;
+      case 'system':
+        return `/systems/${result.slug}`;
+      case 'patch-note':
+        return `/patch-notes/${result.slug}`;
       case 'user':
         return `/user/${result.slug}`;
       default:
@@ -119,6 +125,12 @@ export function GlobalSearch() {
         return 'bg-gruvbox-purple text-black';
       case 'tool':
         return 'bg-gruvbox-orange text-black';
+      case 'item':
+        return 'bg-amber-500 text-black';
+      case 'system':
+        return 'bg-cyan-600 text-white';
+      case 'patch-note':
+        return 'bg-rose-500 text-white';
       case 'user':
         return 'bg-emerald-600 text-white';
       default:

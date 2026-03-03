@@ -116,6 +116,25 @@ export interface ToolDoc extends PayloadDoc {
   url?: string;
 }
 
+export interface ItemDoc extends PayloadDoc {
+  name: string;
+  slug: string;
+  category?: string;
+  rarity?: string;
+  description?: string;
+  icon?: string | { url: string };
+  published?: boolean;
+}
+
+export interface SystemDoc extends PayloadDoc {
+  title: string;
+  slug: string;
+  summary?: string;
+  tags?: Array<{ tag: string }>;
+  coverImage?: string | { url: string };
+  published?: boolean;
+}
+
 export interface PatchNoteDoc extends PayloadDoc {
   title: string;
   slug: string;

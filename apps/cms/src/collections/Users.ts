@@ -107,6 +107,33 @@ const Users: CollectionConfig = {
   },
   defaultSort: 'role',
   hooks: {
+    beforeValidate: [
+      ({ data, operation, req }) => {
+        // Block disposable/throwaway email domains on registration
+        if (operation === 'create' && data?.email) {
+          const DISPOSABLE_DOMAINS = new Set([
+            'fxavaj.com', 'mailinator.com', 'guerrillamail.com', 'tempmail.com',
+            'throwaway.email', 'yopmail.com', 'sharklasers.com', 'guerrillamailblock.com',
+            'grr.la', 'dispostable.com', 'maildrop.cc', 'fakeinbox.com', 'tempail.com',
+            'temp-mail.org', 'trashmail.com', 'trashmail.me', 'trashmail.net',
+            'getnada.com', 'mohmal.com', 'harakirimail.com', 'burnermail.io',
+            'mailnesia.com', 'tempr.email', 'discard.email', '10minutemail.com',
+            'minutemail.com', 'emailondeck.com', 'crazymailing.com', 'mytemp.email',
+            'tmpmail.net', 'tmpmail.org', 'bupmail.com', 'mailcatch.com',
+            'inboxbear.com', 'mailsac.com', 'jetable.org', 'moakt.com',
+          ]);
+          const domain = data.email.split('@')[1]?.toLowerCase();
+          if (domain && DISPOSABLE_DOMAINS.has(domain)) {
+            throw new Error('Disposable email addresses are not allowed.');
+          }
+          // Block random-looking domains (5+ consecutive consonants)
+          if (domain && /^[b-df-hj-np-tv-z]{5,}/.test(domain.split('.')[0])) {
+            throw new Error('This email domain is not accepted. Please use a real email address.');
+          }
+        }
+        return data;
+      },
+    ],
     beforeChange: [
       ({ data, req, operation }) => {
         // SECURITY: Guard dev-only auto-upgrade behind explicit flags
@@ -141,7 +168,15 @@ const Users: CollectionConfig = {
       if (user) return true;
       return { profileVisibility: { equals: 'public' } };
     },
-    create: () => true, // Allow public registration
+    create: ({ req }) => {
+      // Allow admins/owners to create users directly
+      if (req.user && ['admin', 'owner'].includes(req.user.role)) return true;
+      // Allow web app registration proxy via shared secret
+      const secret = (req.headers as Record<string, string | string[] | undefined>)['x-registration-secret'];
+      if (secret && process.env.REGISTRATION_SECRET && secret === process.env.REGISTRATION_SECRET) return true;
+      // Block all other unauthenticated user creation (prevents direct API abuse)
+      return false;
+    },
     update: ({ req: { user } }) => {
       if (!user) return false;
       if (['admin', 'owner'].includes(user.role)) return true;

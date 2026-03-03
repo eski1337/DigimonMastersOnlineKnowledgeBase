@@ -3,12 +3,12 @@ import { withErrorHandler, apiResponse } from '@/lib/api-handler';
 import { searchQuerySchema } from '@/lib/validation-schemas';
 import { logger } from '@/lib/logger';
 import { getCmsToken } from '@/lib/cms-token';
-import type { PayloadResponse, DigimonDoc, GuideDoc, QuestDoc, MapDoc, ToolDoc } from '@/types/payload-responses';
+import type { PayloadResponse, DigimonDoc, GuideDoc, QuestDoc, MapDoc, ToolDoc, ItemDoc, SystemDoc, PatchNoteDoc } from '@/types/payload-responses';
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
 interface SearchResult {
-  type: 'digimon' | 'guide' | 'quest' | 'map' | 'tool' | 'user';
+  type: 'digimon' | 'guide' | 'quest' | 'map' | 'tool' | 'item' | 'system' | 'patch-note' | 'user';
   id: string;
   title: string;
   slug: string;
@@ -32,13 +32,16 @@ async function searchHandler(request: NextRequest) {
   if (userToken) userHeaders['Authorization'] = `JWT ${userToken}`;
 
   // Fire ALL searches in parallel — latency = max(individual) instead of sum(all)
-  const [digimonRes, guidesRes, questsRes, mapsRes, toolsRes, usersRes1, usersRes2] =
+  const [digimonRes, guidesRes, questsRes, mapsRes, toolsRes, itemsRes, systemsRes, patchNotesRes, usersRes1, usersRes2] =
     await Promise.allSettled([
       fetch(`${CMS_URL}/api/digimon?where[name][like]=${q}&where[published][equals]=true&limit=5`, { cache: 'no-store' }),
       fetch(`${CMS_URL}/api/guides?where[title][like]=${q}&where[published][equals]=true&limit=5`, { cache: 'no-store' }),
       fetch(`${CMS_URL}/api/quests?where[title][like]=${q}&where[published][equals]=true&limit=5`, { cache: 'no-store' }),
       fetch(`${CMS_URL}/api/maps?where[name][like]=${q}&where[published][equals]=true&limit=5`, { cache: 'no-store' }),
       fetch(`${CMS_URL}/api/tools?where[title][like]=${q}&where[published][equals]=true&limit=5`, { cache: 'no-store' }),
+      fetch(`${CMS_URL}/api/items?where[name][like]=${q}&where[published][equals]=true&limit=5&depth=1`, { cache: 'no-store' }),
+      fetch(`${CMS_URL}/api/systems?where[title][like]=${q}&where[published][equals]=true&limit=5`, { cache: 'no-store' }),
+      fetch(`${CMS_URL}/api/patchNotes?where[title][like]=${q}&where[published][equals]=true&limit=5&sort=-publishedDate`, { cache: 'no-store' }),
       fetch(`${CMS_URL}/api/users?where[username][like]=${q}&limit=5&depth=1`, { headers: userHeaders, cache: 'no-store' }),
       fetch(`${CMS_URL}/api/users?where[name][like]=${q}&limit=5&depth=1`, { headers: userHeaders, cache: 'no-store' }),
     ]);
@@ -110,6 +113,43 @@ async function searchHandler(request: NextRequest) {
       ...toolsData.docs.map((t) => ({
         type: 'tool' as const, id: t.id, title: t.title, slug: t.slug,
         description: t.description || 'Tool',
+      }))
+    );
+  }
+
+  // Items
+  const itemsData = await settled<PayloadResponse<ItemDoc>>(itemsRes);
+  if (itemsData) {
+    results.push(
+      ...itemsData.docs.map((i) => ({
+        type: 'item' as const, id: i.id, title: i.name, slug: i.slug,
+        description: [i.category, i.rarity].filter(Boolean).join(' · ') || 'Item',
+        image: typeof i.icon === 'string' ? i.icon : (i.icon as { url: string } | undefined)?.url,
+        metadata: i.category ? { category: i.category } : undefined,
+      }))
+    );
+  }
+
+  // Systems
+  const systemsData = await settled<PayloadResponse<SystemDoc>>(systemsRes);
+  if (systemsData) {
+    results.push(
+      ...systemsData.docs.map((s) => ({
+        type: 'system' as const, id: s.id, title: s.title, slug: s.slug,
+        description: s.summary || 'System',
+        image: typeof s.coverImage === 'string' ? s.coverImage : (s.coverImage as { url: string } | undefined)?.url,
+      }))
+    );
+  }
+
+  // Patch Notes
+  const patchNotesData = await settled<PayloadResponse<PatchNoteDoc>>(patchNotesRes);
+  if (patchNotesData) {
+    results.push(
+      ...patchNotesData.docs.map((p) => ({
+        type: 'patch-note' as const, id: p.id, title: p.title, slug: p.slug,
+        description: p.version ? `Version ${p.version}` : 'Patch Note',
+        metadata: p.version ? { version: p.version } : undefined,
       }))
     );
   }

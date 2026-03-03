@@ -161,9 +161,14 @@ async function syncDiscordUserToCMS(profile: { id: string; email: string; userna
 
     // Create new user in CMS
     const randomPassword = crypto.randomBytes(32).toString('hex');
+    const createHeaders: Record<string, string> = { ...authHeaders };
+    // Add registration secret as fallback auth for user creation
+    if (process.env.REGISTRATION_SECRET) {
+      createHeaders['X-Registration-Secret'] = process.env.REGISTRATION_SECRET;
+    }
     const createRes = await fetch(`${CMS_URL}/api/users`, {
       method: 'POST',
-      headers: authHeaders,
+      headers: createHeaders,
       body: JSON.stringify({
         email: profile.email,
         password: randomPassword,

@@ -2,14 +2,81 @@ import { NextRequest } from 'next/server';
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 
+/* ── Rate limiter (in-memory, per-IP) ────────────────────────────────── */
+const RATE_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const RATE_MAX = 3; // max registrations per window per IP
+const ipAttempts = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipAttempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    ipAttempts.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_MAX;
+}
+
+/* ── Disposable / throwaway email domain blocklist ───────────────────── */
+const DISPOSABLE_DOMAINS = new Set([
+  'fxavaj.com', 'mailinator.com', 'guerrillamail.com', 'tempmail.com',
+  'throwaway.email', 'yopmail.com', 'sharklasers.com', 'guerrillamailblock.com',
+  'grr.la', 'dispostable.com', 'maildrop.cc', 'fakeinbox.com', 'tempail.com',
+  'temp-mail.org', 'trashmail.com', 'trashmail.me', 'trashmail.net',
+  'getnada.com', 'mohmal.com', 'harakirimail.com', 'burnermail.io',
+  'mailnesia.com', 'tempr.email', 'discard.email', '10minutemail.com',
+  'minutemail.com', 'emailondeck.com', 'crazymailing.com', 'mytemp.email',
+  'tmpmail.net', 'tmpmail.org', 'bupmail.com', 'mailcatch.com',
+  'inboxbear.com', 'mailsac.com', 'jetable.org', 'moakt.com',
+]);
+
+function isDisposableEmail(email: string): boolean {
+  const domain = email.split('@')[1]?.toLowerCase();
+  if (!domain) return true;
+  if (DISPOSABLE_DOMAINS.has(domain)) return true;
+  // Block domains with random-looking names (5+ consecutive consonants or very short TLD-only domains)
+  if (/^[b-df-hj-np-tv-z]{5,}/.test(domain.split('.')[0])) return true;
+  return false;
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit by IP
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || request.headers.get('x-real-ip')
+      || 'unknown';
+
+    if (isRateLimited(ip)) {
+      return Response.json(
+        { message: 'Too many registration attempts. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
 
     // Validate required fields
     if (!body.email || !body.password || !body.username) {
       return Response.json(
         { message: 'Email, username, and password are required' },
+        { status: 400 }
+      );
+    }
+
+    // Block disposable emails
+    if (isDisposableEmail(body.email)) {
+      return Response.json(
+        { message: 'Disposable email addresses are not allowed. Please use a real email.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format more strictly
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(body.email)) {
+      return Response.json(
+        { message: 'Please enter a valid email address.' },
         { status: 400 }
       );
     }
@@ -27,6 +94,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Registration-Secret': process.env.REGISTRATION_SECRET || '',
       },
       body: JSON.stringify(payload),
     });

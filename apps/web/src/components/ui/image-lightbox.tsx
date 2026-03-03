@@ -68,7 +68,7 @@ export function ImageLightbox({ images, initialIndex = 0, open, onClose }: Image
       {/* Close button */}
       <button
         onClick={(e) => { e.stopPropagation(); onClose(); }}
-        className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+        className="absolute top-16 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
         aria-label="Close"
       >
         <X className="h-6 w-6" />

@@ -74,6 +74,40 @@ function ItemImg({ name, size = 24 }: { name: string; size?: number }) {
   return <img src={src} alt={name} width={size} height={size} className="inline-block align-middle" />;
 }
 
+const currencyIcon: Record<string, string> = {
+  T: `${IMG}/Currency_Tera.png`,
+  M: `${IMG}/Currency_Mega.png`,
+  B: `${IMG}/Currency_Bit.png`,
+};
+
+function CurrencyImg({ unit, size = 16 }: { unit: string; size?: number }) {
+  const src = currencyIcon[unit];
+  if (!src) return <span>{unit}</span>;
+  return <img src={src} alt={unit} width={size} height={size} className="inline-block align-middle" />;
+}
+
+function CurrencyAmount({ value }: { value: string }) {
+  if (value === '0' || value === 'Free') {
+    return <span className="text-green-400 font-medium">Free</span>;
+  }
+  const parts = value.match(/(\d[\d,]*)\s*([TMB])/g);
+  if (!parts) return <span>{value}</span>;
+  return (
+    <span className="inline-flex items-center gap-1 flex-wrap">
+      {parts.map((part, i) => {
+        const m = part.match(/^([\d,]+)\s*([TMB])$/);
+        if (!m) return <span key={i}>{part}</span>;
+        return (
+          <span key={i} className="inline-flex items-center gap-0.5">
+            <span>{m[1]}</span>
+            <CurrencyImg unit={m[2]} />
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 function parseMaterial(m: string): { name: string; qty: string } {
   const match = m.match(/^(.+?)\s+(x\d+)$/);
   if (match) return { name: match[1], qty: match[2] };
@@ -439,7 +473,7 @@ export default function TrueDigivicePage() {
                         ))}
                       </ul>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap font-medium text-primary">{step.cost}</TableCell>
+                    <TableCell className="whitespace-nowrap font-medium text-primary"><CurrencyAmount value={step.cost} /></TableCell>
                     <TableCell className="text-green-400">{step.rate}</TableCell>
                   </tr>
                 ))}
@@ -478,7 +512,7 @@ export default function TrueDigivicePage() {
                         ))}
                       </ul>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap font-medium text-primary">{step.cost}</TableCell>
+                    <TableCell className="whitespace-nowrap font-medium text-primary"><CurrencyAmount value={step.cost} /></TableCell>
                     <TableCell className="text-green-400">{step.rate}</TableCell>
                   </tr>
                 ))}
@@ -547,7 +581,9 @@ export default function TrueDigivicePage() {
                         {item.item}
                       </span>
                     </TableCell>
-                    <TableCell className={`font-medium ${item.item === 'Money' ? 'text-primary' : 'text-muted-foreground'}`}>{item.amount}</TableCell>
+                    <TableCell className={`font-medium ${item.item === 'Money' ? 'text-primary' : 'text-muted-foreground'}`}>
+                      {item.item === 'Money' ? <CurrencyAmount value={item.amount} /> : item.amount}
+                    </TableCell>
                   </tr>
                 ))}
               </tbody>
@@ -590,7 +626,7 @@ export default function TrueDigivicePage() {
                         ))}
                       </ul>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap font-medium text-primary">{recipe.cost}</TableCell>
+                    <TableCell className="whitespace-nowrap font-medium text-primary"><CurrencyAmount value={recipe.cost} /></TableCell>
                   </tr>
                 ))}
               </tbody>

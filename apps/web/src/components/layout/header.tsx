@@ -10,6 +10,7 @@ import { ThemeToggle } from './theme-toggle';
 
 const NAV_ITEMS = [
   { href: '/digimon', label: 'Digimon' },
+  { href: '/items', label: 'Items' },
   { href: '/guides', label: 'Guides' },
   { href: '/systems', label: 'Systems' },
   { href: '/quests', label: 'Quests' },

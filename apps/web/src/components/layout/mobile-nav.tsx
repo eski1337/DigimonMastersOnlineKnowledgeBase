@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Database, BookOpen, Scroll, Map, Wrench, FileText, Cog } from 'lucide-react';
+import { Menu, X, Database, Package, BookOpen, Scroll, Map, Wrench, FileText, Cog } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import * as Dialog from '@radix-ui/react-dialog';
 import { GlobalSearch } from '@/components/search/global-search';
@@ -13,6 +13,7 @@ import { ThemeToggle } from './theme-toggle';
 
 const NAV_ITEMS = [
   { href: '/digimon', label: 'Digimon', icon: Database },
+  { href: '/items', label: 'Items', icon: Package },
   { href: '/guides', label: 'Guides', icon: BookOpen },
   { href: '/systems', label: 'Systems', icon: Cog },
   { href: '/quests', label: 'Quests', icon: Scroll },

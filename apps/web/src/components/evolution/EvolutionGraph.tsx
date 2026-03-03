@@ -57,7 +57,7 @@ export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
   // Fit view after init
   const onInit = useCallback((instance: { fitView: (opts?: { padding?: number; maxZoom?: number }) => void }) => {
     setTimeout(() => {
-      instance.fitView({ padding: 0.2, maxZoom: 1.2 });
+      instance.fitView({ padding: 0.25, maxZoom: 1.2 });
     }, 50);
   }, []);
 

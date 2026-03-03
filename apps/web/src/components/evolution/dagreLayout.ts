@@ -5,10 +5,10 @@ import type { DigimonNodeData } from './nodeTypes';
 
 /* ── Constants ────────────────────────────────────────────────────────── */
 
-const NODE_WIDTH = 170;
-const NODE_HEIGHT = 160;
-const RANK_SEP = 160;
-const NODE_SEP = 60;
+const NODE_WIDTH = 200;
+const NODE_HEIGHT = 190;
+const RANK_SEP = 180;
+const NODE_SEP = 70;
 
 /* ── Build React Flow nodes + edges from API data ─────────────────────── */
 

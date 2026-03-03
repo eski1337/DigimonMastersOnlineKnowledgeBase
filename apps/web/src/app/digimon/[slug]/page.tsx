@@ -135,7 +135,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
   };
 
   return (
-    <div className="container py-8 max-w-[1600px]">
+    <div className="container py-8 max-w-[1920px]">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/digimon" className="hover:text-foreground transition-colors">Digimon</Link>
@@ -143,7 +143,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
         <span className="text-foreground font-medium">{d.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-6 lg:gap-8">
         {/* Main Content */}
         <div className="space-y-8">
           {/* Title and Button */}

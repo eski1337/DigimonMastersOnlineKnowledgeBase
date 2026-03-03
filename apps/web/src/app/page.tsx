@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Database, Map, BookOpen, Wrench, Shield, Calendar } from 'lucide-react';
+import { ArrowRight, Database, Map, BookOpen, Wrench, Shield, Calendar, AlertTriangle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +24,26 @@ export default async function HomePage() {
   }
   return (
     <div className="flex flex-col">
+      {/* Early Development Banner */}
+      <div className="border-b border-yellow-500/30 bg-yellow-500/10 backdrop-blur-sm">
+        <div className="container max-w-[64rem] py-3 px-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-yellow-400 shrink-0 mt-0.5" />
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-yellow-400">Early Development</p>
+              <p className="text-muted-foreground leading-relaxed">
+                This project is still in <strong className="text-foreground">early development</strong>. Bugs, inconsistencies, errors, and incorrect data are to be expected.
+                We&apos;re actively working on improving content and accuracy.
+              </p>
+              <p className="text-muted-foreground leading-relaxed flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span>Interested in helping out? We&apos;re looking for <strong className="text-primary">editors and contributors</strong> &mdash; reach out on our Discord!</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />

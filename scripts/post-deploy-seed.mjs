@@ -7,7 +7,7 @@
 import { createHash } from 'crypto';
 import { existsSync, writeFileSync } from 'fs';
 
-const FLAG = '/tmp/.dmokb-systems-seeded';
+const FLAG = '/tmp/.dmokb-systems-seeded-v2';
 if (existsSync(FLAG)) {
   console.log('[post-deploy-seed] Already done, skipping.');
   process.exit(0);
@@ -37,17 +37,29 @@ async function resetPassword() {
   await client.close();
 }
 
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
 async function login() {
-  console.log('[2/3] Logging into CMS...');
-  const res = await fetch(`${CMS}/api/users/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: SVC_EMAIL, password: SVC_PASSWORD }),
-  });
-  if (!res.ok) throw new Error(`Login failed: ${await res.text()}`);
-  const { token } = await res.json();
-  console.log('  Login OK.');
-  return token;
+  console.log('[2/3] Logging into CMS (with retries)...');
+  for (let attempt = 1; attempt <= 10; attempt++) {
+    try {
+      const res = await fetch(`${CMS}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: SVC_EMAIL, password: SVC_PASSWORD }),
+      });
+      if (res.ok) {
+        const { token } = await res.json();
+        console.log(`  Login OK (attempt ${attempt}).`);
+        return token;
+      }
+      console.log(`  Attempt ${attempt}/10 failed: ${res.status}`);
+    } catch (e) {
+      console.log(`  Attempt ${attempt}/10 error: ${e.message}`);
+    }
+    await sleep(3000);
+  }
+  throw new Error('Login failed after 10 attempts');
 }
 
 const systems = [

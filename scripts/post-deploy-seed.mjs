@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 /**
- * Post-deploy one-shot: seed Systems collection + reset svc password.
- * Uses mongosh CLI (available on VPS) — zero npm dependency issues.
+ * Post-deploy one-shot: seed Systems collection.
+ * Writes a temp .js file and runs it via mongosh (file-based, no escaping issues).
+ * Falls back to Node.js + mongodb driver if mongosh is unavailable.
  */
-import { existsSync, writeFileSync } from 'fs';
+import { existsSync, writeFileSync, unlinkSync } from 'fs';
 import { execSync } from 'child_process';
 
-const FLAG = '/tmp/.dmokb-systems-seeded-v4';
+const FLAG = '/tmp/.dmokb-systems-seeded-v5';
 if (existsSync(FLAG)) {
-  console.log('[post-deploy-seed] Already done, skipping.');
+  console.log('[post-deploy-seed] Already seeded, skipping.');
   process.exit(0);
 }
 
@@ -33,37 +34,67 @@ const systems = [
   { title: 'Digimon Breakthrough', slug: 'digimon-breakthrough', summary: 'Breakthrough system for Digimon stat upgrades.' },
 ];
 
-// Build a mongosh script as a string
 const now = new Date().toISOString();
-let mongoshScript = `use("dmo-kb");\nlet c=0,s=0;\n`;
-for (const sys of systems) {
-  const t = sys.title.replace(/'/g, "\\'");
-  const sl = sys.slug;
-  const su = sys.summary.replace(/'/g, "\\'");
-  mongoshScript += `if(db.systems.countDocuments({slug:'${sl}'})==0){db.systems.insertOne({title:'${t}',slug:'${sl}',summary:'${su}',published:true,tags:[{tag:'System'}],layout:[],createdAt:'${now}',updatedAt:'${now}'});c++;print('  + ${t}')}else{s++}\n`;
-}
-mongoshScript += `print('Done: '+c+' created, '+s+' skipped');\n`;
+const TMPFILE = '/tmp/_seed_systems.js';
 
-console.log('[post-deploy-seed] Seeding 18 systems via mongosh...');
-try {
-  execSync(`mongosh --quiet --eval "${mongoshScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`, {
-    stdio: 'inherit',
-    timeout: 30000,
-  });
-  writeFileSync(FLAG, now);
-  console.log('[post-deploy-seed] Complete.');
-} catch (e) {
-  // Fallback: try with mongo (older systems)
-  console.log('mongosh failed, trying mongo...');
-  try {
-    execSync(`mongo dmo-kb --quiet --eval "${mongoshScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`, {
-      stdio: 'inherit',
-      timeout: 30000,
-    });
-    writeFileSync(FLAG, now);
-    console.log('[post-deploy-seed] Complete (via mongo).');
-  } catch (e2) {
-    console.error('[post-deploy-seed] Both mongosh and mongo failed:', e2.message);
-    process.exit(1);
+// ── Approach 1: mongosh with a file ────────────────────────────────────
+function tryMongosh() {
+  let script = 'db = db.getSiblingDB("dmo-kb");\nvar c=0, s=0;\n';
+  for (const sys of systems) {
+    script += `if (db.systems.countDocuments({slug:"${sys.slug}"}) === 0) { db.systems.insertOne({title:"${sys.title}",slug:"${sys.slug}",summary:"${sys.summary}",published:true,tags:[{tag:"System"}],layout:[],createdAt:"${now}",updatedAt:"${now}"}); c++; print("  + ${sys.title}"); } else { s++; }\n`;
   }
+  script += 'print("Done: " + c + " created, " + s + " skipped");\n';
+  writeFileSync(TMPFILE, script);
+  try {
+    execSync(`mongosh --quiet --file ${TMPFILE}`, { stdio: 'inherit', timeout: 30000 });
+    return true;
+  } catch {
+    try {
+      execSync(`mongo --quiet ${TMPFILE}`, { stdio: 'inherit', timeout: 30000 });
+      return true;
+    } catch { return false; }
+  } finally {
+    try { unlinkSync(TMPFILE); } catch {}
+  }
+}
+
+// ── Approach 2: Node.js + mongodb driver ───────────────────────────────
+async function tryNodeDriver() {
+  const { MongoClient } = await import('mongodb');
+  const client = new MongoClient('mongodb://localhost:27017/dmo-kb');
+  await client.connect();
+  const col = client.db().collection('systems');
+  let c = 0, s = 0;
+  for (const sys of systems) {
+    if (await col.countDocuments({ slug: sys.slug }) > 0) { s++; continue; }
+    await col.insertOne({
+      title: sys.title, slug: sys.slug, summary: sys.summary,
+      published: true, tags: [{ tag: 'System' }], layout: [],
+      createdAt: now, updatedAt: now,
+    });
+    c++;
+    console.log(`  + ${sys.title}`);
+  }
+  console.log(`Done: ${c} created, ${s} skipped`);
+  await client.close();
+}
+
+// ── Run ────────────────────────────────────────────────────────────────
+console.log('[post-deploy-seed] Seeding 18 systems...');
+let ok = tryMongosh();
+if (!ok) {
+  console.log('[post-deploy-seed] mongosh unavailable, trying Node.js mongodb driver...');
+  try {
+    await tryNodeDriver();
+    ok = true;
+  } catch (e) {
+    console.error('[post-deploy-seed] Node driver failed:', e.message);
+  }
+}
+if (ok) {
+  writeFileSync(FLAG, now);
+  console.log('[post-deploy-seed] Complete!');
+} else {
+  console.error('[post-deploy-seed] All approaches failed.');
+  process.exit(1);
 }

@@ -7,7 +7,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       CMS_ADMIN_EMAIL: 'svc@dmokb.info',
-      CMS_ADMIN_PASSWORD: 'DmokbService2026SecurePass',
+      CMS_ADMIN_PASSWORD: 'DmokbSvc2026!Seed',
       CMS_INTERNAL_URL: 'http://localhost:3001',
     },
   }],

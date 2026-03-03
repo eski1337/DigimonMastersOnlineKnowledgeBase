@@ -21,5 +21,12 @@ echo '>>> Restarting PM2...'
 cd /home/deploy/app
 pm2 restart all 2>&1
 
+echo '>>> Waiting for CMS to start...'
+sleep 8
+
+echo '>>> Running post-deploy seed (one-shot)...'
+cd /home/deploy/app
+node scripts/post-deploy-seed.mjs 2>&1 || echo '(seed script failed, non-fatal)'
+
 echo '>>> Deploy complete!'
 pm2 status

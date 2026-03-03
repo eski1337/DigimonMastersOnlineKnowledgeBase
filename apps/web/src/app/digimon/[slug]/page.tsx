@@ -135,7 +135,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
   };
 
   return (
-    <div className="container py-8 max-w-7xl">
+    <div className="container py-8 max-w-[1600px]">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/digimon" className="hover:text-foreground transition-colors">Digimon</Link>
@@ -143,12 +143,12 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
         <span className="text-foreground font-medium">{d.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
         {/* Main Content */}
         <div className="space-y-8">
           {/* Title and Button */}
-          <div className="flex items-start justify-between mb-4">
-            <h1 className={`text-5xl font-bold bg-gradient-to-r ${getRankColor(d.rank)} bg-clip-text text-transparent`}>
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <h1 className={`text-5xl font-bold bg-gradient-to-r ${getRankColor(d.rank)} bg-clip-text text-transparent min-w-0 break-words`}>
               {d.name}
             </h1>
             <div className="flex items-center gap-2">
@@ -308,7 +308,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
             <Card className="overflow-hidden bg-card">
               {/* Title Bar */}
               <div className="bg-gradient-to-r from-orange-600 to-orange-500 px-4 py-3">
-                <h2 className="text-xl font-bold text-white">{d.name}</h2>
+                <h2 className="text-xl font-bold text-white break-words">{d.name}</h2>
                 {/* Localized Names - Collapsible */}
                 {d.names && <LocalizedNames names={d.names} />}
               </div>
@@ -327,11 +327,11 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
               {/* Info List - 2 Column Grid for better spacing */}
               <div className="p-5 text-sm">
                 {/* Grid Layout */}
-                <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+                <div className="grid grid-cols-2 gap-x-3 gap-y-4">
                   
                   {/* ROW 1: Rank, Form, Attribute, Element */}
                   {/* Rank */}
-                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[100px]">
+                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[80px]">
                     <span className="text-orange-400 font-semibold text-xs mb-2">Rank:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.rank ? (
@@ -353,7 +353,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   </div>
 
                   {/* Form */}
-                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[100px]">
+                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[80px] overflow-hidden">
                     <span className="font-semibold text-orange-400 text-xs mb-2">Form:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.form ? (
@@ -367,7 +367,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   </div>
 
                   {/* Attribute */}
-                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[100px]">
+                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[80px]">
                     <span className="text-orange-400 font-semibold text-xs mb-2">Attribute:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.attribute ? (
@@ -389,7 +389,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   </div>
 
                   {/* Element */}
-                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[100px]">
+                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[80px]">
                     <span className="text-orange-400 font-semibold text-xs mb-2">Element:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.element ? (
@@ -412,16 +412,16 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
 
                   {/* ROW 2: Type, Attacker Type, Family */}
                   {/* Type */}
-                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[100px]">
+                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[80px] overflow-hidden">
                     <span className="font-semibold text-orange-400 text-xs mb-2">Type:</span>
-                    <div className="flex items-center justify-center flex-1">
-                      <span className="font-semibold text-foreground text-xs text-center">{d.type || '-'}</span>
+                    <div className="flex items-center justify-center flex-1 w-full">
+                      <span className="font-semibold text-foreground text-xs text-center break-words w-full">{d.type || '-'}</span>
                     </div>
                   </div>
 
                   {/* Attacker Type */}
-                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[100px]">
-                    <span className="text-orange-400 font-semibold text-xs mb-2 whitespace-nowrap">Attacker Type:</span>
+                  <div className="flex flex-col items-center justify-center py-2 border-b border-muted/20 min-h-[80px]">
+                    <span className="text-orange-400 font-semibold text-xs mb-2">Attacker Type:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.attackerType ? (
                         <Link href={`/digimon?attackerType=${encodeURIComponent(d.attackerType)}`} title={`View all ${d.attackerType} Digimon`}>
@@ -442,7 +442,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   </div>
 
                   {/* Family - Span 2 cols */}
-                  <div className="flex flex-col items-center justify-center py-3 border-b border-muted/20 col-span-2 min-h-[110px]">
+                  <div className="flex flex-col items-center justify-center py-3 border-b border-muted/20 col-span-2 min-h-[90px]">
                     <span className="text-orange-400 font-semibold text-xs mb-3">Family:</span>
                     <div className="flex items-center justify-center flex-1 w-full">
                       <div className="flex gap-4 justify-center flex-wrap">
@@ -481,12 +481,12 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   </div>
 
                   {/* Item needed - Span 2 cols */}
-                  <div className="flex flex-col items-center justify-center py-3 border-b border-muted/20 col-span-2 min-h-[80px]">
+                  <div className="flex flex-col items-center justify-center py-3 border-b border-muted/20 col-span-2 min-h-[80px] overflow-hidden">
                     <span className="font-semibold text-orange-400 text-xs mb-2">Item needed:</span>
-                    <div className="flex items-center gap-2 flex-wrap justify-center">
+                    <div className="flex items-center gap-2 flex-wrap justify-center w-full">
                       {(d.unlockItems?.length > 0 || d.unlockedWithItem || d.unlockRequirements?.unlockedWithItem) ? (
                         (d.unlockItems || [d.unlockedWithItem || d.unlockRequirements?.unlockedWithItem]).filter(Boolean).map((item: string, idx: number) => (
-                          <span key={idx} className="font-semibold text-sm text-foreground">{item}</span>
+                          <span key={idx} className="font-semibold text-sm text-foreground text-center break-words">{item}</span>
                         ))
                       ) : (
                         <span className="font-semibold text-sm text-foreground">-</span>
@@ -497,13 +497,13 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
 
                   {/* ROW 4: Digivolved from, Digivolves to */}
                   {/* Digivolved from - Span 2 cols */}
-                  <div className="flex flex-col py-1.5 border-b border-muted/20 col-span-2">
+                  <div className="flex flex-col py-1.5 border-b border-muted/20 col-span-2 min-w-0">
                     <span className="font-semibold text-orange-400 text-xs mb-1">Digivolved from:</span>
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex flex-col gap-0.5 min-w-0">
                       {d.digivolutions?.digivolvesFrom && d.digivolutions.digivolvesFrom.length > 0 ? (
                         d.digivolutions.digivolvesFrom.slice(0, 2).map((prev: any, idx: number) => (
-                          <Link key={idx} href={`/digimon/${prev.slug || prev.name?.toLowerCase().replace(/\s+/g, '-')}`}>
-                            <span className="font-semibold text-xs text-foreground hover:text-orange-300">{prev.name}</span>
+                          <Link key={idx} href={`/digimon/${prev.slug || prev.name?.toLowerCase().replace(/\s+/g, '-')}`} className="min-w-0">
+                            <span className="font-semibold text-xs text-foreground hover:text-orange-300 break-words block">{prev.name}</span>
                           </Link>
                         ))
                       ) : (
@@ -513,13 +513,13 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   </div>
 
                   {/* Digivolves to - Span 2 cols */}
-                  <div className="flex flex-col py-1.5 border-b border-muted/20 col-span-2">
+                  <div className="flex flex-col py-1.5 border-b border-muted/20 col-span-2 min-w-0">
                     <span className="font-semibold text-orange-400 text-xs mb-1">Digivolves to:</span>
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex flex-col gap-0.5 min-w-0">
                       {d.digivolutions?.digivolvesTo && d.digivolutions.digivolvesTo.length > 0 ? (
                         d.digivolutions.digivolvesTo.slice(0, 2).map((next: any, idx: number) => (
-                          <Link key={idx} href={`/digimon/${next.slug || next.name?.toLowerCase().replace(/\s+/g, '-')}`}>
-                            <span className="font-semibold text-xs text-foreground hover:text-orange-300">{next.name}</span>
+                          <Link key={idx} href={`/digimon/${next.slug || next.name?.toLowerCase().replace(/\s+/g, '-')}`} className="min-w-0">
+                            <span className="font-semibold text-xs text-foreground hover:text-orange-300 break-words block">{next.name}</span>
                           </Link>
                         ))
                       ) : (
@@ -528,8 +528,8 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     </div>
                   </div>
 
-                  {/* Availability Section - Span 4 cols */}
-                  <div className="col-span-4 mt-2 space-y-1.5">
+                  {/* Availability Section - Span 2 cols */}
+                  <div className="col-span-2 mt-2 space-y-1.5">
                     {/* Can be ridden */}
                     <div className={`flex items-center justify-between py-2 px-2 rounded ${(d.canBeRidden || d.rideability?.canBeRidden) ? 'bg-lime-400/90' : 'bg-muted/10'}`}>
                       <span className={`font-semibold text-xs ${(d.canBeRidden || d.rideability?.canBeRidden) ? 'text-black' : 'text-orange-400'}`}>Can be ridden:</span>

@@ -3,8 +3,8 @@
 .wrapper {
   position: relative;
   width: 100%;
-  height: min(480px, 65vh);
-  min-height: 340px;
+  height: min(600px, 70vh);
+  min-height: 400px;
   overflow: hidden;
   border-radius: 0.75rem;
   border: 2px solid rgba(249, 115, 22, 0.25);

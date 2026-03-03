@@ -220,6 +220,23 @@ const Users: CollectionConfig = {
       },
     },
     {
+      name: 'preferredLanguage',
+      label: { en: 'Preferred Language', zhTw: '偏好語言' },
+      type: 'select',
+      defaultValue: 'en',
+      options: [
+        { label: { en: 'English', zhTw: '英文' }, value: 'en' },
+        { label: { en: 'Traditional Chinese', zhTw: '繁體中文' }, value: 'zhTw' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: {
+          en: 'Language preference (applies across all devices)',
+          zhTw: '語言偏好設定（適用於所有裝置）',
+        },
+      },
+    },
+    {
       name: 'avatar',
       label: { en: 'Avatar', zhTw: '頭像' },
       type: 'upload',

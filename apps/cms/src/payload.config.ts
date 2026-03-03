@@ -67,6 +67,7 @@ import RegionEditorNavLink from './views/RegionEditor/NavLink';
 import Dashboard from './views/Dashboard/index';
 import CustomLogin from './components/CustomLogin';
 import PageJumpProvider from './components/PageJumpProvider';
+import LanguageSyncProvider from './components/LanguageSyncProvider';
 import resendVerification from './endpoints/resendVerification';
 import updateDigimonSkills from './endpoints/update-digimon-skills';
 import { getLogsEndpoint, clearLogsEndpoint } from './endpoints/logs';
@@ -98,7 +99,7 @@ export default buildConfig({
     components: {
       beforeLogin: [CustomLogin],
       beforeDashboard: [Dashboard],
-      providers: [PageJumpProvider],
+      providers: [PageJumpProvider, LanguageSyncProvider],
       views: {
         kanban: {
           Component: KanbanView,
@@ -130,7 +131,13 @@ export default buildConfig({
   },
   i18n: {
     supportedLngs: ['en', 'zhTw'],
-    fallbackLng: 'en',
+    fallbackLng: {
+      'zh-HK': ['zhTw', 'en'],
+      'zh-TW': ['zhTw', 'en'],
+      'zh-CN': ['zhTw', 'en'],
+      zh: ['zhTw', 'en'],
+      default: ['en'],
+    },
   },
   editor: slateEditor({}),
   collections: [

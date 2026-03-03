@@ -481,7 +481,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                   </div>
 
                   {/* Item needed - Span 2 cols */}
-                  <div className="flex flex-col items-center justify-center py-3 border-b border-muted/20 col-span-2 min-h-[80px] overflow-hidden">
+                  <div className="flex flex-col items-center justify-center py-3 col-span-2 min-h-[60px] overflow-hidden">
                     <span className="font-semibold text-orange-400 text-xs mb-2">Item needed:</span>
                     <div className="flex items-center gap-2 flex-wrap justify-center w-full">
                       {(d.unlockItems?.length > 0 || d.unlockedWithItem || d.unlockRequirements?.unlockedWithItem) ? (
@@ -490,40 +490,6 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                         ))
                       ) : (
                         <span className="font-semibold text-sm text-foreground">-</span>
-                      )}
-                    </div>
-                  </div>
-
-
-                  {/* ROW 4: Digivolved from, Digivolves to */}
-                  {/* Digivolved from - Span 2 cols */}
-                  <div className="flex flex-col py-1.5 border-b border-muted/20 col-span-2 min-w-0">
-                    <span className="font-semibold text-orange-400 text-xs mb-1">Digivolved from:</span>
-                    <div className="flex flex-col gap-0.5 min-w-0">
-                      {d.digivolutions?.digivolvesFrom && d.digivolutions.digivolvesFrom.length > 0 ? (
-                        d.digivolutions.digivolvesFrom.slice(0, 2).map((prev: any, idx: number) => (
-                          <Link key={idx} href={`/digimon/${prev.slug || prev.name?.toLowerCase().replace(/\s+/g, '-')}`} className="min-w-0">
-                            <span className="font-semibold text-xs text-foreground hover:text-orange-300 break-words block">{prev.name}</span>
-                          </Link>
-                        ))
-                      ) : (
-                        <span className="font-semibold text-xs text-foreground">-</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Digivolves to - Span 2 cols */}
-                  <div className="flex flex-col py-1.5 border-b border-muted/20 col-span-2 min-w-0">
-                    <span className="font-semibold text-orange-400 text-xs mb-1">Digivolves to:</span>
-                    <div className="flex flex-col gap-0.5 min-w-0">
-                      {d.digivolutions?.digivolvesTo && d.digivolutions.digivolvesTo.length > 0 ? (
-                        d.digivolutions.digivolvesTo.slice(0, 2).map((next: any, idx: number) => (
-                          <Link key={idx} href={`/digimon/${next.slug || next.name?.toLowerCase().replace(/\s+/g, '-')}`} className="min-w-0">
-                            <span className="font-semibold text-xs text-foreground hover:text-orange-300 break-words block">{next.name}</span>
-                          </Link>
-                        ))
-                      ) : (
-                        <span className="font-semibold text-xs text-foreground">-</span>
                       )}
                     </div>
                   </div>

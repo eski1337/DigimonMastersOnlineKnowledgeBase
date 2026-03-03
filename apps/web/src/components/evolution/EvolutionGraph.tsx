@@ -122,21 +122,9 @@ export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
             href={`${CMS_EDITOR_URL}?line=${data.lineId}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              marginLeft: 12,
-              padding: '4px 12px',
-              borderRadius: 6,
-              border: '1px solid rgba(249, 115, 22, 0.4)',
-              background: 'rgba(249, 115, 22, 0.1)',
-              color: '#f97316',
-              fontSize: 13,
-              fontWeight: 500,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/30 hover:bg-orange-500/25 transition-colors"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
             Edit
           </a>
         )}

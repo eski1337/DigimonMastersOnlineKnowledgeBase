@@ -26,9 +26,11 @@ echo '>>> Seeding systems collection via mongosh...'
 cd /home/deploy/app
 mongosh mongodb://localhost:27017/dmo-kb scripts/seed-systems.js 2>&1 || echo '(seed skipped or failed, non-fatal)'
 
-echo '>>> Restarting PM2...'
+echo '>>> Restarting PM2 (with ecosystem config reload)...'
 cd /home/deploy/app
-pm2 restart all 2>&1
+pm2 delete all 2>&1 || true
+pm2 start ecosystem.config.js 2>&1
+pm2 save 2>&1
 
 echo '>>> Deploy complete!'
 pm2 status

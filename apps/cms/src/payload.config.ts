@@ -14,6 +14,7 @@ import Items from './collections/Items';
 import Maps from './collections/Maps';
 import Quests from './collections/Quests';
 import Guides from './collections/Guides';
+import Systems from './collections/Systems';
 import Tools from './collections/Tools';
 import PatchNotes from './collections/PatchNotes';
 import Events from './collections/Events';
@@ -40,6 +41,7 @@ const i18nLabels: Record<string, { singular: Record<string, string>; plural: Rec
   maps:            { singular: { en: 'Map',               zhTw: '地圖' },             plural: { en: 'Maps',              zhTw: '地圖' } },
   quests:          { singular: { en: 'Quest',             zhTw: '任務' },             plural: { en: 'Quests',            zhTw: '任務' } },
   guides:          { singular: { en: 'Guide',             zhTw: '攻略' },             plural: { en: 'Guides',            zhTw: '攻略' } },
+  systems:         { singular: { en: 'System',            zhTw: '系統' },             plural: { en: 'Systems',           zhTw: '系統' } },
   tools:           { singular: { en: 'Tool',              zhTw: '工具' },             plural: { en: 'Tools',             zhTw: '工具' } },
   patchNotes:      { singular: { en: 'Patch Note',        zhTw: '更新公告' },         plural: { en: 'Patch Notes',       zhTw: '更新公告' } },
   events:          { singular: { en: 'Event',             zhTw: '活動' },             plural: { en: 'Events',            zhTw: '活動' } },
@@ -141,6 +143,7 @@ export default buildConfig({
     withAuditHooks(withI18nLabels(Maps)),
     withAuditHooks(withI18nLabels(Quests)),
     withAuditHooks(withI18nLabels(Guides)),
+    withAuditHooks(withI18nLabels(Systems)),
     withAuditHooks(withI18nLabels(Tools)),
     withAuditHooks(withI18nLabels(PatchNotes)),
     withAuditHooks(withI18nLabels(Events)),

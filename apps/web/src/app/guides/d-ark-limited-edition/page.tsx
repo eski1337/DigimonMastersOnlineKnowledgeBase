@@ -527,14 +527,6 @@ export default function DArkLimitedEditionPage() {
           </div>
         </Section>
       </div>
-
-      {/* Source */}
-      <div className="mt-12 pt-6 border-t border-border/50 text-xs text-muted-foreground/50">
-        Source:{' '}
-        <a href="https://dmowiki.com/Guide:_D-Ark_Limited_Edition" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-          dmowiki.com/Guide:_D-Ark_Limited_Edition
-        </a>
-      </div>
     </div>
   );
 }

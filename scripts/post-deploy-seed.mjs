@@ -1,66 +1,18 @@
 #!/usr/bin/env node
 /**
- * Post-deploy one-shot: reset svc password + seed Systems collection.
+ * Post-deploy one-shot: seed Systems collection + reset svc password.
+ * Writes directly to MongoDB — no CMS API login needed.
  * Runs on VPS where MongoDB is at localhost:27017.
- * Self-marks as done via a flag file so it only runs once.
  */
-import { createHash } from 'crypto';
 import { existsSync, writeFileSync } from 'fs';
 
-const FLAG = '/tmp/.dmokb-systems-seeded-v2';
+const FLAG = '/tmp/.dmokb-systems-seeded-v3';
 if (existsSync(FLAG)) {
   console.log('[post-deploy-seed] Already done, skipping.');
   process.exit(0);
 }
 
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/dmo-kb';
-const CMS = process.env.CMS_INTERNAL_URL || 'http://localhost:3001';
-const SVC_EMAIL = 'svc@dmokb.info';
-const SVC_PASSWORD = 'DmokbSvc2026!Seed';
-
-async function resetPassword() {
-  console.log('[1/3] Resetting svc password via MongoDB...');
-  // Dynamic import so it only fails on VPS if mongodb isn't installed
-  const { MongoClient } = await import('mongodb');
-  const bcrypt = await import('bcryptjs');
-  
-  const client = new MongoClient(MONGO_URI);
-  await client.connect();
-  const db = client.db();
-  
-  const hash = await bcrypt.default.hash(SVC_PASSWORD, 10);
-  const result = await db.collection('users').updateOne(
-    { email: SVC_EMAIL },
-    { $set: { hash, _verified: true } }
-  );
-  console.log(`  Updated ${result.modifiedCount} user(s).`);
-  await client.close();
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-async function login() {
-  console.log('[2/3] Logging into CMS (with retries)...');
-  for (let attempt = 1; attempt <= 10; attempt++) {
-    try {
-      const res = await fetch(`${CMS}/api/users/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: SVC_EMAIL, password: SVC_PASSWORD }),
-      });
-      if (res.ok) {
-        const { token } = await res.json();
-        console.log(`  Login OK (attempt ${attempt}).`);
-        return token;
-      }
-      console.log(`  Attempt ${attempt}/10 failed: ${res.status}`);
-    } catch (e) {
-      console.log(`  Attempt ${attempt}/10 error: ${e.message}`);
-    }
-    await sleep(3000);
-  }
-  throw new Error('Login failed after 10 attempts');
-}
 
 const systems = [
   { title: 'Chat Commands', slug: 'chat-commands', summary: 'Overview of all available chat commands in DMO.' },
@@ -83,38 +35,47 @@ const systems = [
   { title: 'Digimon Breakthrough', slug: 'digimon-breakthrough', summary: 'Breakthrough system for Digimon stat upgrades.' },
 ];
 
-async function seed(token) {
-  console.log('[3/3] Seeding 18 system entries...');
-  for (const sys of systems) {
-    const checkRes = await fetch(`${CMS}/api/systems?where[slug][equals]=${sys.slug}&limit=1`, {
-      headers: { Authorization: `JWT ${token}` },
-    });
-    const checkData = await checkRes.json();
-    if (checkData.docs && checkData.docs.length > 0) {
-      console.log(`  ✓ "${sys.title}" exists, skip.`);
-      continue;
-    }
-    const res = await fetch(`${CMS}/api/systems`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
-      body: JSON.stringify({ title: sys.title, slug: sys.slug, summary: sys.summary, published: true, tags: [{ tag: 'System' }] }),
-    });
-    if (res.ok) console.log(`  ✓ Created "${sys.title}"`);
-    else console.error(`  ✗ "${sys.title}": ${await res.text()}`);
-  }
-}
-
 async function run() {
-  try {
-    await resetPassword();
-    const token = await login();
-    await seed(token);
-    writeFileSync(FLAG, new Date().toISOString());
-    console.log('\nAll done! Flag written to', FLAG);
-  } catch (e) {
-    console.error('Error:', e.message);
-    process.exit(1);
+  const { MongoClient } = await import('mongodb');
+  const client = new MongoClient(MONGO_URI);
+  await client.connect();
+  const db = client.db();
+  const col = db.collection('systems');
+
+  // 1. Reset svc password
+  console.log('[1/2] Resetting svc@dmokb.info password...');
+  const bcrypt = await import('bcryptjs');
+  const hash = await bcrypt.default.hash('DmokbSvc2026!Seed', 10);
+  const pwResult = await db.collection('users').updateOne(
+    { email: 'svc@dmokb.info' },
+    { $set: { hash, _verified: true } }
+  );
+  console.log(`  Updated ${pwResult.modifiedCount} user(s).`);
+
+  // 2. Seed systems directly into MongoDB
+  console.log('[2/2] Seeding systems into MongoDB...');
+  let created = 0, skipped = 0;
+  const now = new Date().toISOString();
+  for (const sys of systems) {
+    const exists = await col.findOne({ slug: sys.slug });
+    if (exists) { skipped++; continue; }
+    await col.insertOne({
+      title: sys.title,
+      slug: sys.slug,
+      summary: sys.summary,
+      published: true,
+      tags: [{ tag: 'System' }],
+      layout: [],
+      createdAt: now,
+      updatedAt: now,
+    });
+    created++;
+    console.log(`  ✓ ${sys.title}`);
   }
+  console.log(`\nDone: ${created} created, ${skipped} already existed.`);
+
+  await client.close();
+  writeFileSync(FLAG, now);
 }
 
-run();
+run().catch(e => { console.error('Error:', e.message); process.exit(1); });

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Package, ShoppingCart, Swords, BookOpen, Link2, Clock, TrendingUp, Shield, Sparkles } from 'lucide-react';
+import { Package, ShoppingCart, Swords, BookOpen, Link2, Clock, TrendingUp, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';

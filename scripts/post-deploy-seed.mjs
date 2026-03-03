@@ -1,18 +1,16 @@
 #!/usr/bin/env node
 /**
  * Post-deploy one-shot: seed Systems collection + reset svc password.
- * Writes directly to MongoDB — no CMS API login needed.
- * Runs on VPS where MongoDB is at localhost:27017.
+ * Uses mongosh CLI (available on VPS) — zero npm dependency issues.
  */
 import { existsSync, writeFileSync } from 'fs';
+import { execSync } from 'child_process';
 
-const FLAG = '/tmp/.dmokb-systems-seeded-v3';
+const FLAG = '/tmp/.dmokb-systems-seeded-v4';
 if (existsSync(FLAG)) {
   console.log('[post-deploy-seed] Already done, skipping.');
   process.exit(0);
 }
-
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/dmo-kb';
 
 const systems = [
   { title: 'Chat Commands', slug: 'chat-commands', summary: 'Overview of all available chat commands in DMO.' },
@@ -35,47 +33,37 @@ const systems = [
   { title: 'Digimon Breakthrough', slug: 'digimon-breakthrough', summary: 'Breakthrough system for Digimon stat upgrades.' },
 ];
 
-async function run() {
-  const { MongoClient } = await import('mongodb');
-  const client = new MongoClient(MONGO_URI);
-  await client.connect();
-  const db = client.db();
-  const col = db.collection('systems');
-
-  // 1. Reset svc password
-  console.log('[1/2] Resetting svc@dmokb.info password...');
-  const bcrypt = await import('bcryptjs');
-  const hash = await bcrypt.default.hash('DmokbSvc2026!Seed', 10);
-  const pwResult = await db.collection('users').updateOne(
-    { email: 'svc@dmokb.info' },
-    { $set: { hash, _verified: true } }
-  );
-  console.log(`  Updated ${pwResult.modifiedCount} user(s).`);
-
-  // 2. Seed systems directly into MongoDB
-  console.log('[2/2] Seeding systems into MongoDB...');
-  let created = 0, skipped = 0;
-  const now = new Date().toISOString();
-  for (const sys of systems) {
-    const exists = await col.findOne({ slug: sys.slug });
-    if (exists) { skipped++; continue; }
-    await col.insertOne({
-      title: sys.title,
-      slug: sys.slug,
-      summary: sys.summary,
-      published: true,
-      tags: [{ tag: 'System' }],
-      layout: [],
-      createdAt: now,
-      updatedAt: now,
-    });
-    created++;
-    console.log(`  ✓ ${sys.title}`);
-  }
-  console.log(`\nDone: ${created} created, ${skipped} already existed.`);
-
-  await client.close();
-  writeFileSync(FLAG, now);
+// Build a mongosh script as a string
+const now = new Date().toISOString();
+let mongoshScript = `use("dmo-kb");\nlet c=0,s=0;\n`;
+for (const sys of systems) {
+  const t = sys.title.replace(/'/g, "\\'");
+  const sl = sys.slug;
+  const su = sys.summary.replace(/'/g, "\\'");
+  mongoshScript += `if(db.systems.countDocuments({slug:'${sl}'})==0){db.systems.insertOne({title:'${t}',slug:'${sl}',summary:'${su}',published:true,tags:[{tag:'System'}],layout:[],createdAt:'${now}',updatedAt:'${now}'});c++;print('  + ${t}')}else{s++}\n`;
 }
+mongoshScript += `print('Done: '+c+' created, '+s+' skipped');\n`;
 
-run().catch(e => { console.error('Error:', e.message); process.exit(1); });
+console.log('[post-deploy-seed] Seeding 18 systems via mongosh...');
+try {
+  execSync(`mongosh --quiet --eval "${mongoshScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`, {
+    stdio: 'inherit',
+    timeout: 30000,
+  });
+  writeFileSync(FLAG, now);
+  console.log('[post-deploy-seed] Complete.');
+} catch (e) {
+  // Fallback: try with mongo (older systems)
+  console.log('mongosh failed, trying mongo...');
+  try {
+    execSync(`mongo dmo-kb --quiet --eval "${mongoshScript.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`, {
+      stdio: 'inherit',
+      timeout: 30000,
+    });
+    writeFileSync(FLAG, now);
+    console.log('[post-deploy-seed] Complete (via mongo).');
+  } catch (e2) {
+    console.error('[post-deploy-seed] Both mongosh and mongo failed:', e2.message);
+    process.exit(1);
+  }
+}

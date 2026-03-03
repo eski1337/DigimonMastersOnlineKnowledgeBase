@@ -302,9 +302,9 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
       )}
         </div>
 
-        {/* Sticky Infobox Sidebar */}
+        {/* Infobox Sidebar */}
         <div>
-          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+          <div>
             <Card className="overflow-hidden bg-card">
               {/* Title Bar */}
               <div className="bg-gradient-to-r from-orange-600 to-orange-500 px-4 py-3">

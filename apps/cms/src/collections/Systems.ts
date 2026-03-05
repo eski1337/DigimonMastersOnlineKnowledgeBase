@@ -120,6 +120,27 @@ const Systems: CollectionConfig = {
           ],
         },
 
+        /* ── Standalone Image / Screenshot ────────────────────── */
+        {
+          slug: 'image',
+          labels: { singular: 'Image', plural: 'Images' },
+          fields: [
+            { name: 'image', type: 'upload', relationTo: 'media' },
+            { name: 'imageUrl', type: 'text', admin: { description: 'External / static image URL (if not using media upload)' } },
+            { name: 'caption', type: 'text' },
+            {
+              name: 'size',
+              type: 'select',
+              defaultValue: 'large',
+              options: [
+                { label: 'Small (inline)', value: 'small' },
+                { label: 'Medium (50%)', value: 'medium' },
+                { label: 'Large (full width)', value: 'large' },
+              ],
+            },
+          ],
+        },
+
         /* ── Image Grid ────────────────────────────────────────── */
         {
           slug: 'imageGrid',

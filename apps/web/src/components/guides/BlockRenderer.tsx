@@ -282,6 +282,29 @@ function ImageGridBlock({ block }: { block: any }) {
   );
 }
 
+function ImageBlock({ block }: { block: any }) {
+  const src = block.image?.url || block.imageUrl;
+  if (!src) return null;
+
+  const sizeClasses: Record<string, string> = {
+    small: 'max-w-xs',
+    medium: 'max-w-lg',
+    large: 'max-w-full',
+  };
+  const sizeClass = sizeClasses[block.size] || sizeClasses.large;
+
+  return (
+    <figure className={`my-6 ${sizeClass} mx-auto`}>
+      <div className="rounded-lg overflow-hidden border border-border/50 bg-secondary/20">
+        <img src={src} alt={block.caption || ''} className="w-full h-auto object-contain" />
+      </div>
+      {block.caption && (
+        <figcaption className="text-center text-sm text-muted-foreground mt-2 italic">{block.caption}</figcaption>
+      )}
+    </figure>
+  );
+}
+
 /* ── Main renderer ──────────────────────────────────────────────── */
 
 export function BlockRenderer({ blocks }: { blocks: any[] }) {
@@ -299,6 +322,8 @@ export function BlockRenderer({ blocks }: { blocks: any[] }) {
             return <TableBlock key={i} block={block} />;
           case 'imageGrid':
             return <ImageGridBlock key={i} block={block} />;
+          case 'image':
+            return <ImageBlock key={i} block={block} />;
           default:
             return null;
         }

@@ -256,122 +256,132 @@ const Users: CollectionConfig = {
     },
     {
       name: 'preferredLanguage',
-      label: { en: 'Preferred Language', zhTw: '偏好語言' },
       type: 'select',
       defaultValue: 'en',
       options: [
-        { label: { en: 'English', zhTw: '英文' }, value: 'en' },
-        { label: { en: 'Traditional Chinese', zhTw: '繁體中文' }, value: 'zhTw' },
+        { label: 'English', value: 'en' },
+        { label: 'Traditional Chinese', value: 'zhTw' },
       ],
-      admin: {
-        position: 'sidebar',
-        description: {
-          en: 'Language preference (applies across all devices)',
-          zhTw: '語言偏好設定（適用於所有裝置）',
-        },
-      },
-    },
-    {
-      name: 'avatar',
-      label: { en: 'Avatar', zhTw: '頭像' },
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'discordId',
-      type: 'text',
-      access: {
-        read: ({ req: { user }, id }) => {
-          if (!user) return false;
-          if (['admin', 'owner'].includes(user.role)) return true;
-          return user.id === id;
-        },
-      },
+      admin: { hidden: true },
     },
 
     /* ═══════════════════════════════════════════════════════════════
-       PROFILE — public-facing user profile fields
+       TABS — organised profile editor
        ═══════════════════════════════════════════════════════════════ */
     {
-      type: 'collapsible',
-      label: { en: 'Profile', zhTw: '個人檔案' },
-      admin: { initCollapsed: true },
-      fields: [
+      type: 'tabs',
+      tabs: [
+        /* ── Tab 1: Account ─────────────────────────────────────── */
         {
-          name: 'banner',
-          label: { en: 'Profile Banner', zhTw: '個人檔案橫幅' },
-          type: 'upload',
-          relationTo: 'media',
-          admin: { description: { en: 'Banner image for your profile page (recommended 1200×400)', zhTw: '個人檔案頁面的橫幅圖片（建議 1200×400）' } },
-        },
-        {
-          name: 'bio',
-          label: { en: 'Bio', zhTw: '自我介紹' },
-          type: 'textarea',
-          maxLength: 500,
-          admin: { description: { en: 'Tell others about yourself (max 500 chars)', zhTw: '介紹一下自己（最多 500 字）' } },
-        },
-        {
-          name: 'location',
-          label: { en: 'Location', zhTw: '所在地' },
-          type: 'text',
-          maxLength: 100,
-          admin: { description: { en: 'Your location (optional)', zhTw: '你的所在地（選填）' } },
-        },
-        {
-          name: 'socialLinks',
-          label: { en: 'Social Links', zhTw: '社群連結' },
-          type: 'group',
-          admin: { description: { en: 'Your social media profiles', zhTw: '你的社群媒體帳號' } },
+          label: { en: 'Account', zhTw: '帳號' },
           fields: [
-            { name: 'discord', type: 'text', admin: { width: '50%', description: 'Discord username' } },
-            { name: 'twitter', type: 'text', admin: { width: '50%', description: 'Twitter/X handle' } },
-            { name: 'youtube', type: 'text', admin: { width: '50%', description: 'YouTube channel URL' } },
-            { name: 'twitch', type: 'text', admin: { width: '50%', description: 'Twitch username' } },
-            { name: 'website', type: 'text', admin: { width: '50%', description: 'Personal website URL' } },
+            {
+              name: 'avatar',
+              label: { en: 'Avatar', zhTw: '頭像' },
+              type: 'upload',
+              relationTo: 'media',
+            },
+            {
+              name: 'discordId',
+              type: 'text',
+              admin: { description: { en: 'Linked Discord account ID', zhTw: '已連結的 Discord 帳號 ID' } },
+              access: {
+                read: ({ req: { user }, id }) => {
+                  if (!user) return false;
+                  if (['admin', 'owner'].includes(user.role)) return true;
+                  return user.id === id;
+                },
+              },
+            },
           ],
         },
+        /* ── Tab 2: Profile ─────────────────────────────────────── */
         {
-          name: 'profileVisibility',
-          label: { en: 'Profile Visibility', zhTw: '個人檔案可見度' },
-          type: 'select',
-          defaultValue: 'public',
-          options: [
-            { label: { en: 'Public', zhTw: '公開' }, value: 'public' },
-            { label: { en: 'Registered Users Only', zhTw: '僅限註冊使用者' }, value: 'registered' },
-            { label: { en: 'Private', zhTw: '私人' }, value: 'private' },
+          label: { en: 'Profile', zhTw: '個人檔案' },
+          fields: [
+            {
+              name: 'banner',
+              label: { en: 'Profile Banner', zhTw: '個人檔案橫幅' },
+              type: 'upload',
+              relationTo: 'media',
+              admin: { description: { en: 'Banner image for your profile page (recommended 1200×400)', zhTw: '個人檔案頁面的橫幅圖片（建議 1200×400）' } },
+            },
+            {
+              name: 'bio',
+              label: { en: 'Bio', zhTw: '自我介紹' },
+              type: 'textarea',
+              maxLength: 500,
+              admin: { description: { en: 'Tell others about yourself (max 500 chars)', zhTw: '介紹一下自己（最多 500 字）' } },
+            },
+            {
+              name: 'location',
+              label: { en: 'Location', zhTw: '所在地' },
+              type: 'text',
+              maxLength: 100,
+              admin: { description: { en: 'Your location (optional)', zhTw: '你的所在地（選填）' } },
+            },
+            {
+              name: 'socialLinks',
+              label: { en: 'Social Links', zhTw: '社群連結' },
+              type: 'group',
+              admin: { description: { en: 'Your social media profiles', zhTw: '你的社群媒體帳號' } },
+              fields: [
+                { name: 'discord', type: 'text', admin: { width: '50%', description: 'Discord username' } },
+                { name: 'twitter', type: 'text', admin: { width: '50%', description: 'Twitter/X handle' } },
+                { name: 'youtube', type: 'text', admin: { width: '50%', description: 'YouTube channel URL' } },
+                { name: 'twitch', type: 'text', admin: { width: '50%', description: 'Twitch username' } },
+                { name: 'website', type: 'text', admin: { width: '50%', description: 'Personal website URL' } },
+              ],
+            },
           ],
-          admin: { description: { en: 'Who can see your profile', zhTw: '誰可以查看你的個人檔案' } },
         },
+        /* ── Tab 3: Privacy ─────────────────────────────────────── */
         {
-          name: 'allowMessages',
-          label: { en: 'Allow Direct Messages', zhTw: '允許私訊' },
-          type: 'select',
-          defaultValue: 'everyone',
-          options: [
-            { label: { en: 'Everyone', zhTw: '所有人' }, value: 'everyone' },
-            { label: { en: 'Registered Users', zhTw: '註冊使用者' }, value: 'registered' },
-            { label: { en: 'Nobody', zhTw: '無人' }, value: 'nobody' },
+          label: { en: 'Privacy', zhTw: '隱私設定' },
+          fields: [
+            {
+              name: 'profileVisibility',
+              label: { en: 'Profile Visibility', zhTw: '個人檔案可見度' },
+              type: 'select',
+              defaultValue: 'public',
+              options: [
+                { label: { en: 'Public', zhTw: '公開' }, value: 'public' },
+                { label: { en: 'Registered Users Only', zhTw: '僅限註冊使用者' }, value: 'registered' },
+                { label: { en: 'Private', zhTw: '私人' }, value: 'private' },
+              ],
+              admin: { description: { en: 'Who can see your profile', zhTw: '誰可以查看你的個人檔案' } },
+            },
+            {
+              name: 'allowMessages',
+              label: { en: 'Allow Direct Messages', zhTw: '允許私訊' },
+              type: 'select',
+              defaultValue: 'everyone',
+              options: [
+                { label: { en: 'Everyone', zhTw: '所有人' }, value: 'everyone' },
+                { label: { en: 'Registered Users', zhTw: '註冊使用者' }, value: 'registered' },
+                { label: { en: 'Nobody', zhTw: '無人' }, value: 'nobody' },
+              ],
+              admin: { description: { en: 'Who can send you direct messages', zhTw: '誰可以傳送私訊給你' } },
+            },
+            {
+              name: 'allowProfileComments',
+              label: { en: 'Allow Profile Comments', zhTw: '允許檔案留言' },
+              type: 'select',
+              defaultValue: 'everyone',
+              options: [
+                { label: { en: 'Everyone', zhTw: '所有人' }, value: 'everyone' },
+                { label: { en: 'Registered Users', zhTw: '註冊使用者' }, value: 'registered' },
+                { label: { en: 'Nobody', zhTw: '無人' }, value: 'nobody' },
+              ],
+              admin: { description: { en: 'Who can comment on your profile wall', zhTw: '誰可以在你的個人檔案留言' } },
+            },
+            {
+              name: 'lastSeen',
+              label: { en: 'Last Seen', zhTw: '最後上線' },
+              type: 'date',
+              admin: { readOnly: true, description: { en: 'Last activity timestamp', zhTw: '最後活動時間戳記' } },
+            },
           ],
-          admin: { description: { en: 'Who can send you direct messages', zhTw: '誰可以傳送私訊給你' } },
-        },
-        {
-          name: 'allowProfileComments',
-          label: { en: 'Allow Profile Comments', zhTw: '允許檔案留言' },
-          type: 'select',
-          defaultValue: 'everyone',
-          options: [
-            { label: { en: 'Everyone', zhTw: '所有人' }, value: 'everyone' },
-            { label: { en: 'Registered Users', zhTw: '註冊使用者' }, value: 'registered' },
-            { label: { en: 'Nobody', zhTw: '無人' }, value: 'nobody' },
-          ],
-          admin: { description: { en: 'Who can comment on your profile wall', zhTw: '誰可以在你的個人檔案留言' } },
-        },
-        {
-          name: 'lastSeen',
-          label: { en: 'Last Seen', zhTw: '最後上線' },
-          type: 'date',
-          admin: { readOnly: true, description: { en: 'Last activity timestamp', zhTw: '最後活動時間戳記' } },
         },
       ],
     },

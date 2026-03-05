@@ -59,12 +59,12 @@
   --ds-radius-2xl: 16px;
   --ds-radius-full: 9999px;
 
-  /* Shadows (dark-optimized) */
-  --ds-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
-  --ds-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.20);
-  --ds-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.20);
-  --ds-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.25);
-  --ds-shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.40);
+  /* Shadows (warm-tinted) */
+  --ds-shadow-xs: 0 1px 2px rgba(20, 15, 10, 0.30);
+  --ds-shadow-sm: 0 2px 4px rgba(20, 15, 10, 0.25);
+  --ds-shadow-md: 0 4px 12px rgba(20, 15, 10, 0.25);
+  --ds-shadow-lg: 0 8px 24px rgba(20, 15, 10, 0.30);
+  --ds-shadow-xl: 0 20px 60px rgba(20, 15, 10, 0.45);
   --ds-shadow-ring: 0 0 0 3px var(--ds-accent-ring);
 
   /* Transitions */
@@ -74,50 +74,51 @@
 }
 
 /* ── 2. Dark Mode (default) ───────────────────────────────────────────────── */
+/* Warm palette matching the live website (hue ≈ 40, saturation 10-14%)       */
 
 :root,
 html[data-theme="dark"] {
-  --ds-bg-app: #09090b;
-  --ds-bg-surface: #0f0f12;
-  --ds-bg-elevated: #17171a;
-  --ds-bg-overlay: #1c1c20;
-  --ds-bg-inset: #0c0c0e;
-  --ds-bg-hover: rgba(255, 255, 255, 0.04);
-  --ds-bg-active: rgba(255, 255, 255, 0.06);
+  --ds-bg-app: #2a2520;
+  --ds-bg-surface: #322d27;
+  --ds-bg-elevated: #3b352e;
+  --ds-bg-overlay: #443e36;
+  --ds-bg-inset: #231f1a;
+  --ds-bg-hover: rgba(245, 230, 210, 0.05);
+  --ds-bg-active: rgba(245, 230, 210, 0.08);
 
-  --ds-border: #232329;
-  --ds-border-subtle: #1a1a1f;
-  --ds-border-strong: #2e2e35;
-  --ds-border-hover: #3f3f46;
+  --ds-border: #4d4640;
+  --ds-border-subtle: #3b352e;
+  --ds-border-strong: #5c5448;
+  --ds-border-hover: #6e6558;
 
-  --ds-text-primary: #fafafa;
-  --ds-text-secondary: #a1a1aa;
-  --ds-text-tertiary: #71717a;
-  --ds-text-quaternary: #52525b;
+  --ds-text-primary: #ede7d9;
+  --ds-text-secondary: #ada598;
+  --ds-text-tertiary: #8a8176;
+  --ds-text-quaternary: #6b6258;
 
-  /* Map to Payload theme vars */
+  /* Map to Payload theme vars — warm elevation scale */
   --theme-bg: var(--ds-bg-app);
   --theme-text: var(--ds-text-primary);
-  --theme-elevation-0: #09090b;
-  --theme-elevation-50: #0f0f12;
-  --theme-elevation-100: #17171a;
-  --theme-elevation-150: #232329;
-  --theme-elevation-200: #2e2e35;
-  --theme-elevation-250: #3f3f46;
-  --theme-elevation-300: #52525b;
-  --theme-elevation-350: #71717a;
-  --theme-elevation-400: #a1a1aa;
-  --theme-elevation-450: #b4b4bc;
-  --theme-elevation-500: #d4d4d8;
-  --theme-elevation-550: #e4e4e7;
-  --theme-elevation-600: #f4f4f5;
-  --theme-elevation-650: #fafafa;
-  --theme-elevation-700: #ffffff;
-  --theme-elevation-750: #ffffff;
-  --theme-elevation-800: #ffffff;
-  --theme-elevation-850: #ffffff;
-  --theme-elevation-900: #ffffff;
-  --theme-elevation-950: #ffffff;
+  --theme-elevation-0: #211d18;
+  --theme-elevation-50: #2a2520;
+  --theme-elevation-100: #322d27;
+  --theme-elevation-150: #4d4640;
+  --theme-elevation-200: #5c5448;
+  --theme-elevation-250: #6e6558;
+  --theme-elevation-300: #6b6258;
+  --theme-elevation-350: #8a8176;
+  --theme-elevation-400: #ada598;
+  --theme-elevation-450: #bfb8ac;
+  --theme-elevation-500: #cfc9be;
+  --theme-elevation-550: #ddd8ce;
+  --theme-elevation-600: #e5e0d6;
+  --theme-elevation-650: #ede7d9;
+  --theme-elevation-700: #f3eee4;
+  --theme-elevation-750: #f7f2e9;
+  --theme-elevation-800: #faf6ee;
+  --theme-elevation-850: #fcf9f3;
+  --theme-elevation-900: #fefcf8;
+  --theme-elevation-950: #fffefc;
   --theme-elevation-1000: #ffffff;
 
   --theme-input-bg: var(--ds-bg-inset);

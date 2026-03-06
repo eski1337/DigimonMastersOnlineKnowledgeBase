@@ -148,7 +148,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
         <div className="space-y-8">
           {/* Title and Button */}
           <div className="flex items-start justify-between gap-4 mb-4">
-            <h1 className={`text-5xl font-bold bg-gradient-to-r ${getRankColor(d.rank)} bg-clip-text text-transparent min-w-0 break-words`}>
+            <h1 className={`text-5xl font-bold leading-normal pb-1 bg-gradient-to-r ${getRankColor(d.rank)} bg-clip-text text-transparent min-w-0 break-words`}>
               {d.name}
             </h1>
             <div className="flex items-center gap-2">

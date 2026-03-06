@@ -125,53 +125,93 @@ function dataUriToArrayBuffer(dataUri) {
 /* ── Full-page screenshot capture ────────────────────────────────── */
 
 async function captureFullPage(tabId) {
-  // Get page dimensions from content script
+  // Step 1: Hide fixed/sticky elements (nav bars, overlays, search bars)
+  await chrome.tabs.sendMessage(tabId, { action: 'prepareScreenshot' });
+  await sleep(300);
+
+  // Step 2: Get page dimensions AFTER hiding fixed elements
   const dims = await chrome.tabs.sendMessage(tabId, { action: 'getPageDimensions' });
-  const { scrollWidth, scrollHeight, viewportWidth, viewportHeight } = dims;
+  const { scrollHeight, viewportWidth, viewportHeight } = dims;
 
   // Device pixel ratio — capture at actual resolution
   const dpr = window.devicePixelRatio || 1;
 
-  const captures = [];
-  let y = 0;
+  // Calculate how many full viewport captures we need
+  const numFull = Math.floor(scrollHeight / viewportHeight);
+  const remainder = scrollHeight % viewportHeight;
+  const totalCaptures = numFull + (remainder > 0 ? 1 : 0);
 
-  // Scroll through the page and capture each viewport
-  while (y < scrollHeight) {
-    await chrome.tabs.sendMessage(tabId, { action: 'scrollTo', x: 0, y });
-    // Small delay for rendering to settle after scroll
-    await sleep(150);
+  const captures = []; // { dataUri, srcY, srcH, dstY }
+
+  // Capture full viewports from top
+  for (let i = 0; i < numFull; i++) {
+    const scrollY = i * viewportHeight;
+    await chrome.tabs.sendMessage(tabId, { action: 'scrollTo', x: 0, y: scrollY });
+    await sleep(250);
 
     const dataUri = await chrome.tabs.captureVisibleTab(null, { format: 'png' });
-    const remaining = scrollHeight - y;
-    const captureHeight = Math.min(viewportHeight, remaining);
-    captures.push({ dataUri, y, captureHeight });
-
-    y += viewportHeight;
+    captures.push({
+      dataUri,
+      srcY: 0,                       // take from top of captured image
+      srcH: viewportHeight * dpr,    // full viewport height
+      dstY: scrollY * dpr,           // position in final canvas
+    });
   }
 
-  // Restore scroll position
-  await chrome.tabs.sendMessage(tabId, { action: 'scrollTo', x: 0, y: 0 });
+  // Capture the last partial viewport (if any) by scrolling to the very bottom
+  if (remainder > 0) {
+    const scrollY = scrollHeight - viewportHeight; // scroll so bottom of page aligns with bottom of viewport
+    await chrome.tabs.sendMessage(tabId, { action: 'scrollTo', x: 0, y: scrollY });
+    await sleep(250);
 
-  // Stitch captures into a single canvas
-  const canvas = new OffscreenCanvas(viewportWidth * dpr, scrollHeight * dpr);
+    const dataUri = await chrome.tabs.captureVisibleTab(null, { format: 'png' });
+    // Only take the bottom portion of this capture (the remainder)
+    const overlap = viewportHeight - remainder;
+    captures.push({
+      dataUri,
+      srcY: overlap * dpr,           // skip the overlapping top part
+      srcH: remainder * dpr,         // only the new content at the bottom
+      dstY: numFull * viewportHeight * dpr, // position after all full captures
+    });
+  }
+
+  // Step 3: Restore page state
+  await chrome.tabs.sendMessage(tabId, { action: 'restoreAfterScreenshot' });
+
+  // Step 4: Stitch captures into a single canvas
+  const canvasW = viewportWidth * dpr;
+  const canvasH = scrollHeight * dpr;
+  const canvas = new OffscreenCanvas(canvasW, canvasH);
   const ctx = canvas.getContext('2d');
 
   for (const cap of captures) {
-    const img = await createImageBitmap(await (await fetch(cap.dataUri)).blob());
-    // For the last capture, only draw the portion that's part of the page
-    const srcHeight = Math.round(cap.captureHeight * dpr);
-    const dstY = Math.round(cap.y * dpr);
-    ctx.drawImage(img, 0, 0, img.width, srcHeight, 0, dstY, img.width, srcHeight);
+    const blob = await (await fetch(cap.dataUri)).blob();
+    const img = await createImageBitmap(blob);
+    // drawImage(source, srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH)
+    ctx.drawImage(img, 0, cap.srcY, img.width, cap.srcH, 0, cap.dstY, img.width, cap.srcH);
     img.close();
   }
 
-  const blob = await canvas.convertToBlob({ type: 'image/png' });
-  return blob;
+  const resultBlob = await canvas.convertToBlob({ type: 'image/png' });
+  return resultBlob;
 }
 
 async function downloadAllFormats(data, tabId) {
   const slug = (data.slug || data.title || 'page').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase();
   const zip = new JSZip();
+
+  // ── Full-page screenshot (capture FIRST while page is in natural state) ──
+  let hasScreenshot = false;
+  if (tabId) {
+    try {
+      setStatus('Capturing full-page screenshot...', 'info');
+      const screenshotBlob = await captureFullPage(tabId);
+      zip.file('screenshot.png', screenshotBlob);
+      hasScreenshot = true;
+    } catch (e) {
+      console.warn('Screenshot capture failed:', e);
+    }
+  }
 
   // ── Collect unique full-res images ──
   const imageDownloads = [];
@@ -265,19 +305,6 @@ async function downloadAllFormats(data, tabId) {
   zip.file(`${slug}.json`, jsonContent);
   zip.file(`${slug}.html`, htmlContent);
   zip.file(`${slug}.txt`, txtParts.join('\n'));
-
-  // ── Full-page screenshot ──
-  let hasScreenshot = false;
-  if (tabId) {
-    try {
-      setStatus('Capturing full-page screenshot...', 'info');
-      const screenshotBlob = await captureFullPage(tabId);
-      zip.file('screenshot.png', screenshotBlob);
-      hasScreenshot = true;
-    } catch (e) {
-      console.warn('Screenshot capture failed:', e);
-    }
-  }
 
   // ── Generate ZIP and download ──
   setStatus(`Packing ZIP...`, 'info');

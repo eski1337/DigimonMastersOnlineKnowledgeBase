@@ -387,13 +387,72 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // Scroll to a specific position (for screenshot capture)
   if (msg.action === 'scrollTo') {
     window.scrollTo(msg.x || 0, msg.y || 0);
-    // Wait a frame for rendering to settle
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        sendResponse({ done: true, scrollX: window.scrollX, scrollY: window.scrollY });
-      });
-    });
+    // Wait for rendering to settle after scroll
+    setTimeout(() => {
+      sendResponse({ done: true, scrollX: window.scrollX, scrollY: window.scrollY });
+    }, 80);
     return true; // keep channel open for async
+  }
+
+  // Hide fixed/sticky elements before screenshot capture
+  if (msg.action === 'prepareScreenshot') {
+    const style = document.createElement('style');
+    style.id = '__scraper_screenshot_style';
+    style.textContent = `
+      /* Hide all fixed & sticky elements during capture */
+      *[style*="position: fixed"], *[style*="position:fixed"],
+      *[style*="position: sticky"], *[style*="position:sticky"] {
+        display: none !important;
+      }
+      /* Also target common wiki fixed elements by computed style */
+      .vector-sticky-header,
+      .mw-header-container,
+      #mw-navigation,
+      .mw-header,
+      nav.navbar,
+      .fixed-header,
+      .sticky-header,
+      [role="banner"],
+      .vector-header-container.vector-sticky-header-visible {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Also find and hide elements with computed position: fixed/sticky
+    const hidden = [];
+    document.querySelectorAll('*').forEach(el => {
+      const cs = getComputedStyle(el);
+      if (cs.position === 'fixed' || cs.position === 'sticky') {
+        hidden.push({ el, prev: el.style.display });
+        el.style.setProperty('display', 'none', 'important');
+      }
+    });
+    window.__screenshotHidden = hidden;
+
+    // Scroll to top first
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+      sendResponse({ done: true });
+    }, 100);
+    return true;
+  }
+
+  // Restore hidden elements after screenshot capture
+  if (msg.action === 'restoreAfterScreenshot') {
+    const style = document.getElementById('__scraper_screenshot_style');
+    if (style) style.remove();
+
+    if (window.__screenshotHidden) {
+      for (const { el, prev } of window.__screenshotHidden) {
+        el.style.display = prev;
+      }
+      delete window.__screenshotHidden;
+    }
+
+    window.scrollTo(0, 0);
+    sendResponse({ done: true });
+    return;
   }
 
   // Fetch a batch of images from same origin (avoids CORS in popup)

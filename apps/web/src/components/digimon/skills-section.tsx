@@ -116,24 +116,26 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-4 gap-2 mt-3">
-                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-1.5">
-                      <div className="text-[10px] text-yellow-400/70">Cooldown</div>
-                      <div className="text-base font-bold text-yellow-400">{displayValue(skill.cooldown, 's')}</div>
+                  {(skill.cooldown != null || skill.dsConsumption != null || skill.skillPointsPerUpgrade != null || skill.animationTime != null) && (
+                    <div className="grid grid-cols-4 gap-2 mt-3">
+                      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-1.5">
+                        <div className="text-[10px] text-yellow-400/70">Cooldown</div>
+                        <div className="text-base font-bold text-yellow-400">{displayValue(skill.cooldown, 's')}</div>
+                      </div>
+                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-1.5">
+                        <div className="text-[10px] text-blue-400/70">DS</div>
+                        <div className="text-base font-bold text-blue-400">{displayValue(skill.dsConsumption)}</div>
+                      </div>
+                      <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-1.5">
+                        <div className="text-[10px] text-purple-400/70">SP/Upgrade</div>
+                        <div className="text-base font-bold text-purple-400">{displayValue(skill.skillPointsPerUpgrade)}</div>
+                      </div>
+                      <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-1.5">
+                        <div className="text-[10px] text-green-400/70">Animation</div>
+                        <div className="text-base font-bold text-green-400">{displayValue(skill.animationTime, 's')}</div>
+                      </div>
                     </div>
-                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-1.5">
-                      <div className="text-[10px] text-blue-400/70">DS</div>
-                      <div className="text-base font-bold text-blue-400">{displayValue(skill.dsConsumption)}</div>
-                    </div>
-                    <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-1.5">
-                      <div className="text-[10px] text-purple-400/70">SP/Upgrade</div>
-                      <div className="text-base font-bold text-purple-400">{displayValue(skill.skillPointsPerUpgrade)}</div>
-                    </div>
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-1.5">
-                      <div className="text-[10px] text-green-400/70">Animation</div>
-                      <div className="text-base font-bold text-green-400">{displayValue(skill.animationTime, 's')}</div>
-                    </div>
-                  </div>
+                  )}
                   
                   {damageEntries.length > 0 && (
                     <div className="bg-muted/30 rounded-lg p-2 border border-muted mt-2">

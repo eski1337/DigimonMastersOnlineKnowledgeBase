@@ -201,7 +201,6 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                 <div className="grid grid-cols-2 gap-3">
                   {STAT_ORDER.map(({ key, label }) => {
                     const value = (d.stats as Record<string, number>)?.[key];
-                    if (value === undefined || value === null) return null;
                     return (
                       <div key={key} className="flex items-center gap-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg hover:bg-orange-500/20 transition-colors">
                         <Image 
@@ -213,7 +212,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                           className="flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0 text-center text-base font-bold text-orange-300 tabular-nums">
-                          {String(value)}{(key === 'ct' || key === 'ev') ? '%' : ''}
+                          {value != null ? `${value}${(key === 'ct' || key === 'ev') ? '%' : ''}` : '-'}
                         </div>
                       </div>
                     );
@@ -247,7 +246,6 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
               <div className="grid grid-cols-2 gap-3">
                 {STAT_ORDER.map(({ key, label }) => {
                   const value = (d.maxStats as Record<string, number>)?.[key];
-                  if (value === undefined || value === null) return null;
                   return (
                     <div key={key} className="flex items-center gap-2 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg hover:bg-purple-500/20 transition-colors">
                       <Image 
@@ -259,7 +257,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                         className="flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0 text-center text-base font-bold text-purple-300 tabular-nums">
-                        {String(value)}{(key === 'ct' || key === 'ev') ? '%' : ''}
+                        {value != null ? `${value}${(key === 'ct' || key === 'ev') ? '%' : ''}` : '-'}
                       </div>
                     </div>
                   );

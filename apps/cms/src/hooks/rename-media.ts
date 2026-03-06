@@ -131,8 +131,11 @@ export function createMediaRenameHook(
   nameField: string,
   mappings: FieldMapping[],
 ): CollectionAfterChangeHook {
-  return async ({ doc, req }) => {
+  return async ({ doc, req, operation }) => {
     if (!req.payload || !doc) return doc;
+
+    // Only rename on create — updates should not touch existing media filenames
+    if (operation !== 'create') return doc;
 
     const entityName = doc[nameField];
     if (!entityName || typeof entityName !== 'string') return doc;

@@ -44,15 +44,6 @@
     --ring: 39 84% 59%;
     --radius: 0.5rem;
 
-    /* Evolution graph node tokens */
-    --node-card-bg: rgba(17,24,39,0.96);
-    --node-img-bg: rgba(17,24,39,0.6);
-    --node-img-border: rgba(75,85,99,0.2);
-    --node-text-color: #e5e7eb;
-    --node-neutral-border: #4b5563;
-    --node-neutral-glow: rgba(75,85,99,0.12);
-    --node-neutral-bg: rgba(75,85,99,0.04);
-    --node-badge-color: #9ca3af;
   }
 
   .light {
@@ -76,15 +67,6 @@
     --input: 40 18% 84%;
     --ring: 24 80% 50%;
 
-    /* Evolution graph node tokens */
-    --node-card-bg: rgba(255,255,255,0.96);
-    --node-img-bg: rgba(0,0,0,0.04);
-    --node-img-border: rgba(0,0,0,0.1);
-    --node-text-color: #1f2937;
-    --node-neutral-border: #d1d5db;
-    --node-neutral-glow: rgba(0,0,0,0.06);
-    --node-neutral-bg: rgba(0,0,0,0.02);
-    --node-badge-color: #6b7280;
   }
 
   * {

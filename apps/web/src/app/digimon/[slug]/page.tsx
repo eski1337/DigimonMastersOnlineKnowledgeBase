@@ -18,7 +18,7 @@ const USE_NEW_EVOLUTION = process.env.NEXT_PUBLIC_USE_NEW_EVOLUTION === 'true';
 async function getDigimon(slug: string) {
   try {
     const response = await fetch(
-      `${CMS_URL}/api/digimon?where[slug][equals]=${slug}&where[published][equals]=true&limit=1&depth=1`,
+      `${CMS_URL}/api/digimon?where[slug][equals]=${slug}&where[published][equals]=true&limit=1&depth=2`,
       {
         next: { revalidate: 5 },
       }
@@ -189,7 +189,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
             </CardContent>
           </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Base Stats - Always show */}
         <Card className="bg-card border-orange-500/30">
           <CardHeader>
@@ -271,52 +271,52 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
             )}
           </CardContent>
         </Card>
-      </div>
+          </div>
 
 
-      {/* Evolution Display */}
-      {USE_NEW_EVOLUTION ? (
-        <EvolutionGraphLoader slug={d.slug} userRole={session?.user?.role as string | undefined} />
-      ) : (
-        <>
-          {/* Complete Evolution Tree - Always show */}
-          <EvolutionTree
-            currentDigimon={{ 
-              name: d.name, 
-              slug: d.slug,
-              icon: typeof d.icon === 'string' ? d.icon : (d.icon as PayloadMedia)?.url,
-              rank: d.rank
-            }}
-            digivolvesFrom={d.digivolutions?.digivolvesFrom || []}
-            digivolvesTo={d.digivolutions?.digivolvesTo || []}
-          />
+          {/* Evolution Display */}
+          {USE_NEW_EVOLUTION ? (
+            <EvolutionGraphLoader slug={d.slug} userRole={session?.user?.role as string | undefined} />
+          ) : (
+            <>
+              {/* Complete Evolution Tree - Always show */}
+              <EvolutionTree
+                currentDigimon={{ 
+                  name: d.name, 
+                  slug: d.slug,
+                  icon: typeof d.icon === 'string' ? d.icon : (d.icon as PayloadMedia)?.url,
+                  rank: d.rank
+                }}
+                digivolvesFrom={d.digivolutions?.digivolvesFrom || []}
+                digivolvesTo={d.digivolutions?.digivolvesTo || []}
+              />
 
-          {/* Visual Evolution Editor - Only for Owner/Admin/Editor */}
-          <VisualEvolutionEditor
-            digimonId={d.id}
-            digimonName={d.name}
-            digimonSlug={d.slug}
-            userRole={session?.user?.role}
-          />
-        </>
-      )}
+              {/* Visual Evolution Editor - Only for Owner/Admin/Editor */}
+              <VisualEvolutionEditor
+                digimonId={d.id}
+                digimonName={d.name}
+                digimonSlug={d.slug}
+                userRole={session?.user?.role}
+              />
+            </>
+          )}
 
-      {/* Skills - Always show */}
-      {d.skills && d.skills.length > 0 ? (
-        <SkillsSection skills={d.skills} />
-      ) : (
-        <Card className="bg-card border-blue-500/30">
-          <CardHeader>
-            <CardTitle className="text-xl text-blue-400">Skills & Abilities</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <p className="text-lg">No skills available</p>
-              <p className="text-sm mt-2">Skills data has not been imported yet</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          {/* Skills - Always show */}
+          {d.skills && d.skills.length > 0 ? (
+            <SkillsSection skills={d.skills} />
+          ) : (
+            <Card className="bg-card border-blue-500/30">
+              <CardHeader>
+                <CardTitle className="text-xl text-blue-400">Skills & Abilities</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-muted-foreground">
+                  <p className="text-lg">No skills available</p>
+                  <p className="text-sm mt-2">Skills data has not been imported yet</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Infobox Sidebar */}

@@ -35,10 +35,10 @@ export interface DigimonStats {
   hp?: number;
   ds?: number;
   at?: number;
+  as?: number;
   de?: number;
   ct?: number;
   ht?: number;
-  bl?: number;
   ev?: number;
 }
 

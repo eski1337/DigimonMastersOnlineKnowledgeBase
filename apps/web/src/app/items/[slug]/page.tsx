@@ -7,6 +7,12 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+const PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
+
+function resolveMediaUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  return url.startsWith('http') ? url : `${PUBLIC_CMS_URL}${url}`;
+}
 
 interface CMSItem {
   id: string;
@@ -38,12 +44,11 @@ interface CMSItem {
   relatedItems?: { id: string; name: string; slug: string; icon?: { url: string } }[];
   relatedGuide?: { id: string; title: string; slug: string } | null;
   notes?: any;
-  sourceUrl?: string;
   published?: boolean;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
-  evolution: 'Evolution Item', unlock: 'Unlock Item', consumable: 'Consumable',
+  evolution: 'Evolution Item', unlock: 'Unlock Item', 'ride-mode-unlock': 'Ride Mode Unlock', consumable: 'Consumable',
   equipment: 'Equipment', material: 'Material', quest: 'Quest Item',
   egg: 'Egg / Mercenary', costume: 'Costume / Skin', token: 'Token / Currency',
   booster: 'Booster / Buff', digivice: 'Digivice', accessory: 'Accessory',
@@ -53,6 +58,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 const CATEGORY_COLORS: Record<string, string> = {
   evolution: 'from-green-400 to-emerald-500',
   unlock: 'from-cyan-400 to-blue-500',
+  'ride-mode-unlock': 'from-teal-400 to-cyan-500',
   consumable: 'from-red-400 to-pink-500',
   equipment: 'from-orange-400 to-amber-500',
   material: 'from-stone-400 to-stone-500',
@@ -139,7 +145,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
             {(iconUrl || imageUrl) ? (
               <div className={`w-20 h-20 rounded-xl bg-muted/50 flex items-center justify-center flex-shrink-0 overflow-hidden border-2 ${rarityStyle.border}`}>
                 <Image
-                  src={imageUrl || iconUrl!}
+                  src={resolveMediaUrl(imageUrl || iconUrl)}
                   alt={item.name}
                   width={64}
                   height={64}
@@ -281,7 +287,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                   {item.craftingRecipe!.materials!.map((mat, i) => (
                     <div key={i} className="flex items-center gap-3 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                       {mat.icon?.url && (
-                        <Image src={mat.icon.url} alt={mat.item} width={24} height={24} className="object-contain flex-shrink-0" />
+                        <Image src={resolveMediaUrl(mat.icon.url)} alt={mat.item} width={24} height={24} className="object-contain flex-shrink-0" />
                       )}
                       <span className="text-sm font-medium text-foreground">{mat.item}</span>
                       {mat.amount && <span className="text-sm text-amber-400 ml-auto font-bold">x{mat.amount}</span>}
@@ -305,7 +311,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                   {item.relatedDigimon!.map(digi => (
                     <Link key={digi.id} href={`/digimon/${digi.slug}`} className="flex items-center gap-2 p-2 bg-orange-500/10 border border-orange-500/20 rounded-lg hover:bg-orange-500/20 transition-colors">
                       {digi.icon?.url && (
-                        <Image src={digi.icon.url} alt={digi.name} width={28} height={28} className="object-contain" />
+                        <Image src={resolveMediaUrl(digi.icon.url)} alt={digi.name} width={28} height={28} className="object-contain" />
                       )}
                       <span className="text-sm font-medium">{digi.name}</span>
                     </Link>
@@ -328,7 +334,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                   {item.relatedItems!.map(rel => (
                     <Link key={rel.id} href={`/items/${rel.slug}`} className="flex items-center gap-2 p-2 bg-primary/10 border border-primary/20 rounded-lg hover:bg-primary/20 transition-colors">
                       {rel.icon?.url && (
-                        <Image src={rel.icon.url} alt={rel.name} width={24} height={24} className="object-contain" />
+                        <Image src={resolveMediaUrl(rel.icon.url)} alt={rel.name} width={24} height={24} className="object-contain" />
                       )}
                       <span className="text-sm font-medium">{rel.name}</span>
                     </Link>
@@ -367,7 +373,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
               {(iconUrl || imageUrl) ? (
                 <div className={`w-32 h-32 rounded-xl bg-background/80 flex items-center justify-center border-2 ${rarityStyle.border}`}>
                   <Image
-                    src={imageUrl || iconUrl!}
+                    src={resolveMediaUrl(imageUrl || iconUrl)}
                     alt={item.name}
                     width={96}
                     height={96}
@@ -434,19 +440,6 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                 )}
               </div>
 
-              {/* Source link */}
-              {item.sourceUrl && (
-                <div className="pt-2">
-                  <a
-                    href={item.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-primary hover:underline flex items-center gap-1"
-                  >
-                    <Link2 className="h-3 w-3" /> Wiki Source
-                  </a>
-                </div>
-              )}
             </div>
           </Card>
         </div>

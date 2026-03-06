@@ -49,9 +49,11 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
       <CardContent>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {skills.map((skill, index) => {
-            const skillIconUrl = typeof skill.icon === 'string' 
+            const rawIconUrl = typeof skill.icon === 'string' 
               ? skill.icon 
               : skill.icon?.url;
+            // Guard: if it's a raw MongoDB ObjectId (24-char hex), it's unresolved — skip it
+            const skillIconUrl = rawIconUrl && /^[a-f0-9]{24}$/.test(rawIconUrl) ? undefined : rawIconUrl;
             
             // Parse damage per level (stored as JSON string: [{"level":1,"damage":1234},...])
             let damageEntries: { level: number; damage: number }[] = [];

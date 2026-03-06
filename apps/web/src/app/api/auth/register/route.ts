@@ -7,6 +7,16 @@ const RATE_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const RATE_MAX = 3; // max registrations per window per IP
 const ipAttempts = new Map<string, { count: number; resetAt: number }>();
 
+// Periodically clean up expired entries to prevent memory leak
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of ipAttempts) {
+      if (now > entry.resetAt) ipAttempts.delete(key);
+    }
+  }, 5 * 60 * 1000); // every 5 minutes
+}
+
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
   const entry = ipAttempts.get(ip);

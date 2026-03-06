@@ -24,7 +24,7 @@ export function buildValidationSummary(preview: DigimonPreview): ValidationSumma
   preview.families.length > 0 ? complete.push(`Families (${preview.families.length})`) : missing.push('Families');
 
   // Stats
-  preview.stats.hp > 0 || preview.maxStats.hp > 0 ? complete.push('Stats') : missing.push('Stats');
+  preview.stats?.hp > 0 || preview.maxStats?.hp > 0 ? complete.push('Stats') : missing.push('Stats');
 
   // Skills
   preview.skills.length > 0 ? complete.push(`Skills (${preview.skills.length})`) : missing.push('Skills');
@@ -56,7 +56,7 @@ export function buildValidationSummary(preview: DigimonPreview): ValidationSumma
  */
 export async function preparePreviewForDisplay(
   preview: DigimonPreview,
-  resolveMediaUrl: (id: string) => Promise<{ url?: string; filename?: string; sourceUrl?: string } | null>,
+  resolveMediaUrl: (id: string) => Promise<{ url?: string; filename?: string } | null>,
 ): Promise<any> {
   const display = JSON.parse(JSON.stringify(preview));
 
@@ -65,7 +65,6 @@ export async function preparePreviewForDisplay(
     const media = await resolveMediaUrl(display.icon);
     if (media) {
       display.iconUrl = media.url || `/media/${media.filename}`;
-      display.iconSourceUrl = media.sourceUrl;
     }
   }
 
@@ -74,7 +73,6 @@ export async function preparePreviewForDisplay(
     const media = await resolveMediaUrl(display.mainImage);
     if (media) {
       display.mainImageUrl = media.url || `/media/${media.filename}`;
-      display.mainImageSourceUrl = media.sourceUrl;
     }
   }
 
@@ -92,7 +90,6 @@ export async function preparePreviewForDisplay(
           const media = await resolveMediaUrl(skill.icon);
           if (media) {
             skill.iconUrl = media.url || `/media/${media.filename}`;
-            skill.iconSourceUrl = media.sourceUrl;
           }
         }
         return skill;
@@ -111,14 +108,11 @@ export function transformForSave(data: any): any {
   // Remove display-only URL fields
   delete data.iconUrl;
   delete data.mainImageUrl;
-  delete data.iconSourceUrl;
-  delete data.mainImageSourceUrl;
 
   // Transform skills
   if (data.skills && Array.isArray(data.skills)) {
     data.skills = data.skills.map((skill: any) => {
       delete skill.iconUrl;
-      delete skill.iconSourceUrl;
 
       // Flatten damagePerLevel
       if (skill.damagePerLevel && Array.isArray(skill.damagePerLevel)) {

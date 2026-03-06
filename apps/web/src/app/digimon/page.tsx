@@ -167,7 +167,7 @@ export default function DigimonPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <aside className="lg:col-span-1">
-          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto px-1 pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pt-1 px-1 pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
             <DigimonFilters filters={filters} onFiltersChange={handleFiltersChange} />
           </div>
         </aside>

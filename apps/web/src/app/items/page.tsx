@@ -11,11 +11,18 @@ import { ItemFilters, type ItemFiltersState } from '@/components/items/item-filt
 import Link from 'next/link';
 import Image from 'next/image';
 
+const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
 const ITEMS_PER_PAGE = 36;
+
+function resolveMediaUrl(url: string): string {
+  if (!url) return '';
+  return url.startsWith('http') ? url : `${CMS_URL}${url}`;
+}
 
 const CATEGORY_LABELS: Record<string, string> = {
   evolution: 'Evolution',
   unlock: 'Unlock',
+  'ride-mode-unlock': 'Ride Mode Unlock',
   consumable: 'Consumable',
   equipment: 'Equipment',
   material: 'Material',
@@ -184,7 +191,7 @@ export default function ItemsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <aside className="lg:col-span-1">
-          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto px-1 pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pt-1 px-1 pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
             <ItemFilters filters={filters} onFiltersChange={handleFiltersChange} />
           </div>
         </aside>
@@ -219,7 +226,7 @@ export default function ItemsPage() {
                           {item.icon?.url ? (
                             <div className="w-10 h-10 rounded bg-muted/50 flex items-center justify-center flex-shrink-0 overflow-hidden border border-border/50">
                               <Image
-                                src={item.icon.url}
+                                src={resolveMediaUrl(item.icon.url)}
                                 alt={item.name}
                                 width={32}
                                 height={32}

@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload/types';
+import { createMediaRenameHook } from '../hooks/rename-media';
 
 export const Items: CollectionConfig = {
   slug: 'items',
@@ -94,6 +95,7 @@ export const Items: CollectionConfig = {
                   options: [
                     { label: 'Evolution Item', value: 'evolution' },
                     { label: 'Unlock Item', value: 'unlock' },
+                    { label: 'Ride Mode Unlock', value: 'ride-mode-unlock' },
                     { label: 'Consumable', value: 'consumable' },
                     { label: 'Equipment', value: 'equipment' },
                     { label: 'Material', value: 'material' },
@@ -309,21 +311,24 @@ export const Items: CollectionConfig = {
           ],
         },
 
-        /* ── Tab 6: Notes & Sources ──────────────────────────────── */
+        /* ── Tab 6: Notes ────────────────────────────────────────── */
         {
           label: 'Notes',
           fields: [
             { name: 'notes', type: 'richText', admin: { description: 'Additional notes, tips, or trivia' } },
-            {
-              name: 'sourceUrl',
-              type: 'text',
-              admin: { description: 'Original DMO Wiki URL for this item' },
-            },
           ],
         },
       ],
     },
   ],
+  hooks: {
+    afterChange: [
+      createMediaRenameHook('name', [
+        { field: 'icon', suffix: 'Icon' },
+        { field: 'image', suffix: 'Image' },
+      ]),
+    ],
+  },
 };
 
 export default Items;

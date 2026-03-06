@@ -8,6 +8,7 @@ import {
   DIGIMON_ATTACKER_TYPES,
 } from '@dmo-kb/shared';
 import ImportButton from '../components/ImportButton';
+import { createMediaRenameHook } from '../hooks/rename-media';
 
 /* ── Reusable stat row (4 per row via 25% width) ─────────────────── */
 const statFields = (prefix?: string) => [
@@ -285,7 +286,7 @@ const Digimon: CollectionConfig = {
                   label: { en: 'Skill Icon', zhTw: '技能圖示' },
                   type: 'upload',
                   relationTo: 'media',
-                  admin: { description: { en: 'Skill icon from DMO Wiki', zhTw: 'DMO Wiki 的技能圖示' } },
+                  admin: { description: { en: 'Skill icon', zhTw: '技能圖示' } },
                 },
                 { name: 'description', type: 'textarea' },
                 {
@@ -444,21 +445,24 @@ const Digimon: CollectionConfig = {
           ],
         },
 
-        /* ── Tab 8: Notes & Sources ────────────────────────────── */
+        /* ── Tab 8: Notes ────────────────────────────────────── */
         {
           label: { en: 'Notes', zhTw: '備註' },
           fields: [
             { name: 'notes', type: 'richText' },
-            {
-              name: 'sources',
-              type: 'array',
-              fields: [{ name: 'source', type: 'text' }],
-            },
           ],
         },
       ],
     },
   ],
+  hooks: {
+    afterChange: [
+      createMediaRenameHook('name', [
+        { field: 'icon', suffix: 'Icon' },
+        { field: 'mainImage', suffix: 'Artwork' },
+      ]),
+    ],
+  },
 };
 
 export default Digimon;

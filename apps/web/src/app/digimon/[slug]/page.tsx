@@ -101,6 +101,17 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
     return `/icons/Families/${fileName}.png`;
   };
 
+  const STAT_ORDER: { key: string; label: string }[] = [
+    { key: 'hp', label: 'HP' },
+    { key: 'at', label: 'AT' },
+    { key: 'de', label: 'DE' },
+    { key: 'as', label: 'AS' },
+    { key: 'ds', label: 'DS' },
+    { key: 'ct', label: 'CT' },
+    { key: 'ht', label: 'HT' },
+    { key: 'ev', label: 'EV' },
+  ];
+
   const getStatIconPath = (stat: string) => {
     return `/icons/Stats/${stat.toUpperCase()}.png`;
   };
@@ -188,21 +199,25 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
             {d.stats && Object.values(d.stats).some((v: any) => v > 0) ? (
               <>
                 <div className="grid grid-cols-2 gap-3">
-                  {Object.entries(d.stats).map(([key, value]) => (
-                    <div key={key} className="flex items-center gap-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg hover:bg-orange-500/20 transition-colors">
-                      <Image 
-                        src={getStatIconPath(key)} 
-                        alt={key}
-                        width={48}
-                        height={48}
-                        style={{ width: 'auto', height: 'auto' }}
-                        className="flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0 text-center text-base font-bold text-orange-300 tabular-nums">
-                        {String(value)}{(key === 'ct' || key === 'ev') ? '%' : ''}
+                  {STAT_ORDER.map(({ key, label }) => {
+                    const value = (d.stats as Record<string, number>)?.[key];
+                    if (value === undefined || value === null) return null;
+                    return (
+                      <div key={key} className="flex items-center gap-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg hover:bg-orange-500/20 transition-colors">
+                        <Image 
+                          src={getStatIconPath(key)} 
+                          alt={label}
+                          width={48}
+                          height={48}
+                          style={{ width: 'auto', height: 'auto' }}
+                          className="flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0 text-center text-base font-bold text-orange-300 tabular-nums">
+                          {String(value)}{(key === 'ct' || key === 'ev') ? '%' : ''}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 {d.sizePct && (
                   <div className="mt-3 pt-3 border-t border-orange-500/20">
@@ -230,21 +245,25 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
           <CardContent>
             {d.maxStats && Object.values(d.maxStats).some((v: any) => v > 0) ? (
               <div className="grid grid-cols-2 gap-3">
-                {Object.entries(d.maxStats).map(([key, value]) => (
-                  <div key={key} className="flex items-center gap-2 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg hover:bg-purple-500/20 transition-colors">
-                    <Image 
-                      src={getStatIconPath(key)} 
-                      alt={key}
-                      width={48}
-                      height={48}
-                      style={{ width: 'auto', height: 'auto' }}
-                      className="flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0 text-center text-base font-bold text-purple-300 tabular-nums">
-                      {String(value)}{(key === 'ct' || key === 'ev') ? '%' : ''}
+                {STAT_ORDER.map(({ key, label }) => {
+                  const value = (d.maxStats as Record<string, number>)?.[key];
+                  if (value === undefined || value === null) return null;
+                  return (
+                    <div key={key} className="flex items-center gap-2 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg hover:bg-purple-500/20 transition-colors">
+                      <Image 
+                        src={getStatIconPath(key)} 
+                        alt={label}
+                        width={48}
+                        height={48}
+                        style={{ width: 'auto', height: 'auto' }}
+                        className="flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0 text-center text-base font-bold text-purple-300 tabular-nums">
+                        {String(value)}{(key === 'ct' || key === 'ev') ? '%' : ''}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">

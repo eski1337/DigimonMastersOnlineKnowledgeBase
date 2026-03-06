@@ -17,13 +17,13 @@ export interface DigimonNodeData {
 
 /* ── Colors ───────────────────────────────────────────────────────────── */
 
-const NEUTRAL_BORDER = '#4b5563';    // gray-600
-const NEUTRAL_GLOW = 'rgba(75,85,99,0.12)';
-const NEUTRAL_BG = 'rgba(75,85,99,0.04)';
+const NEUTRAL_BORDER = 'var(--node-neutral-border, #4b5563)';
+const NEUTRAL_GLOW = 'var(--node-neutral-glow, rgba(75,85,99,0.12))';
+const NEUTRAL_BG = 'var(--node-neutral-bg, rgba(75,85,99,0.04))';
 const CURRENT_BORDER = '#f97316';    // orange-500
 const CURRENT_GLOW = 'rgba(249,115,22,0.35)';
 const CURRENT_BG = 'rgba(249,115,22,0.08)';
-const BADGE_COLOR = '#9ca3af';       // gray-400
+const BADGE_COLOR = 'var(--node-badge-color, #9ca3af)';
 
 function isValidIconUrl(icon?: string): boolean {
   if (!icon) return false;
@@ -52,8 +52,8 @@ function DigimonNodeInner({ data }: NodeProps) {
         borderRadius: '12px',
         border: `2px solid ${borderColor}`,
         background: isCurrent
-          ? `linear-gradient(145deg, ${CURRENT_BG}, rgba(17,24,39,0.96))`
-          : `linear-gradient(145deg, ${NEUTRAL_BG}, rgba(17,24,39,0.96))`,
+          ? `linear-gradient(145deg, ${CURRENT_BG}, var(--node-card-bg, rgba(17,24,39,0.96)))`
+          : `linear-gradient(145deg, ${NEUTRAL_BG}, var(--node-card-bg, rgba(17,24,39,0.96)))`,
         backdropFilter: 'blur(6px)',
         boxShadow: isCurrent
           ? `0 0 20px ${CURRENT_GLOW}, 0 0 6px rgba(249,115,22,0.15), 0 2px 8px rgba(0,0,0,0.4)`
@@ -73,8 +73,8 @@ function DigimonNodeInner({ data }: NodeProps) {
           height: 80,
           borderRadius: '8px',
           overflow: 'hidden',
-          background: 'rgba(17,24,39,0.6)',
-          border: '1px solid rgba(75,85,99,0.2)',
+          background: 'var(--node-img-bg, rgba(17,24,39,0.6))',
+          border: '1px solid var(--node-img-border, rgba(75,85,99,0.2))',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -104,7 +104,7 @@ function DigimonNodeInner({ data }: NodeProps) {
           fontWeight: 700,
           lineHeight: 1.2,
           textAlign: 'center',
-          color: isCurrent ? '#fb923c' : '#e5e7eb',
+          color: isCurrent ? '#fb923c' : 'var(--node-text-color, #e5e7eb)',
           maxWidth: 170,
           overflow: 'hidden',
           display: '-webkit-box',
@@ -149,10 +149,10 @@ function DigimonNodeInner({ data }: NodeProps) {
       )}
 
       {/* Handles at each position — source type with loose connection mode */}
-      <Handle type="source" position={Position.Left} id="left" style={{ width: 6, height: 6, background: borderColor, border: '1.5px solid rgba(17,24,39,0.8)', left: -4 }} />
-      <Handle type="source" position={Position.Right} id="right" style={{ width: 6, height: 6, background: borderColor, border: '1.5px solid rgba(17,24,39,0.8)', right: -4 }} />
-      <Handle type="source" position={Position.Top} id="top" style={{ width: 6, height: 6, background: borderColor, border: '1.5px solid rgba(17,24,39,0.8)', top: -4 }} />
-      <Handle type="source" position={Position.Bottom} id="bottom" style={{ width: 6, height: 6, background: borderColor, border: '1.5px solid rgba(17,24,39,0.8)', bottom: -4 }} />
+      <Handle type="source" position={Position.Left} id="left" style={{ width: 6, height: 6, background: borderColor, border: '1.5px solid var(--node-card-bg, rgba(17,24,39,0.8))', left: -4 }} />
+      <Handle type="source" position={Position.Right} id="right" style={{ width: 6, height: 6, background: borderColor, border: '1.5px solid var(--node-card-bg, rgba(17,24,39,0.8))', right: -4 }} />
+      <Handle type="source" position={Position.Top} id="top" style={{ width: 6, height: 6, background: borderColor, border: '1.5px solid var(--node-card-bg, rgba(17,24,39,0.8))', top: -4 }} />
+      <Handle type="source" position={Position.Bottom} id="bottom" style={{ width: 6, height: 6, background: borderColor, border: '1.5px solid var(--node-card-bg, rgba(17,24,39,0.8))', bottom: -4 }} />
     </div>
   );
 

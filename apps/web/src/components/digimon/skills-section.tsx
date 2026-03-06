@@ -42,7 +42,7 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
   const keybindLabel = (idx: number) => `F${idx + 1}`;
 
   return (
-    <Card className="mt-8 bg-gradient-to-br from-[#1d2021] to-[#282828]">
+    <Card className="mt-8 bg-card">
       <CardHeader>
         <CardTitle className="text-2xl">Skills & Abilities</CardTitle>
       </CardHeader>
@@ -74,7 +74,7 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
             const currentLevel = selectedLevels[index] || 0;
             
             return (
-              <Card key={index} className="bg-gradient-to-br from-[#252525] to-[#1a1a1a] border-blue-500/30">
+              <Card key={index} className="bg-card border-blue-500/30">
                 <CardContent className="pt-5 pb-4 px-4">
                   <div className="flex gap-3">
                     {skillIconUrl && (
@@ -140,7 +140,7 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
                       <div className="flex items-center gap-2 flex-wrap">
                         <label className="text-xs font-semibold text-muted-foreground whitespace-nowrap">Damage at Level:</label>
                         <select 
-                          className="flex-1 min-w-[100px] max-w-[160px] px-2 py-1 bg-[#1a1a1a] border border-blue-500/30 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                          className="flex-1 min-w-[100px] max-w-[160px] px-2 py-1 bg-background border border-blue-500/30 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                           value={currentLevel}
                           onChange={(e) => {
                             setSelectedLevels(prev => ({

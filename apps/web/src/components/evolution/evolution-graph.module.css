@@ -10,7 +10,7 @@
   border: 2px solid rgba(249, 115, 22, 0.25);
   background:
     radial-gradient(ellipse at 30% 20%, rgba(249, 115, 22, 0.03) 0%, transparent 60%),
-    linear-gradient(160deg, rgba(12, 14, 20, 0.95), rgba(20, 24, 36, 0.95));
+    hsl(var(--card));
   contain: layout style paint;
 }
 
@@ -39,7 +39,7 @@
 .wrapper :global(.react-flow__controls button) {
   width: 26px;
   height: 26px;
-  background: rgba(12, 14, 20, 0.92);
+  background: hsl(var(--card));
   border: 1px solid rgba(249, 115, 22, 0.25);
   color: #f97316;
   border-radius: 6px;
@@ -96,7 +96,7 @@
 .card {
   border-radius: 0.75rem;
   border: 2px solid rgba(249, 115, 22, 0.3);
-  background: linear-gradient(160deg, rgba(17, 24, 39, 0.8), rgba(31, 41, 55, 0.8));
+  background: hsl(var(--card));
   overflow: hidden;
 }
 
@@ -133,7 +133,7 @@
   align-items: center;
   gap: 5px;
   font-size: 0.6875rem;
-  color: #9ca3af;
+  color: hsl(var(--muted-foreground));
   font-weight: 500;
 }
 
@@ -183,10 +183,10 @@
 
 .fallbackText {
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: hsl(var(--muted-foreground));
 }
 
 .fallbackSub {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground) / 0.7);
 }

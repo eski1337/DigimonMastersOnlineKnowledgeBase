@@ -74,11 +74,12 @@ function parseStats(tables) {
   if (!statsTable) return null;
 
   const stats = {};
+  const maxStats = {};
   const statMap = {
     'health': 'hp', 'hp': 'hp',
     'digi-soul': 'ds', 'ds': 'ds',
-    'attack': 'at', 'at': 'at',
     'attack speed': 'as', 'as': 'as',
+    'attack': 'at', 'at': 'at',
     'critical': 'ct', 'ct': 'ct',
     'hit rate': 'ht', 'ht': 'ht',
     'defense': 'de', 'de': 'de',
@@ -86,61 +87,156 @@ function parseStats(tables) {
   };
 
   for (const row of (statsTable.rows || [])) {
-    if (!Array.isArray(row) || row.length < 2) continue;
+    if (!Array.isArray(row) || row.length < 3) continue;
     const label = ((typeof row[1] === 'object' ? row[1].text : row[1]) || '').toLowerCase().trim();
-    const value = (typeof row[2] === 'object' ? row[2].text : row[2]) || (typeof row[1] === 'object' ? row[1].text : row[1]) || '';
+    const baseVal = (typeof row[2] === 'object' ? row[2].text : row[2]) || '';
+    const maxVal = row[3] ? (typeof row[3] === 'object' ? row[3].text : row[3]) || '' : '';
 
     for (const [key, field] of Object.entries(statMap)) {
       if (label.includes(key)) {
-        // Parse numeric value (strip % and commas)
-        const num = parseFloat(value.replace(/[,%]/g, ''));
-        if (!isNaN(num)) stats[field] = num;
+        const baseNum = parseFloat(baseVal.replace(/[,%]/g, ''));
+        if (!isNaN(baseNum)) stats[field] = baseNum;
+        const maxNum = parseFloat(maxVal.replace(/[,%]/g, ''));
+        if (!isNaN(maxNum)) maxStats[field] = maxNum;
         break;
       }
     }
   }
-  return Object.keys(stats).length > 0 ? stats : null;
+  return {
+    stats: Object.keys(stats).length > 0 ? stats : null,
+    maxStats: Object.keys(maxStats).length > 0 ? maxStats : null,
+  };
 }
 
-// ── Parse skills from skill table ──
+// ── Parse skills from skill tables ──
 function parseSkills(tables) {
-  // Find table with headers that include "Attack" and level columns
-  const skillTable = tables?.find(t =>
+  // Find the damage-per-level table (headers include "Attack" and "Lv." columns)
+  const damageTable = tables?.find(t =>
     t.headers?.some(h => {
       const text = typeof h === 'string' ? h : (h.text || h.label || '');
       return text === 'Attack' || text.includes('Lv.');
     })
   );
-  if (!skillTable) return [];
 
-  const skills = [];
-  for (const row of (skillTable.rows || [])) {
-    if (!Array.isArray(row) || row.length < 3) continue;
-    // Column 0 = icon, Column 1 = skill name, Columns 2+ = damage per level
-    const name = ((typeof row[1] === 'object' ? row[1].text : row[1]) || '').trim();
-    if (!name) continue;
+  // Find the skill detail table (rows contain cooldown/DS consumed text)
+  const detailTable = tables?.find(t =>
+    !t.headers?.length && t.rows?.some(r =>
+      Array.isArray(r) && r.some(c => {
+        const text = typeof c === 'object' ? c.text : c;
+        return (text || '').includes('cooldown') || (text || '').includes('DS consumed');
+      })
+    )
+  );
 
-    // Get icon URL from first cell
-    let iconUrl = null;
-    if (typeof row[0] === 'object' && row[0].images?.length) {
-      iconUrl = row[0].images[0].src;
+  // Parse skill metadata from detail table
+  const skillMeta = {};
+  if (detailTable) {
+    let currentSkill = null;
+    for (const row of (detailTable.rows || [])) {
+      if (!Array.isArray(row)) continue;
+      const cell0Text = ((typeof row[0] === 'object' ? row[0].text : row[0]) || '').trim();
+
+      // Skill name row: first cell has bold name, subsequent cells have metadata
+      const hasMetadata = row.some(c => {
+        const t = typeof c === 'object' ? c.text : c;
+        return (t || '').includes('cooldown');
+      });
+
+      if (hasMetadata && cell0Text) {
+        currentSkill = cell0Text;
+        const meta = { name: currentSkill };
+
+        for (const cell of row) {
+          const t = ((typeof cell === 'object' ? cell.text : cell) || '').trim();
+
+          // Element from images
+          if (typeof cell === 'object' && cell.images?.length) {
+            const imgSrc = cell.images[0].src || '';
+            const elemMap = {
+              'Fire': 'Fire', 'Water': 'Water', 'Ice': 'Ice', 'Wind': 'Wind',
+              'Thunder': 'Thunder', 'Light': 'Light', 'Steel': 'Steel',
+              'Wood': 'Wood', 'Dark': 'Pitch Black', 'Pitch_Black': 'Pitch Black',
+            };
+            for (const [key, val] of Object.entries(elemMap)) {
+              if (imgSrc.includes(key)) { meta.element = val; break; }
+            }
+          }
+
+          // Cooldown: "3.5 seconds cooldown"
+          const cdMatch = t.match(/([\d.]+)\s*seconds?\s*cooldown/i);
+          if (cdMatch) meta.cooldown = parseFloat(cdMatch[1]);
+
+          // DS consumed: "24 DS consumed"
+          const dsMatch = t.match(/(\d+)\s*DS\s*consumed/i);
+          if (dsMatch) meta.dsConsumption = parseInt(dsMatch[1]);
+
+          // SP per upgrade: "2 skill points per upgrade"
+          const spMatch = t.match(/(\d+)\s*skill\s*points?\s*per\s*upgrade/i);
+          if (spMatch) meta.skillPointsPerUpgrade = parseInt(spMatch[1]);
+
+          // Animation: "2.1 seconds animation"
+          const animMatch = t.match(/([\d.]+)\s*seconds?\s*animation/i);
+          if (animMatch) meta.animationTime = parseFloat(animMatch[1]);
+        }
+
+        skillMeta[currentSkill] = meta;
+      } else if (currentSkill && row.length > 1) {
+        // Description row (colspan row after skill name)
+        const descText = row.map(c => ((typeof c === 'object' ? c.text : c) || '').trim()).filter(Boolean).join(' ').trim();
+        if (descText && descText.length > 3) {
+          skillMeta[currentSkill].description = descText;
+        }
+      }
     }
-
-    // Collect damage per level
-    const damages = [];
-    for (let i = 2; i < row.length; i++) {
-      const val = (typeof row[i] === 'object' ? row[i].text : row[i]) || '';
-      const num = parseInt(val.replace(/,/g, ''));
-      if (!isNaN(num)) damages.push(num);
-    }
-
-    skills.push({
-      name,
-      type: 'Attack',
-      iconUrl,
-      damagePerLevel: damages.length > 0 ? damages.join(', ') : null,
-    });
   }
+
+  // Parse damage-per-level table and merge with metadata
+  const skills = [];
+  if (damageTable) {
+    for (const row of (damageTable.rows || [])) {
+      if (!Array.isArray(row) || row.length < 3) continue;
+      const name = ((typeof row[1] === 'object' ? row[1].text : row[1]) || '').trim();
+      if (!name) continue;
+
+      let iconUrl = null;
+      if (typeof row[0] === 'object' && row[0].images?.length) {
+        iconUrl = row[0].images[0].src;
+      }
+
+      const damages = [];
+      for (let i = 2; i < row.length; i++) {
+        const val = (typeof row[i] === 'object' ? row[i].text : row[i]) || '';
+        const num = parseInt(val.replace(/,/g, ''));
+        if (!isNaN(num)) damages.push(num);
+      }
+
+      const meta = skillMeta[name] || {};
+      skills.push({
+        name,
+        type: 'Attack',
+        iconUrl,
+        element: meta.element || null,
+        cooldown: meta.cooldown || null,
+        dsConsumption: meta.dsConsumption || null,
+        skillPointsPerUpgrade: meta.skillPointsPerUpgrade || null,
+        animationTime: meta.animationTime || null,
+        description: meta.description || null,
+        damagePerLevel: damages.length > 0 ? damages.join(', ') : null,
+      });
+    }
+  } else {
+    // No damage table, just use metadata
+    for (const [name, meta] of Object.entries(skillMeta)) {
+      skills.push({
+        name,
+        type: 'Attack',
+        iconUrl: null,
+        ...meta,
+        damagePerLevel: null,
+      });
+    }
+  }
+
   return skills;
 }
 
@@ -290,15 +386,17 @@ function processZip(zipPath) {
   const slug = toSlug(name);
   const infobox = parseInfobox(data);
   const names = parseNames(data.tables);
-  const stats = parseStats(data.tables);
+  const parsedStats = parseStats(data.tables);
+  const stats = parsedStats?.stats || null;
+  const maxStats = parsedStats?.maxStats || null;
   const skills = parseSkills(data.tables);
   const introduction = extractIntro(data);
   const mainImg = findMainImage(data);
 
-  console.log(`  ${slug}: "${name}" form=${infobox.form||'?'} attr=${infobox.attribute||'?'} elem=${infobox.element||'?'} rank=${infobox.rank||'?'} skills=${skills.length} stats=${stats ? Object.keys(stats).length : 0}`);
+  console.log(`  ${slug}: "${name}" form=${infobox.form||'?'} attr=${infobox.attribute||'?'} elem=${infobox.element||'?'} rank=${infobox.rank||'?'} skills=${skills.length} stats=${stats ? Object.keys(stats).length : 0} maxStats=${maxStats ? Object.keys(maxStats).length : 0}`);
 
   return {
-    name, slug, infobox, names, stats, skills, introduction,
+    name, slug, infobox, names, stats, maxStats, skills, introduction,
     mainImg, data, zip, filename,
   };
 }
@@ -373,11 +471,26 @@ function generateDigimonUpsert(d) {
     setFields += `    },\n`;
   }
 
+  // Max Stats
+  if (d.maxStats) {
+    setFields += `    maxStats: {\n`;
+    for (const [k, v] of Object.entries(d.maxStats)) {
+      setFields += `      ${k}: ${v},\n`;
+    }
+    setFields += `    },\n`;
+  }
+
   // Skills
   if (d.skills.length > 0) {
     setFields += `    skills: [\n`;
     for (const sk of d.skills) {
       setFields += `      { name: '${safe(sk.name)}', type: '${sk.type}'`;
+      if (sk.element) setFields += `, element: '${safe(sk.element)}'`;
+      if (sk.cooldown != null) setFields += `, cooldown: ${sk.cooldown}`;
+      if (sk.dsConsumption != null) setFields += `, dsConsumption: ${sk.dsConsumption}`;
+      if (sk.skillPointsPerUpgrade != null) setFields += `, skillPointsPerUpgrade: ${sk.skillPointsPerUpgrade}`;
+      if (sk.animationTime != null) setFields += `, animationTime: ${sk.animationTime}`;
+      if (sk.description) setFields += `, description: '${safe(sk.description)}'`;
       if (sk.damagePerLevel) setFields += `, damagePerLevel: '${safe(sk.damagePerLevel)}'`;
       setFields += ` },\n`;
     }
@@ -408,10 +521,22 @@ function generateDigimonUpsert(d) {
 
 // ── Main ──
 async function main() {
-  const specificFile = process.argv[2];
+  const arg = process.argv[2];
   let zipFiles;
-  if (specificFile) {
-    zipFiles = [path.resolve(SCRAPES_DIR, specificFile)];
+  if (arg) {
+    const resolved = path.resolve(arg);
+    if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
+      // Argument is a directory — scan for ZIPs inside it
+      zipFiles = fs.readdirSync(resolved)
+        .filter(f => f.endsWith('.zip'))
+        .map(f => path.resolve(resolved, f));
+    } else if (resolved.endsWith('.zip') && fs.existsSync(resolved)) {
+      // Argument is a single ZIP file (absolute path)
+      zipFiles = [resolved];
+    } else {
+      // Argument is a filename relative to SCRAPES_DIR
+      zipFiles = [path.resolve(SCRAPES_DIR, arg)];
+    }
   } else {
     zipFiles = fs.readdirSync(SCRAPES_DIR)
       .filter(f => f.endsWith('.zip'))

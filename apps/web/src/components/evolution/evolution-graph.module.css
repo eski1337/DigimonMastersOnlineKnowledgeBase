@@ -1,6 +1,7 @@
-/* ── Theme tokens (dark default, light override below) ────────────── */
+/* ── Graph container + theme tokens ───────────────────────────────── */
 
-:root {
+.wrapper {
+  /* Dark tokens (default) */
   --evo-bg: #0c0e14;
   --evo-bg-subtle: rgba(255,255,255,0.03);
   --evo-border: rgba(249,115,22,0.18);
@@ -12,10 +13,20 @@
   --evo-tooltip-bg: rgba(8,10,18,0.97);
   --evo-tooltip-border: rgba(249,115,22,0.35);
   --evo-ctrl-bg: rgba(15,17,25,0.85);
-  --evo-dots: rgba(249,115,22,0.08);
+
+  position: relative;
+  width: 100%;
+  height: min(700px, 75vh);
+  min-height: 480px;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid var(--evo-border);
+  background: var(--evo-bg);
+  contain: layout style paint;
 }
 
-:global(.light) {
+/* Light mode overrides */
+:global(.light) .wrapper {
   --evo-bg: #f8fafc;
   --evo-bg-subtle: rgba(0,0,0,0.02);
   --evo-border: rgba(249,115,22,0.22);
@@ -27,21 +38,6 @@
   --evo-tooltip-bg: rgba(255,255,255,0.97);
   --evo-tooltip-border: rgba(249,115,22,0.3);
   --evo-ctrl-bg: rgba(255,255,255,0.9);
-  --evo-dots: rgba(249,115,22,0.06);
-}
-
-/* ── Graph container ──────────────────────────────────────────────── */
-
-.wrapper {
-  position: relative;
-  width: 100%;
-  height: min(700px, 75vh);
-  min-height: 480px;
-  overflow: hidden;
-  border-radius: 0.75rem;
-  border: 1px solid var(--evo-border);
-  background: var(--evo-bg);
-  contain: layout style paint;
 }
 
 /* ── React Flow overrides ─────────────────────────────────────────── */

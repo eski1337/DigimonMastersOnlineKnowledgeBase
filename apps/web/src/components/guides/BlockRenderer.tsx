@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Info, AlertTriangle, Lightbulb } from 'lucide-react';
 import { resolveMediaUrl } from '@/lib/icon-paths';
 

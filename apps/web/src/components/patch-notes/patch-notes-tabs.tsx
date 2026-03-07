@@ -19,7 +19,7 @@ function PatchNoteCard({ patch }: { patch: PatchNoteDoc }) {
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <Link href={`/patch-notes/${patch.slug}`} className="hover:underline">
+            <Link href={`/patch-notes/${patch.slug}`} prefetch={false} className="hover:underline">
               <CardTitle className="text-2xl mb-2">{patch.title}</CardTitle>
             </Link>
             <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">

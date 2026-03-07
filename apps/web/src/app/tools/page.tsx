@@ -1,5 +1,5 @@
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calculator, Timer, TrendingUp, Dices, Shield } from 'lucide-react';
+import { Calculator, TrendingUp, Dices, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 const tools = [
@@ -28,22 +28,6 @@ const tools = [
     type: 'calculator' as const,
   },
   {
-    id: '4',
-    slug: 'raid-timer',
-    title: 'Raid Timer',
-    description: 'Track raid spawn times and set notifications.',
-    icon: Timer,
-    type: 'utility' as const,
-  },
-  {
-    id: '5',
-    slug: 'progress-tracker',
-    title: 'Progress Tracker',
-    description: 'Keep track of your collection and achievements.',
-    icon: TrendingUp,
-    type: 'tracker' as const,
-  },
-  {
     id: '6',
     slug: 'gacha-simulator',
     title: 'Gacha Simulator',
@@ -69,7 +53,7 @@ export default function ToolsPage() {
         {tools.map(tool => {
           const Icon = tool.icon;
           return (
-            <Link key={tool.id} href={`/tools/${tool.slug}`}>
+            <Link key={tool.id} href={`/tools/${tool.slug}`} prefetch={false}>
               <Card className="card-hover h-full">
                 <CardHeader>
                   <Icon className="h-10 w-10 text-primary mb-3" />

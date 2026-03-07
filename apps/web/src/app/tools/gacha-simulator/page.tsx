@@ -89,9 +89,7 @@ export default function GachaSimulatorPage() {
 
   useEffect(() => {
     Object.values(RARITY_VIDEO).forEach(src => {
-      const link = document.createElement('link');
-      link.rel = 'preload'; link.as = 'video'; link.href = src;
-      document.head.appendChild(link);
+      fetch(src, { priority: 'low' } as RequestInit).catch(() => {});
     });
   }, []);
 

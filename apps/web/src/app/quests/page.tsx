@@ -1,11 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
 
 const mockQuests = [
   {
     id: '1',
-    slug: 'welcome-to-dmo',
     title: 'Welcome to DMO',
     type: 'Tutorial' as const,
     level: 1,
@@ -13,7 +11,6 @@ const mockQuests = [
   },
   {
     id: '2',
-    slug: 'first-battle',
     title: 'Your First Battle',
     type: 'Main' as const,
     level: 3,
@@ -35,24 +32,22 @@ export default function QuestsPage() {
 
       <div className="space-y-4">
         {mockQuests.map(quest => (
-          <Link key={quest.id} href={`/quests/${quest.slug}`}>
-            <Card className="card-hover">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <CardTitle>{quest.title}</CardTitle>
-                    <CardDescription>Level {quest.level}</CardDescription>
-                  </div>
-                  <Badge variant="secondary">{quest.type}</Badge>
+          <Card key={quest.id}>
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <CardTitle>{quest.title}</CardTitle>
+                  <CardDescription>Level {quest.level}</CardDescription>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm text-muted-foreground">
-                  Rewards: {quest.rewards.map(r => r.item).join(', ')}
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+                <Badge variant="secondary">{quest.type}</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-sm text-muted-foreground">
+                Rewards: {quest.rewards.map(r => r.item).join(', ')}
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

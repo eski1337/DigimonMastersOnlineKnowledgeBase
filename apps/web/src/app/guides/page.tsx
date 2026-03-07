@@ -65,7 +65,7 @@ export default async function GuidesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {guides.map(guide => (
-          <Link key={guide.id} href={`/guides/${guide.slug}`}>
+          <Link key={guide.id} href={`/guides/${guide.slug}`} prefetch={false}>
             <Card className="card-hover h-full">
               <CardHeader>
                 <div className="flex items-start gap-3 mb-2">

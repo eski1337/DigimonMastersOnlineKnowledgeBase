@@ -37,6 +37,7 @@ export function Header() {
               <Link
                 key={href}
                 href={href}
+                prefetch={false}
                 className={`transition-colors hover:text-foreground/80 ${
                   isActive ? 'text-foreground' : 'text-foreground/60'
                 }`}

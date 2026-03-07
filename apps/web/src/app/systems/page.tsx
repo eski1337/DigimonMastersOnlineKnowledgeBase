@@ -65,7 +65,7 @@ export default async function SystemsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {systems.map(system => (
-          <Link key={system.id} href={`/systems/${system.slug}`}>
+          <Link key={system.id} href={`/systems/${system.slug}`} prefetch={false}>
             <Card className="card-hover h-full">
               <CardHeader>
                 <div className="flex items-start gap-3 mb-2">

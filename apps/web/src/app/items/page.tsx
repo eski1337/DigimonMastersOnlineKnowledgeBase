@@ -223,7 +223,7 @@ export default function ItemsPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {items.map((item: any) => (
-                  <Link key={item.id} href={`/items/${item.slug}`}>
+                  <Link key={item.id} href={`/items/${item.slug}`} prefetch={false}>
                     <Card className="card-hover h-full group">
                       <CardHeader className="pb-3">
                         <div className="flex items-start gap-3">

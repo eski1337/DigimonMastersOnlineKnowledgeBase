@@ -57,8 +57,13 @@ export function resolveDigimonImage(url: string | null | undefined): string {
   return shouldUsePlaceholder(url) ? DIGIMON_PLACEHOLDER : url!;
 }
 
+const ELEMENT_FILENAME_MAP: Record<string, string> = {
+  'Pitch Black': 'Pitch_Black',
+};
+
 export function getElementIconPath(element: string): string {
-  return `/icons/Elements/${element.replace(/\s+/g, '_')}.png`;
+  const fileName = ELEMENT_FILENAME_MAP[element] || element.replace(/\s+/g, '_');
+  return `/icons/Elements/${fileName}.png`;
 }
 
 export function getAttributeIconPath(attribute: string): string {

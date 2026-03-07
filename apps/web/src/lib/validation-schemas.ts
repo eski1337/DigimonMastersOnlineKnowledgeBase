@@ -67,7 +67,7 @@ export type SearchQuery = z.infer<typeof searchQuerySchema>;
 
 export const digimonFilterSchema = z.object({
   element: z.enum(['Fire', 'Water', 'Ice', 'Wind', 'Thunder', 'Light', 'Pitch Black', 'Land', 'Wood', 'Steel', 'Neutral']).optional(),
-  attribute: z.enum(['Vaccine', 'Virus', 'Data', 'Free', 'Unknown']).optional(),
+  attribute: z.enum(['Vaccine', 'Virus', 'Data', 'Unknown', 'None']).optional(),
   rank: z.enum(['N', 'A', 'A+', 'S', 'S+', 'SS', 'SS+', 'SSS', 'SSS+', 'U', 'U+']).optional(),
   search: z.string().max(100).optional(),
   page: z.coerce.number().int().positive().optional().default(1),

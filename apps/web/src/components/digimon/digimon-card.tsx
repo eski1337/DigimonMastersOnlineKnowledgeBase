@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CmsImage } from '@/components/ui/cms-image';
 import type { Digimon } from '@dmo-kb/shared';
+import { getElementIconPath, getAttributeIconPath, getRankIconPath } from '@/lib/icon-paths';
 import styles from './digimon-card.module.css';
 
 interface DigimonCardProps {
@@ -75,47 +76,6 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
     typeof d.mainImage === 'object' && d.mainImage?.width ? d.mainImage.width : 1024;
   const imageHeight =
     typeof d.mainImage === 'object' && d.mainImage?.height ? d.mainImage.height : 1024;
-
-  // Map element names to icon paths
-  const getElementIconPath = (element: string) => {
-    const normalizedElement = element?.replace(/\s+/g, '_');
-    return `/icons/Elements/${normalizedElement}.png`;
-  };
-
-  // Map attribute names to icon paths
-  const getAttributeIconPath = (attribute: string) => {
-    // Handle special case for Unknown attribute
-    if (attribute === 'Unknown') {
-      return `/icons/Attributes/Unknown_Attribute.png`;
-    }
-    return `/icons/Attributes/${attribute}.png`;
-  };
-
-  // Map rank names to icon paths
-  const getRankIconPath = (rank: string) => {
-    return `/icons/Ranks/${rank}.png`;
-  };
-
-  // Map family names to icon paths
-  const _getFamilyIconPath = (family: string) => {
-    // Map display names to file names
-    const familyMap: Record<string, string> = {
-      'Dark Area': 'DarkArea',
-      'Deep Savers': 'DeepSavers',
-      "Dragon's Roar": 'DragonsRoar',
-      'Jungle Troopers': 'JungleTroopers',
-      'Metal Empire': 'MetalEmpire',
-      'Nature Spirits': 'NatureSpirits',
-      'Nightmare Soldiers': 'NightmareSoliders', // Note: typo in original file name
-      'Virus Busters': 'VirusBusters',
-      'Wind Guardians': 'WindGuardians',
-      'Unknown': 'Unknown',
-      'TBD': 'TBD',
-    };
-    
-    const fileName = familyMap[family] || family.replace(/\s+/g, '').replace(/'/g, '');
-    return `/icons/Families/${fileName}.png`;
-  };
 
   return (
     <Link href={`/digimon/${d.slug}`} prefetch={false}>

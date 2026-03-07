@@ -15,47 +15,13 @@ import {
   DIGIMON_ATTACKER_TYPES,
 } from '@dmo-kb/shared';
 import type { DigimonFilters } from '@dmo-kb/shared';
-
-const getElementIconPath = (element: string) =>
-  `/icons/Elements/${element.replace(/\s+/g, '_')}.png`;
-
-const getAttributeIconPath = (attribute: string) => {
-  if (attribute === 'Unknown') return '/icons/Attributes/Unknown_Attribute.png';
-  // 'Free' removed - use 'None' instead
-  return `/icons/Attributes/${attribute}.png`;
-};
-
-const getRankIconPath = (rank: string) =>
-  `/icons/Ranks/${rank}.png`;
-
-const getFamilyIconPath = (family: string) => {
-  const familyMap: Record<string, string> = {
-    'Dark Area': 'DarkArea',
-    'Deep Savers': 'DeepSavers',
-    "Dragon's Roar": 'DragonsRoar',
-    'Jungle Troopers': 'JungleTroopers',
-    'Metal Empire': 'MetalEmpire',
-    'Nature Spirits': 'NatureSpirits',
-    'Nightmare Soldiers': 'NightmareSoliders',
-    'Virus Busters': 'VirusBusters',
-    'Wind Guardians': 'WindGuardians',
-    'Unknown': 'Unknown',
-    'TBD': 'TBD',
-  };
-  const fileName = familyMap[family] || family.replace(/\s+/g, '').replace(/'/g, '');
-  return `/icons/Families/${fileName}.png`;
-};
-
-const getAttackerTypeIconPath = (attackerType: string) => {
-  const typeMap: Record<string, string> = {
-    'Quick Attacker': 'QuickAttacker',
-    'Short Attacker': 'ShortAttacker',
-    'Near Attacker': 'NearAttacker',
-    'Defender': 'Defender',
-  };
-  const fileName = typeMap[attackerType] || attackerType.replace(/\s+/g, '');
-  return `/icons/AttackerType/${fileName}.png`;
-};
+import {
+  getElementIconPath,
+  getAttributeIconPath,
+  getRankIconPath,
+  getFamilyIconPath,
+  getAttackerTypeIconPath,
+} from '@/lib/icon-paths';
 
 interface DigimonFiltersProps {
   filters: DigimonFilters;

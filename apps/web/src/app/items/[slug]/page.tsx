@@ -5,14 +5,9 @@ import { Package, ShoppingCart, Swords, BookOpen, Link2, Clock, TrendingUp, Spar
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
+import { resolveMediaUrl } from '@/lib/icon-paths';
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
-const PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
-
-function resolveMediaUrl(url: string | null | undefined): string {
-  if (!url) return '';
-  return url.startsWith('http') ? url : `${PUBLIC_CMS_URL}${url}`;
-}
 
 interface CMSItem {
   id: string;

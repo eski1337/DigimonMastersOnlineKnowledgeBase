@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -11,9 +12,43 @@ import { EvolutionGraphLoader } from '@/components/evolution/EvolutionGraphLoade
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import type { PayloadMedia } from '@/types/digimon';
+import {
+  getElementIconPath,
+  getAttributeIconPath,
+  getRankIconPath,
+  getFamilyIconPath,
+  getAttackerTypeIconPath,
+  getStatIconPath,
+  STAT_ORDER,
+} from '@/lib/icon-paths';
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
+const PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info';
 const USE_NEW_EVOLUTION = process.env.NEXT_PUBLIC_USE_NEW_EVOLUTION === 'true';
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const d = await getDigimon(params.slug);
+  if (!d) return { title: 'Digimon Not Found' };
+
+  const desc = [d.form, d.rank, d.element, d.attribute].filter(Boolean).join(' · ');
+  const imgUrl = typeof d.mainImage === 'object' && d.mainImage?.url
+    ? (d.mainImage.url.startsWith('http') ? d.mainImage.url : `${PUBLIC_CMS_URL}${d.mainImage.url}`)
+    : undefined;
+
+  return {
+    title: `${d.name} — DMO Knowledge Base`,
+    description: d.introduction
+      ? d.introduction.slice(0, 160)
+      : `${d.name} is a ${desc} Digimon in Digimon Masters Online.`,
+    openGraph: {
+      title: d.name,
+      description: d.introduction?.slice(0, 160) || `${d.name} — ${desc}`,
+      url: `${APP_URL}/digimon/${d.slug}`,
+      ...(imgUrl ? { images: [{ url: imgUrl, alt: d.name }] } : {}),
+    },
+  };
+}
 
 async function getDigimon(slug: string) {
   try {
@@ -65,67 +100,6 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
     imageUrl = '/icons/Placeholder/digiplaceholder.png';
   }
 
-  // Icon path helpers
-  const getElementIconPath = (element: string) => {
-    const normalizedElement = element?.replace(/\s+/g, '_');
-    return `/icons/Elements/${normalizedElement}.png`;
-  };
-
-  const getAttributeIconPath = (attribute: string) => {
-    // Handle special case for Unknown attribute
-    if (attribute === 'Unknown') {
-      return `/icons/Attributes/Unknown_Attribute.png`;
-    }
-    return `/icons/Attributes/${attribute}.png`;
-  };
-
-  const getRankIconPath = (rank: string) => {
-    return `/icons/Ranks/${rank}.png`;
-  };
-
-  const getFamilyIconPath = (family: string) => {
-    const familyMap: Record<string, string> = {
-      'Dark Area': 'DarkArea',
-      'Deep Savers': 'DeepSavers',
-      "Dragon's Roar": 'DragonsRoar',
-      'Jungle Troopers': 'JungleTroopers',
-      'Metal Empire': 'MetalEmpire',
-      'Nature Spirits': 'NatureSpirits',
-      'Nightmare Soldiers': 'NightmareSoliders',
-      'Virus Busters': 'VirusBusters',
-      'Wind Guardians': 'WindGuardians',
-      'Unknown': 'Unknown',
-      'TBD': 'TBD',
-    };
-    const fileName = familyMap[family] || family.replace(/\s+/g, '').replace(/'/g, '');
-    return `/icons/Families/${fileName}.png`;
-  };
-
-  const STAT_ORDER: { key: string; label: string }[] = [
-    { key: 'hp', label: 'HP' },
-    { key: 'at', label: 'AT' },
-    { key: 'de', label: 'DE' },
-    { key: 'as', label: 'AS' },
-    { key: 'ds', label: 'DS' },
-    { key: 'ct', label: 'CT' },
-    { key: 'ht', label: 'HT' },
-    { key: 'ev', label: 'EV' },
-  ];
-
-  const getStatIconPath = (stat: string) => {
-    return `/icons/Stats/${stat.toUpperCase()}.png`;
-  };
-
-  const getAttackerTypeIconPath = (attackerType: string) => {
-    const typeMap: Record<string, string> = {
-      'Quick Attacker': 'QuickAttacker',
-      'Short Attacker': 'ShortAttacker',
-      'Near Attacker': 'NearAttacker',
-      'Defender': 'Defender',
-    };
-    const fileName = typeMap[attackerType] || attackerType.replace(/\s+/g, '');
-    return `/icons/AttackerType/${fileName}.png`;
-  };
 
   // Get rank color for rarity indication
   const getRankColor = (rank: string) => {

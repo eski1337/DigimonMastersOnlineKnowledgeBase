@@ -10,14 +10,10 @@ import { Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ItemFilters, type ItemFiltersState } from '@/components/items/item-filters';
 import Link from 'next/link';
 import Image from 'next/image';
+import { resolveMediaUrl } from '@/lib/icon-paths';
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
 const ITEMS_PER_PAGE = 36;
-
-function resolveMediaUrl(url: string): string {
-  if (!url) return '';
-  return url.startsWith('http') ? url : `${CMS_URL}${url}`;
-}
 
 const CATEGORY_LABELS: Record<string, string> = {
   evolution: 'Evolution',

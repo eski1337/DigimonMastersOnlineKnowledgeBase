@@ -344,7 +344,7 @@ function ImageGridBlockView({ block }: { block: ImageGridBlockData }) {
       {block.title && <h2 className="text-xl font-bold mb-2 text-foreground">{block.title}</h2>}
       <div className={`grid ${gridCols[cols] || gridCols['4']} gap-3`}>
         {(block.images || []).map((img, i) => {
-          const src = resolveImgSrc(img.image?.url) || img.imageUrl;
+          const src = resolveImgSrc(img.image?.url) || resolveImgSrc(img.imageUrl);
           if (!src) return null;
           return (
             <Card key={i} className="text-center overflow-hidden">
@@ -365,7 +365,7 @@ function ImageGridBlockView({ block }: { block: ImageGridBlockData }) {
 }
 
 function ImageBlockView({ block }: { block: ImageBlockData }) {
-  const src = resolveImgSrc(block.image?.url) || block.imageUrl;
+  const src = resolveImgSrc(block.image?.url) || resolveImgSrc(block.imageUrl);
   if (!src) return null;
 
   const sizeClasses: Record<string, string> = {

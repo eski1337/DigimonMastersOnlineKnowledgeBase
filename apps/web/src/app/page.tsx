@@ -52,11 +52,12 @@ export default async function HomePage() {
             Community-Driven Knowledge Base
           </Badge>
           <h1 className="text-3xl font-bold sm:text-5xl md:text-6xl lg:text-7xl">
-            Master the Digital World
+            Digimon Masters Online
+            <span className="block text-primary">Knowledge Base</span>
           </h1>
           <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-            Your comprehensive guide to Digimon Masters Online. Discover Digimon stats, complete
-            quests, explore maps, and use powerful tools to enhance your gameplay.
+            The ultimate DMO wiki and database. Browse Digimon stats, digivolution charts,
+            items, maps, guides and patch notes — for GDMO, KDMO, and all servers.
           </p>
           <div className="flex gap-4">
             <Button asChild size="lg">
@@ -86,34 +87,34 @@ export default async function HomePage() {
               <Database className="h-10 w-10 text-primary mb-2" />
               <CardTitle>Digimon Database</CardTitle>
               <CardDescription>
-                Browse hundreds of Digimon with detailed stats, evolution paths, and skills.
+                Browse every DMO Digimon with stats, digivolution chains, skills, and evolution requirements.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader>
               <Map className="h-10 w-10 text-primary mb-2" />
-              <CardTitle>Interactive Maps</CardTitle>
+              <CardTitle>DMO Maps & Locations</CardTitle>
               <CardDescription>
-                Explore every corner of the Digital World with detailed map information.
+                Explore Real World and Digital World maps with wild Digimon spawns, NPCs, and drops.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader>
               <BookOpen className="h-10 w-10 text-primary mb-2" />
-              <CardTitle>Quest Guides</CardTitle>
+              <CardTitle>Guides & Walkthroughs</CardTitle>
               <CardDescription>
-                Complete every quest with step-by-step guides and reward information.
+                In-depth DMO guides for beginners and veterans — digivice, farming, evolution and more.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card>
             <CardHeader>
               <Wrench className="h-10 w-10 text-primary mb-2" />
-              <CardTitle>Tools & Calculators</CardTitle>
+              <CardTitle>Items & Equipment</CardTitle>
               <CardDescription>
-                Use powerful tools like clone calculators, gacha simulators, and more.
+                Complete item database — evolution items, consumables, materials, eggs, and equipment.
               </CardDescription>
             </CardHeader>
           </Card>

@@ -35,6 +35,7 @@ export const Items: CollectionConfig = {
       name: 'published',
       type: 'checkbox',
       defaultValue: true,
+      index: true,
       admin: { position: 'sidebar' },
     },
 
@@ -49,6 +50,7 @@ export const Items: CollectionConfig = {
           type: 'text',
           required: true,
           unique: true,
+          index: true,
           admin: { width: '60%', description: 'Item name (e.g., "Option Change Stone", "Burst Mode Item")' },
         },
         {
@@ -91,6 +93,7 @@ export const Items: CollectionConfig = {
                   name: 'category',
                   type: 'select',
                   required: true,
+                  index: true,
                   defaultValue: 'other',
                   options: [
                     { label: 'Evolution Item', value: 'evolution' },
@@ -115,6 +118,7 @@ export const Items: CollectionConfig = {
                 {
                   name: 'rarity',
                   type: 'select',
+                  index: true,
                   options: [
                     { label: 'Common', value: 'common' },
                     { label: 'Uncommon', value: 'uncommon' },

@@ -37,16 +37,29 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     ? (d.mainImage.url.startsWith('http') ? d.mainImage.url : `${PUBLIC_CMS_URL}${d.mainImage.url}`)
     : undefined;
 
+  const seoDesc = d.introduction
+    ? d.introduction.slice(0, 160)
+    : `${d.name} — ${desc} Digimon in Digimon Masters Online (DMO). Stats, digivolution chain, skills & evolution requirements.`;
+
   return {
-    title: `${d.name} — DMO Knowledge Base`,
-    description: d.introduction
-      ? d.introduction.slice(0, 160)
-      : `${d.name} is a ${desc} Digimon in Digimon Masters Online.`,
+    title: `${d.name} — Stats, Digivolution & Skills`,
+    description: seoDesc,
+    keywords: [
+      d.name, `${d.name} DMO`, `${d.name} Digimon Masters`,
+      `${d.name} stats`, `${d.name} digivolution`, `${d.name} evolution`,
+      'DMO', 'Digimon Masters Online', 'GDMO', 'KDMO',
+    ],
     openGraph: {
-      title: d.name,
-      description: d.introduction?.slice(0, 160) || `${d.name} — ${desc}`,
+      title: `${d.name} — DMO Knowledge Base`,
+      description: seoDesc,
       url: `${APP_URL}/digimon/${d.slug}`,
       ...(imgUrl ? { images: [{ url: imgUrl, alt: d.name }] } : {}),
+    },
+    twitter: {
+      card: imgUrl ? 'summary_large_image' : 'summary',
+      title: `${d.name} — DMO Knowledge Base`,
+      description: seoDesc,
+      ...(imgUrl ? { images: [imgUrl] } : {}),
     },
   };
 }

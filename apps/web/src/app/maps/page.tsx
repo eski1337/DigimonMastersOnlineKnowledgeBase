@@ -2,8 +2,19 @@ import type { Metadata } from 'next';
 import { MapsExplorer } from '@/components/maps/maps-explorer';
 
 export const metadata: Metadata = {
-  title: 'Maps & Areas - DMO KB',
-  description: 'Explore all locations in the Real World and Digital World of Digimon Masters Online.',
+  title: 'Maps & Areas — DMO World Map, Dungeons & Locations',
+  description:
+    'Interactive map database for Digimon Masters Online. All Real World and Digital World locations, dungeons, raid maps, wild Digimon spawns, NPCs and item drops for GDMO, KDMO & all servers.',
+  keywords: [
+    'DMO maps', 'DMO map database', 'Digimon Masters maps',
+    'DMO dungeons', 'DMO raid maps', 'DMO locations',
+    'DMO wild Digimon', 'DMO spawns', 'GDMO maps', 'KDMO maps',
+    'DMO Digital World', 'DMO Real World',
+  ],
+  openGraph: {
+    title: 'Maps & Areas — DMO Knowledge Base',
+    description: 'All DMO maps, dungeons, and locations with wild Digimon spawns and NPC info.',
+  },
 };
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';

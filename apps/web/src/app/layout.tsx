@@ -13,27 +13,61 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  title: 'DMO KB - Digimon Masters Online Knowledge Base',
+  title: {
+    default: 'DMO Knowledge Base — Digimon Masters Online Wiki, Database & Guides',
+    template: '%s — DMO Knowledge Base',
+  },
   description:
-    'A comprehensive, modern knowledge base for Digimon Masters Online. Find Digimon stats, quests, guides, tools, and more.',
+    'The most comprehensive Digimon Masters Online (DMO) knowledge base. Digimon stats, digivolution charts, item database, maps, guides, patch notes & tools. Covers GDMO, KDMO, NADMO, TWDMO, HKDMO, THDMO & more.',
   keywords: [
-    'Digimon Masters Online',
-    'DMO',
-    'Digimon',
-    'Knowledge Base',
-    'Wiki',
-    'Database',
-    'Guides',
-    'Tools',
+    // Primary
+    'Digimon Masters Online', 'DMO', 'DMO Wiki', 'DMO Database', 'DMO Knowledge Base',
+    'DMO KB', 'DMOKB',
+    // Regional server variants — what players actually search
+    'GDMO', 'NADMO', 'KDMO', 'TWDMO', 'HKDMO', 'THDMO', 'TDMO',
+    'Global DMO', 'Korea DMO', 'NA DMO', 'Taiwan DMO',
+    // Alternative names / competitor keywords
+    'DMOWiki', 'DMO Wiki', 'Digimon Masters Wiki', 'Digimon Masters Database',
+    'Digimon Masters Guide', 'Digimon Online',
+    // Content keywords
+    'Digimon stats', 'Digimon digivolution', 'DMO digivolution chart',
+    'DMO items', 'DMO maps', 'DMO guides', 'DMO patch notes',
+    'DMO evolution line', 'DMO tier list', 'DMO best Digimon',
+    'Digimon Masters builds', 'DMO beginner guide',
+    // Franchise
+    'Digimon', 'Digital Monsters',
   ],
   authors: [{ name: 'DMO KB Community' }],
+  creator: 'DMO KB',
+  publisher: 'DMO KB',
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info',
-    siteName: 'DMO KB',
-    title: 'DMO KB - Digimon Masters Online Knowledge Base',
-    description: 'Comprehensive DMO knowledge base with Digimon stats, quests, and guides.',
+    siteName: 'DMO Knowledge Base',
+    title: 'DMO Knowledge Base — Digimon Masters Online Wiki & Database',
+    description:
+      'Comprehensive Digimon Masters Online database. Digimon stats, digivolution trees, items, maps, guides & patch notes for GDMO, KDMO, NADMO and all servers.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'DMO Knowledge Base — Digimon Masters Online',
+    description:
+      'The ultimate DMO wiki. Digimon stats, digivolution charts, items, maps & guides.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   manifest: '/manifest.json',
 };
@@ -45,6 +79,45 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'WebSite',
+                  '@id': `${process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info'}/#website`,
+                  url: process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info',
+                  name: 'DMO Knowledge Base',
+                  alternateName: ['DMOKB', 'DMO KB', 'DMO Wiki', 'Digimon Masters Wiki', 'Digimon Masters Database'],
+                  description: 'The most comprehensive Digimon Masters Online knowledge base. Covers GDMO, KDMO, NADMO, TWDMO, HKDMO, THDMO and all servers.',
+                  potentialAction: {
+                    '@type': 'SearchAction',
+                    target: {
+                      '@type': 'EntryPoint',
+                      urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info'}/digimon?search={search_term_string}`,
+                    },
+                    'query-input': 'required name=search_term_string',
+                  },
+                },
+                {
+                  '@type': 'Organization',
+                  '@id': `${process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info'}/#organization`,
+                  name: 'DMO Knowledge Base',
+                  alternateName: 'DMOKB',
+                  url: process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info',
+                  logo: {
+                    '@type': 'ImageObject',
+                    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info'}/og-image.png`,
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
         <SessionProvider>

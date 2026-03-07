@@ -1,7 +1,23 @@
+import type { Metadata } from 'next';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Guides — DMO Beginner & Advanced Guides',
+  description:
+    'In-depth guides for Digimon Masters Online. Beginner walkthroughs, digivice guides, evolution tips, farming strategies and more for GDMO, KDMO & all DMO servers.',
+  keywords: [
+    'DMO guide', 'DMO beginner guide', 'Digimon Masters guide',
+    'DMO tips', 'DMO walkthrough', 'GDMO guide', 'KDMO guide',
+    'DMO digivice guide', 'DMO farming guide', 'DMO evolution guide',
+  ],
+  openGraph: {
+    title: 'Guides — DMO Knowledge Base',
+    description: 'In-depth Digimon Masters Online guides for beginners and veterans.',
+  },
+};
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 

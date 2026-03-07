@@ -1,7 +1,23 @@
+import type { Metadata } from 'next';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Cog } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Game Systems — DMO Mechanics & Systems Explained',
+  description:
+    'Detailed explanations of all Digimon Masters Online game systems. Size system, attribute advantage, OCS, sealing, hatching, evolution mechanics and more for GDMO, KDMO & all servers.',
+  keywords: [
+    'DMO systems', 'DMO game mechanics', 'Digimon Masters systems',
+    'DMO size system', 'DMO OCS', 'DMO sealing', 'DMO hatching',
+    'DMO attribute system', 'GDMO systems', 'DMO evolution system',
+  ],
+  openGraph: {
+    title: 'Game Systems — DMO Knowledge Base',
+    description: 'All DMO game mechanics and systems explained in detail.',
+  },
+};
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
 

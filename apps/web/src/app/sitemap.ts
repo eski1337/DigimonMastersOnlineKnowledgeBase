@@ -5,12 +5,17 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [
+    // Core pages
     { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     { url: `${BASE_URL}/digimon`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/items`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE_URL}/maps`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE_URL}/guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/systems`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/patch-notes`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
-    { url: `${BASE_URL}/guides`, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE_URL}/quests`, changeFrequency: 'weekly', priority: 0.7 },
+    // Static pages
+    { url: `${BASE_URL}/about`, changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${BASE_URL}/contribute`, changeFrequency: 'monthly', priority: 0.4 },
   ];
 
   // Fetch all published digimon slugs
@@ -49,6 +54,63 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   } catch {
     // CMS unavailable — skip dynamic map entries
+  }
+
+  // Fetch all published items slugs
+  try {
+    const items = await fetchCMSCollection<{ slug: string; updatedAt: string }>('items', {
+      where: { published: { equals: true } },
+      limit: 2000,
+      sort: '-updatedAt',
+    });
+    for (const i of items.docs) {
+      entries.push({
+        url: `${BASE_URL}/items/${i.slug}`,
+        lastModified: new Date(i.updatedAt),
+        changeFrequency: 'weekly',
+        priority: 0.6,
+      });
+    }
+  } catch {
+    // CMS unavailable — skip dynamic item entries
+  }
+
+  // Fetch all published guides slugs
+  try {
+    const guides = await fetchCMSCollection<{ slug: string; updatedAt: string }>('guides', {
+      where: { published: { equals: true } },
+      limit: 500,
+      sort: '-updatedAt',
+    });
+    for (const g of guides.docs) {
+      entries.push({
+        url: `${BASE_URL}/guides/${g.slug}`,
+        lastModified: new Date(g.updatedAt),
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
+    }
+  } catch {
+    // CMS unavailable — skip dynamic guide entries
+  }
+
+  // Fetch all published systems slugs
+  try {
+    const systems = await fetchCMSCollection<{ slug: string; updatedAt: string }>('systems', {
+      where: { published: { equals: true } },
+      limit: 500,
+      sort: '-updatedAt',
+    });
+    for (const s of systems.docs) {
+      entries.push({
+        url: `${BASE_URL}/systems/${s.slug}`,
+        lastModified: new Date(s.updatedAt),
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
+    }
+  } catch {
+    // CMS unavailable — skip dynamic systems entries
   }
 
   // Fetch all published patch notes slugs

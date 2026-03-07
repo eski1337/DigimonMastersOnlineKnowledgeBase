@@ -20,6 +20,7 @@ import {
   getAttackerTypeIconPath,
   getStatIconPath,
   STAT_ORDER,
+  resolveDigimonImage,
 } from '@/lib/icon-paths';
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
@@ -82,23 +83,11 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
   }
 
   // Get image URL - prefer mainImage, fallback to icon, then placeholder
-  let imageUrl = typeof d.mainImage === 'string' 
+  const rawImageUrl = typeof d.mainImage === 'string' 
     ? d.mainImage 
     : (d.mainImage as PayloadMedia)?.url || 
       (typeof d.icon === 'string' ? d.icon : (d.icon as PayloadMedia)?.url);
-  
-  // Use placeholder if no image or if it's a wrong icon
-  const shouldUsePlaceholder = !imageUrl || 
-      imageUrl.includes('/Families/') || 
-      imageUrl.includes('/Attributes/') ||
-      imageUrl.includes('Virus_Busters') ||
-      imageUrl.includes('VirusBuster') ||
-      imageUrl.includes('VB.png') ||
-      imageUrl.includes('Alphamon_(X-Antibody_System)_Icon'); // Specific bad icon
-  
-  if (shouldUsePlaceholder) {
-    imageUrl = '/icons/Placeholder/digiplaceholder.png';
-  }
+  const imageUrl = resolveDigimonImage(rawImageUrl);
 
 
   // Get rank color for rarity indication

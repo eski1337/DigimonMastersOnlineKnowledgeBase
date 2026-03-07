@@ -34,6 +34,29 @@ const ATTACKER_TYPE_FILENAME_MAP: Record<string, string> = {
   'Defender': 'Defender',
 };
 
+/** Bad icon patterns that should fall back to placeholder */
+const BAD_ICON_PATTERNS = [
+  '/Families/',
+  '/Attributes/',
+  'Virus_Busters',
+  'VirusBuster',
+  'VB.png',
+  'Alphamon_(X-Antibody_System)_Icon',
+];
+
+export const DIGIMON_PLACEHOLDER = '/icons/Placeholder/digiplaceholder.png';
+
+/** Check if an image URL is a known bad icon that should use a placeholder */
+export function shouldUsePlaceholder(url: string | null | undefined): boolean {
+  if (!url) return true;
+  return BAD_ICON_PATTERNS.some((p) => url.includes(p));
+}
+
+/** Resolve a Digimon image URL, returning the placeholder for bad/missing icons */
+export function resolveDigimonImage(url: string | null | undefined): string {
+  return shouldUsePlaceholder(url) ? DIGIMON_PLACEHOLDER : url!;
+}
+
 export function getElementIconPath(element: string): string {
   return `/icons/Elements/${element.replace(/\s+/g, '_')}.png`;
 }

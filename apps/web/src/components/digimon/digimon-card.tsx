@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CmsImage } from '@/components/ui/cms-image';
 import type { Digimon } from '@dmo-kb/shared';
-import { getElementIconPath, getAttributeIconPath, getRankIconPath } from '@/lib/icon-paths';
+import { getElementIconPath, getAttributeIconPath, getRankIconPath, resolveDigimonImage } from '@/lib/icon-paths';
 import styles from './digimon-card.module.css';
 
 interface DigimonCardProps {
@@ -59,18 +59,7 @@ export function DigimonCard({ digimon, priority = false }: DigimonCardProps) {
     imageUrl = typeof d.icon === 'object' && d.icon ? d.icon.url : undefined;
   }
   
-  // Use placeholder if no image or if it's a wrong icon
-  const shouldUsePlaceholder = !imageUrl || 
-      imageUrl.includes('/Families/') || 
-      imageUrl.includes('/Attributes/') ||
-      imageUrl.includes('Virus_Busters') ||
-      imageUrl.includes('VirusBuster') ||
-      imageUrl.includes('VB.png') ||
-      imageUrl.includes('Alphamon_(X-Antibody_System)_Icon'); // Specific bad icon
-  
-  if (shouldUsePlaceholder) {
-    imageUrl = '/icons/Placeholder/digiplaceholder.png';
-  }
+  imageUrl = resolveDigimonImage(imageUrl);
 
   const imageWidth =
     typeof d.mainImage === 'object' && d.mainImage?.width ? d.mainImage.width : 1024;

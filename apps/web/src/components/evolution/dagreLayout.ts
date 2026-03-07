@@ -6,10 +6,10 @@ import { COMPACT_NODE_WIDTH, COMPACT_NODE_HEIGHT } from './nodeTypes';
 
 /* ── Constants ────────────────────────────────────────────────────────── */
 
-const NODE_WIDTH = 160;
-const NODE_HEIGHT = 150;
-const RANK_SEP = 140;
-const NODE_SEP = 50;
+const NODE_WIDTH = 200;
+const NODE_HEIGHT = 190;
+const RANK_SEP = 180;
+const NODE_SEP = 70;
 
 /* ── Build React Flow nodes + edges from API data ─────────────────────── */
 

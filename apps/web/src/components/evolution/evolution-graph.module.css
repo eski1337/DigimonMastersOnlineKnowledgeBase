@@ -13,6 +13,7 @@
   --evo-tooltip-bg: rgba(8,10,18,0.97);
   --evo-tooltip-border: rgba(249,115,22,0.35);
   --evo-ctrl-bg: rgba(15,17,25,0.85);
+  --evo-edge-outline: #0c0e14;
 
   position: relative;
   width: 100%;
@@ -38,6 +39,7 @@
   --evo-tooltip-bg: rgba(255,255,255,0.97);
   --evo-tooltip-border: rgba(249,115,22,0.3);
   --evo-ctrl-bg: rgba(255,255,255,0.9);
+  --evo-edge-outline: #f8fafc;
 }
 
 /* ── React Flow overrides ─────────────────────────────────────────── */
@@ -88,7 +90,10 @@
   box-shadow: 0 0 0 1px rgba(249,115,22,0.15), 0 0 20px rgba(249,115,22,0.12), var(--evo-node-shadow);
 }
 
-/* hover lift */
+/* hover lift + z-index so tooltip is above everything */
+.wrapper :global(.react-flow__node:hover) {
+  z-index: 1000 !important;
+}
 .wrapper :global(.react-flow__node:hover .evo-node) {
   transform: translateY(-2px);
   box-shadow: 0 0 24px rgba(249,115,22,0.18), 0 8px 20px rgba(0,0,0,0.18);

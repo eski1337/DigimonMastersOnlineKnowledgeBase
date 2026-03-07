@@ -3,6 +3,8 @@
 import { memo } from 'react';
 import { BaseEdge, getSmoothStepPath, EdgeLabelRenderer, type EdgeProps } from '@xyflow/react';
 
+const BORDER_RADIUS = 0;
+
 /* ── Edge color map by evolution type ─────────────────────────────────── */
 
 const EDGE_COLORS: Record<string, string> = {
@@ -105,6 +107,7 @@ function EvolutionEdgeInner(props: EdgeProps) {
       targetY,
       sourcePosition,
       targetPosition,
+      borderRadius: BORDER_RADIUS,
     });
   }
 
@@ -115,7 +118,7 @@ function EvolutionEdgeInner(props: EdgeProps) {
         id={`${id}-outline`}
         path={edgePath}
         style={{
-          stroke: '#0a0a0f',
+          stroke: 'var(--evo-edge-outline, #0c0e14)',
           strokeWidth: 10,
           strokeLinecap: 'round',
         }}
@@ -160,7 +163,7 @@ function EvolutionEdgeInner(props: EdgeProps) {
           >
             <div
               style={{
-                background: 'rgba(10, 10, 15, 0.92)',
+                background: 'var(--evo-tooltip-bg, rgba(10,10,15,0.92))',
                 border: `1px solid ${color}50`,
                 borderRadius: '10px',
                 padding: '2px 8px',
@@ -188,7 +191,7 @@ function EvolutionEdgeInner(props: EdgeProps) {
                 style={{
                   fontSize: '9px',
                   fontWeight: 600,
-                  color: '#e5e7eb',
+                  color: 'var(--evo-text, #e5e7eb)',
                   letterSpacing: '0.02em',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',

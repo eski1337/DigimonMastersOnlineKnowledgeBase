@@ -34,7 +34,7 @@ type ViewMode = 'icon' | 'artwork';
 export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
   const router = useRouter();
   const { data, isLoading, error } = useEvolutionGraph(slug);
-  const [viewMode, setViewMode] = useState<ViewMode>('icon');
+  const [viewMode, setViewMode] = useState<ViewMode>('artwork');
 
   // Build React Flow elements from API data
   const { nodes, edges } = useMemo(() => {

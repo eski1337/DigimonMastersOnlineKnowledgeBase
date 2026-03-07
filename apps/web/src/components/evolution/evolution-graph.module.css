@@ -1,4 +1,36 @@
-/* ── Digivolution Graph Container ──────────────────────────────────── */
+/* ── Theme tokens (dark default, light override below) ────────────── */
+
+:root {
+  --evo-bg: #0c0e14;
+  --evo-bg-subtle: rgba(255,255,255,0.03);
+  --evo-border: rgba(249,115,22,0.18);
+  --evo-node-bg: rgba(15,17,25,0.92);
+  --evo-node-border: rgba(100,116,139,0.35);
+  --evo-node-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  --evo-text: #e2e8f0;
+  --evo-text-muted: #94a3b8;
+  --evo-tooltip-bg: rgba(8,10,18,0.97);
+  --evo-tooltip-border: rgba(249,115,22,0.35);
+  --evo-ctrl-bg: rgba(15,17,25,0.85);
+  --evo-dots: rgba(249,115,22,0.08);
+}
+
+:global(.light) {
+  --evo-bg: #f8fafc;
+  --evo-bg-subtle: rgba(0,0,0,0.02);
+  --evo-border: rgba(249,115,22,0.22);
+  --evo-node-bg: rgba(255,255,255,0.92);
+  --evo-node-border: rgba(148,163,184,0.4);
+  --evo-node-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  --evo-text: #1e293b;
+  --evo-text-muted: #64748b;
+  --evo-tooltip-bg: rgba(255,255,255,0.97);
+  --evo-tooltip-border: rgba(249,115,22,0.3);
+  --evo-ctrl-bg: rgba(255,255,255,0.9);
+  --evo-dots: rgba(249,115,22,0.06);
+}
+
+/* ── Graph container ──────────────────────────────────────────────── */
 
 .wrapper {
   position: relative;
@@ -7,97 +39,217 @@
   min-height: 480px;
   overflow: hidden;
   border-radius: 0.75rem;
-  border: 2px solid rgba(249, 115, 22, 0.25);
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(249, 115, 22, 0.03) 0%, transparent 60%),
-    hsl(var(--card));
+  border: 1px solid var(--evo-border);
+  background: var(--evo-bg);
   contain: layout style paint;
 }
 
 /* ── React Flow overrides ─────────────────────────────────────────── */
 
-.wrapper :global(.react-flow) {
-  width: 100%;
-  height: 100%;
-}
-
-.wrapper :global(.react-flow__background) {
-  opacity: 0.2;
-}
-
-.wrapper :global(.react-flow__attribution) {
-  display: none;
-}
+.wrapper :global(.react-flow) { width: 100%; height: 100%; }
+.wrapper :global(.react-flow__background) { opacity: 1; }
+.wrapper :global(.react-flow__attribution) { display: none; }
+.wrapper :global(.react-flow__minimap) { display: none; }
 
 .wrapper :global(.react-flow__controls) {
-  bottom: 10px;
-  right: 10px;
-  left: auto;
-  gap: 2px;
+  bottom: 10px; right: 10px; left: auto; gap: 2px;
 }
-
 .wrapper :global(.react-flow__controls button) {
-  width: 26px;
-  height: 26px;
-  background: hsl(var(--card));
-  border: 1px solid rgba(249, 115, 22, 0.25);
+  width: 28px; height: 28px;
+  background: var(--evo-ctrl-bg);
+  border: 1px solid var(--evo-border);
   color: #f97316;
   border-radius: 6px;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
 }
-
 .wrapper :global(.react-flow__controls button:hover) {
-  background: rgba(249, 115, 22, 0.12);
-  border-color: rgba(249, 115, 22, 0.45);
+  background: rgba(249,115,22,0.12);
+  border-color: rgba(249,115,22,0.45);
 }
-
 .wrapper :global(.react-flow__controls button svg) {
-  fill: currentColor;
-  max-width: 14px;
-  max-height: 14px;
+  fill: currentColor; max-width: 14px; max-height: 14px;
 }
 
-.wrapper :global(.react-flow__minimap) {
-  display: none;
+/* ── Node base ────────────────────────────────────────────────────── */
+
+.wrapper :global(.evo-node) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px;
+  border: 1.5px solid var(--evo-node-border);
+  background: var(--evo-node-bg);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--evo-node-shadow);
+  transition: box-shadow 0.2s ease, transform 0.18s ease, border-color 0.2s ease;
+  user-select: none;
+  overflow: hidden;
 }
 
-/* ── Node hover elevation ─────────────────────────────────────────── */
-
-.wrapper :global(.react-flow__node:hover .evolution-node-card) {
-  box-shadow:
-    0 0 20px rgba(249, 115, 22, 0.25),
-    0 4px 16px rgba(0, 0, 0, 0.4) !important;
-  transform: translateY(-1px);
+.wrapper :global(.evo-node--clickable) { cursor: pointer; }
+.wrapper :global(.evo-node--current) {
+  border-color: #f97316;
+  box-shadow: 0 0 0 1px rgba(249,115,22,0.15), 0 0 20px rgba(249,115,22,0.12), var(--evo-node-shadow);
 }
 
-/* ── Current node pulse ───────────────────────────────────────────── */
-
-@keyframes currentPulse {
-  0%, 100% { opacity: 0.3; }
-  50%      { opacity: 0.7; }
+/* hover lift */
+.wrapper :global(.react-flow__node:hover .evo-node) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(249,115,22,0.18), 0 8px 20px rgba(0,0,0,0.18);
+  border-color: rgba(249,115,22,0.5);
 }
 
-/* ── Mobile touch ─────────────────────────────────────────────────── */
+/* ── Detailed node ────────────────────────────────────────────────── */
 
-.wrapper :global(.react-flow__pane) {
-  touch-action: none;
+.wrapper :global(.evo-node--detailed) {
+  width: 150px;
+  padding: 10px 8px 8px;
+  gap: 5px;
 }
+
+.wrapper :global(.evo-node__icon-wrap) {
+  width: 72px; height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--evo-bg-subtle);
+  border: 1px solid var(--evo-node-border);
+  display: flex;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.wrapper :global(.evo-node__icon-img) {
+  width: 64px; height: 64px;
+  object-fit: contain;
+}
+
+.wrapper :global(.evo-node__icon-fallback) {
+  color: var(--evo-text-muted);
+  font-size: 20px; font-weight: 700;
+  align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+}
+
+.wrapper :global(.evo-node__name) {
+  font-size: 12px; font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--evo-text);
+  max-width: 140px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+.wrapper :global(.evo-node--current .evo-node__name) { color: #fb923c; }
+
+.wrapper :global(.evo-node__badge) {
+  font-size: 9px; font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(148,163,184,0.1);
+  color: var(--evo-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Compact node ─────────────────────────────────────────────────── */
+
+.wrapper :global(.evo-node--compact) {
+  width: 68px; height: 68px;
+  padding: 0;
+  border-radius: 12px;
+}
+
+.wrapper :global(.evo-node__compact-img) {
+  width: 60px; height: 60px;
+  object-fit: contain;
+  padding: 2px;
+}
+
+.wrapper :global(.evo-node__icon-fallback--lg) {
+  font-size: 22px;
+}
+
+/* ── Current pulse ring ───────────────────────────────────────────── */
+
+.wrapper :global(.evo-node__pulse) {
+  position: absolute;
+  inset: -4px;
+  border-radius: 13px;
+  border: 2px solid rgba(249,115,22,0.25);
+  pointer-events: none;
+  animation: evoPulse 2.5s ease-in-out infinite;
+}
+.wrapper :global(.evo-node__pulse--compact) {
+  inset: -3px;
+  border-radius: 14px;
+}
+
+@keyframes evoPulse {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50%      { opacity: 0.6;  transform: scale(1.02); }
+}
+
+/* ── Compact hover tooltip ────────────────────────────────────────── */
+
+.wrapper :global(.evo-tooltip) {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%) translateY(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px 5px;
+  border-radius: 8px;
+  background: var(--evo-tooltip-bg);
+  border: 1px solid var(--evo-tooltip-border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 50;
+}
+
+.wrapper :global(.evo-tooltip__name) {
+  font-size: 12px; font-weight: 700;
+  color: var(--evo-text);
+}
+.wrapper :global(.evo-node--current ~ .evo-tooltip .evo-tooltip__name) { color: #fb923c; }
+
+.wrapper :global(.evo-tooltip__badge) {
+  font-size: 9px; font-weight: 600;
+  color: var(--evo-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wrapper :global(.evo-tooltip__arrow) {
+  position: absolute;
+  bottom: -5px; left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px; height: 8px;
+  background: var(--evo-tooltip-bg);
+  border-right: 1px solid var(--evo-tooltip-border);
+  border-bottom: 1px solid var(--evo-tooltip-border);
+}
+
+.wrapper :global(.react-flow__node:hover .evo-tooltip) {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────── */
+
+.wrapper :global(.react-flow__pane) { touch-action: none; }
 
 @media (max-width: 768px) {
-  .wrapper {
-    height: min(420px, 60vh);
-    min-height: 320px;
-    touch-action: pan-y;
-  }
-}
-
-/* ── Outer card ───────────────────────────────────────────────────── */
-
-.card {
-  border-radius: 0.75rem;
-  border: 2px solid rgba(249, 115, 22, 0.3);
-  background: hsl(var(--card));
-  overflow: hidden;
+  .wrapper { height: min(420px, 60vh); min-height: 320px; touch-action: pan-y; }
 }
 
 /* ── Header ───────────────────────────────────────────────────────── */
@@ -112,7 +264,7 @@
 .title {
   font-size: 1.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #fb923c, #f97316);
+  background: linear-gradient(135deg, #fb923c, #ea580c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -138,76 +290,28 @@
 }
 
 .legendDot {
-  width: 8px;
+  width: 10px;
   height: 3px;
   border-radius: 2px;
   flex-shrink: 0;
 }
 
-/* ── Loading skeleton ─────────────────────────────────────────────── */
-
-.skeleton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.spinner {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  border-bottom-color: #f97316;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ── Error / empty fallback ───────────────────────────────────────── */
-
-.fallback {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  height: 100%;
-  padding: 2rem;
-  text-align: center;
-}
-
-.fallbackText {
-  font-size: 0.875rem;
-  color: hsl(var(--muted-foreground));
-}
-
-.fallbackSub {
-  font-size: 0.75rem;
-  color: hsl(var(--muted-foreground) / 0.7);
-}
-
-/* ── View toggle ─────────────────────────────────────────────── */
+/* ── View toggle ──────────────────────────────────────────────────── */
 
 .viewToggle {
   display: flex;
   gap: 2px;
   padding: 2px;
   border-radius: 8px;
-  background: rgba(75, 85, 99, 0.15);
-  border: 1px solid rgba(75, 85, 99, 0.2);
+  background: hsl(var(--muted) / 0.5);
+  border: 1px solid hsl(var(--border));
 }
 
 .viewToggleBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 28px;
+  width: 30px; height: 28px;
   border-radius: 6px;
   border: none;
   background: transparent;
@@ -217,39 +321,54 @@
 }
 
 .viewToggleBtn:hover {
-  background: rgba(249, 115, 22, 0.1);
+  background: rgba(249,115,22,0.1);
   color: #f97316;
 }
 
 .viewToggleActive {
-  background: rgba(249, 115, 22, 0.2) !important;
+  background: rgba(249,115,22,0.15) !important;
   color: #f97316 !important;
-  box-shadow: 0 0 6px rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249,115,22,0.25);
 }
 
-/* ── Compact node tooltip ─────────────────────────────────────── */
+/* ── Loading / error / empty ──────────────────────────────────────── */
 
-.wrapper :global(.compact-node-tooltip) {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 8px);
-  transform: translateX(-50%);
+.skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; height: 100%;
+}
+
+.spinner {
+  width: 2.5rem; height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-bottom-color: #f97316;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.fallback {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: rgba(10, 10, 15, 0.95);
-  border: 1px solid rgba(249, 115, 22, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-  z-index: 50;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%; height: 100%;
+  padding: 2rem;
+  text-align: center;
 }
 
-.wrapper :global(.react-flow__node:hover .compact-node-tooltip) {
-  opacity: 1;
+.fallbackText { font-size: 0.875rem; color: hsl(var(--muted-foreground)); }
+.fallbackSub  { font-size: 0.75rem;  color: hsl(var(--muted-foreground) / 0.7); }
+
+/* ── Outer card (unused but kept) ─────────────────────────────────── */
+
+.card {
+  border-radius: 0.75rem;
+  border: 1px solid var(--evo-border);
+  background: hsl(var(--card));
+  overflow: hidden;
 }

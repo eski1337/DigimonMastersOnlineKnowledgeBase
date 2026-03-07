@@ -6,10 +6,10 @@ import { COMPACT_NODE_WIDTH, COMPACT_NODE_HEIGHT } from './nodeTypes';
 
 /* ── Constants ────────────────────────────────────────────────────────── */
 
-const NODE_WIDTH = 200;
-const NODE_HEIGHT = 190;
-const RANK_SEP = 180;
-const NODE_SEP = 70;
+const NODE_WIDTH = 160;
+const NODE_HEIGHT = 150;
+const RANK_SEP = 140;
+const NODE_SEP = 50;
 
 /* ── Build React Flow nodes + edges from API data ─────────────────────── */
 
@@ -185,8 +185,8 @@ export function buildCompactFlowElements(
   g.setDefaultEdgeLabel(() => ({}));
   g.setGraph({
     rankdir: 'LR',
-    ranksep: 80,
-    nodesep: 30,
+    ranksep: 60,
+    nodesep: 24,
     marginx: 15,
     marginy: 15,
   });

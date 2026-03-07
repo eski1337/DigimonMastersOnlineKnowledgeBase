@@ -197,9 +197,9 @@ export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
         >
           <Background
             variant={BackgroundVariant.Dots}
-            gap={24}
-            size={0.8}
-            color="rgba(249, 115, 22, 0.1)"
+            gap={20}
+            size={0.6}
+            color="rgba(148, 163, 184, 0.12)"
           />
           <Controls
             showInteractive={false}

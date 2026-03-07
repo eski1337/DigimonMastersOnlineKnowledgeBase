@@ -12,7 +12,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { resolveMediaUrl } from '@/lib/icon-paths';
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
 const ITEMS_PER_PAGE = 36;
 
 const CATEGORY_LABELS: Record<string, string> = {

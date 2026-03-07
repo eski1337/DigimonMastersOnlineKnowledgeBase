@@ -333,30 +333,30 @@ function TableBlockView({ block }: { block: TableBlockData }) {
 
 function ImageGridBlockView({ block }: { block: ImageGridBlockData }) {
   const cols = block.columns || '4';
-  const gridCols: Record<string, string> = {
-    '2': 'grid-cols-2',
-    '3': 'grid-cols-2 sm:grid-cols-3',
-    '4': 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4',
-  };
+  const imageCount = (block.images || []).length;
+  // Use denser grid for large icon collections
+  const gridCols: Record<string, string> = imageCount > 20
+    ? { '2': 'grid-cols-3 sm:grid-cols-4 md:grid-cols-6', '3': 'grid-cols-3 sm:grid-cols-4 md:grid-cols-6', '4': 'grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8' }
+    : { '2': 'grid-cols-2', '3': 'grid-cols-2 sm:grid-cols-3', '4': 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4' };
+  const iconSize = imageCount > 20 ? 'max-w-[56px]' : 'max-w-[100px]';
+  const gap = imageCount > 20 ? 'gap-2' : 'gap-3';
 
   return (
     <div className="my-3">
       {block.title && <h2 className="text-xl font-bold mb-2 text-foreground">{block.title}</h2>}
-      <div className={`grid ${gridCols[cols] || gridCols['4']} gap-3`}>
+      <div className={`grid ${gridCols[cols] || gridCols['4']} ${gap}`}>
         {(block.images || []).map((img, i) => {
           const src = resolveImgSrc(img.image?.url) || resolveImgSrc(img.imageUrl);
           if (!src) return null;
           return (
-            <Card key={i} className="text-center overflow-hidden">
-              <CardContent className="pt-3 pb-2 px-2">
-                <div className="relative w-full aspect-square max-w-[140px] mx-auto mb-2">
-                  <img src={src} alt={img.caption || ''} className="w-full h-full object-contain" />
-                </div>
-                {img.caption && (
-                  <span className="text-xs font-bold text-primary leading-tight">{img.caption}</span>
-                )}
-              </CardContent>
-            </Card>
+            <div key={i} className="flex flex-col items-center text-center gap-1">
+              <div className={`relative w-full aspect-square ${iconSize} mx-auto`}>
+                <img src={src} alt={img.caption || ''} className="w-full h-full object-contain" />
+              </div>
+              {img.caption && (
+                <span className="text-[10px] leading-tight font-medium text-muted-foreground line-clamp-2">{img.caption}</span>
+              )}
+            </div>
           );
         })}
       </div>
@@ -364,24 +364,38 @@ function ImageGridBlockView({ block }: { block: ImageGridBlockData }) {
   );
 }
 
-function ImageBlockView({ block }: { block: ImageBlockData }) {
+function ImageBlockView({ block, compact }: { block: ImageBlockData; compact?: boolean }) {
   const src = resolveImgSrc(block.image?.url) || resolveImgSrc(block.imageUrl);
   if (!src) return null;
 
+  // Compact mode: render as a small inline icon with caption below
+  if (compact) {
+    return (
+      <figure className="flex flex-col items-center text-center gap-1">
+        <div className="w-16 h-16 flex-shrink-0">
+          <img src={src} alt={block.caption || ''} className="w-full h-full object-contain" />
+        </div>
+        {block.caption && (
+          <figcaption className="text-[10px] leading-tight text-muted-foreground max-w-[80px] line-clamp-2">{block.caption}</figcaption>
+        )}
+      </figure>
+    );
+  }
+
   const sizeClasses: Record<string, string> = {
     small: 'max-w-xs',
-    medium: 'max-w-lg',
-    large: 'max-w-full',
+    medium: 'max-w-md',
+    large: 'max-w-2xl',
   };
   const sizeClass = (block.size && sizeClasses[block.size]) || sizeClasses.large;
 
   return (
-    <figure className={`my-3 ${sizeClass} mx-auto`}>
-      <div className="rounded-lg overflow-hidden border border-border/50 bg-secondary/20">
+    <figure className={`my-3 ${sizeClass}`}>
+      <div className="rounded-lg overflow-hidden">
         <img src={src} alt={block.caption || ''} className="w-full h-auto object-contain" />
       </div>
       {block.caption && (
-        <figcaption className="text-center text-xs text-muted-foreground mt-1 italic">{block.caption}</figcaption>
+        <figcaption className="text-xs text-muted-foreground mt-1.5 italic">{block.caption}</figcaption>
       )}
     </figure>
   );
@@ -392,24 +406,56 @@ function ImageBlockView({ block }: { block: ImageBlockData }) {
 export function BlockRenderer({ blocks }: { blocks: GuideBlock[] }) {
   if (!blocks || !Array.isArray(blocks) || blocks.length === 0) return null;
 
+  // Group consecutive image blocks into compact rows when there are 3+ in a row
+  const elements: React.ReactNode[] = [];
+  let i = 0;
+  while (i < blocks.length) {
+    const block = blocks[i];
+    if (block.blockType === 'image') {
+      // Count consecutive image blocks
+      let runEnd = i + 1;
+      while (runEnd < blocks.length && blocks[runEnd].blockType === 'image') runEnd++;
+      const runLength = runEnd - i;
+
+      if (runLength >= 3) {
+        // Render as compact icon row
+        const imageBlocks = blocks.slice(i, runEnd) as ImageBlockData[];
+        elements.push(
+          <div key={i} className="my-3 flex flex-wrap gap-4 items-start">
+            {imageBlocks.map((ib, j) => (
+              <ImageBlockView key={`${i}-${j}`} block={ib} compact />
+            ))}
+          </div>
+        );
+        i = runEnd;
+      } else {
+        elements.push(<ImageBlockView key={i} block={block} />);
+        i++;
+      }
+    } else {
+      switch (block.blockType) {
+        case 'richText':
+          elements.push(<RichTextBlockView key={i} block={block} />);
+          break;
+        case 'callout':
+          elements.push(<CalloutBlockView key={i} block={block} />);
+          break;
+        case 'table':
+          elements.push(<TableBlockView key={i} block={block} />);
+          break;
+        case 'imageGrid':
+          elements.push(<ImageGridBlockView key={i} block={block} />);
+          break;
+        default:
+          break;
+      }
+      i++;
+    }
+  }
+
   return (
     <div className="space-y-1">
-      {blocks.map((block, i) => {
-        switch (block.blockType) {
-          case 'richText':
-            return <RichTextBlockView key={i} block={block} />;
-          case 'callout':
-            return <CalloutBlockView key={i} block={block} />;
-          case 'table':
-            return <TableBlockView key={i} block={block} />;
-          case 'imageGrid':
-            return <ImageGridBlockView key={i} block={block} />;
-          case 'image':
-            return <ImageBlockView key={i} block={block} />;
-          default:
-            return null;
-        }
-      })}
+      {elements}
     </div>
   );
 }

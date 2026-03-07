@@ -272,7 +272,9 @@ export async function POST(request: NextRequest) {
             }).catch(() => {});
           }
         }
-      } catch { /* ignore */ }
+      } catch {
+        // Notification creation is best-effort — message was already sent successfully
+      }
     }
 
     return NextResponse.json({

@@ -57,7 +57,6 @@ export function VisualEvolutionEditor({
   const [gridSnap, setGridSnap] = useState(true);
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
-  const [_panOffset, _setPanOffset] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 

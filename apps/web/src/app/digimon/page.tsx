@@ -88,37 +88,46 @@ export default function DigimonPage() {
     return params.toString();
   }, []);
 
-  // Fetch current page from API with server-side filters
+  // Fetch current page from API with server-side filters (debounced)
+  const prevPageRef = useRef(currentPage);
   useEffect(() => {
     let cancelled = false;
-    async function fetchDigimon() {
-      try {
-        setIsLoading(true);
-        const qs = buildQuery(filters, currentPage);
-        const response = await fetch(`/api/digimon?${qs}`);
-        if (response.ok && !cancelled) {
-          const data = await response.json();
-          setDigimon(data.docs || []);
-          setTotalDocs(data.totalDocs || 0);
-          setTotalPages(data.totalPages || 1);
-        }
-      } catch (error) {
-        console.error('Failed to fetch Digimon:', error);
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-          // Restore scroll position after data renders
-          if (shouldRestoreScroll.current) {
-            shouldRestoreScroll.current = false;
-            requestAnimationFrame(() => {
-              window.scrollTo(0, savedScrollY.current);
-            });
+    // Skip debounce for pagination (instant), debounce filter/search changes
+    const isPageChange = prevPageRef.current !== currentPage;
+    prevPageRef.current = currentPage;
+    const delay = isPageChange ? 0 : 300;
+
+    const timer = setTimeout(() => {
+      async function fetchDigimon() {
+        try {
+          setIsLoading(true);
+          const qs = buildQuery(filters, currentPage);
+          const response = await fetch(`/api/digimon?${qs}`);
+          if (response.ok && !cancelled) {
+            const data = await response.json();
+            setDigimon(data.docs || []);
+            setTotalDocs(data.totalDocs || 0);
+            setTotalPages(data.totalPages || 1);
+          }
+        } catch (error) {
+          console.error('Failed to fetch Digimon:', error);
+        } finally {
+          if (!cancelled) {
+            setIsLoading(false);
+            // Restore scroll position after data renders
+            if (shouldRestoreScroll.current) {
+              shouldRestoreScroll.current = false;
+              requestAnimationFrame(() => {
+                window.scrollTo(0, savedScrollY.current);
+              });
+            }
           }
         }
       }
-    }
-    fetchDigimon();
-    return () => { cancelled = true; };
+      fetchDigimon();
+    }, delay);
+
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [filters, currentPage, buildQuery]);
 
   // Navigate to page via URL

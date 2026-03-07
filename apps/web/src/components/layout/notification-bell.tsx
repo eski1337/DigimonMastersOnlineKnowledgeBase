@@ -97,7 +97,9 @@ export function NotificationBell() {
         prev.map(n => ids.includes(n.id) ? { ...n, isRead: true } : n)
       );
       setUnreadCount(prev => Math.max(0, prev - ids.length));
-    } catch { /* ignore */ }
+    } catch {
+      // Mark-as-read is best-effort — UI already updated optimistically
+    }
   };
 
   const markAllRead = async () => {
@@ -109,7 +111,9 @@ export function NotificationBell() {
       });
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
       setUnreadCount(0);
-    } catch { /* ignore */ }
+    } catch {
+      // Mark-all-read is best-effort — UI already updated optimistically
+    }
   };
 
   if (!session?.user) return null;

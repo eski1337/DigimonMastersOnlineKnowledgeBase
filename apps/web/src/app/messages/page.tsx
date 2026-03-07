@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   MessageSquare, Send, ArrowLeft, Inbox,
 } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 /* ── Types ─────────────────────────────────────────────────────── */
 
@@ -149,6 +150,7 @@ export default function MessagesPage() {
   const [isLoadingMsgs, setIsLoadingMsgs] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [showInbox, setShowInbox] = useState(true);
+  const { toast } = useToast();
 
   // Handle ?to=username param for starting new conversations
   const toUsername = searchParams.get('to');
@@ -170,7 +172,9 @@ export default function MessagesPage() {
         const data = await res.json();
         setConversations(data.docs || []);
       }
-    } catch { /* ignore fetch error */ }
+    } catch {
+      // Non-critical — conversations will load on next attempt
+    }
     setIsLoadingConvs(false);
   }, [session?.user]);
 
@@ -188,7 +192,9 @@ export default function MessagesPage() {
         // Reverse so oldest messages are at top
         setMessages((data.docs || []).reverse());
       }
-    } catch { /* ignore fetch error */ }
+    } catch {
+      // Non-critical — messages will load on next attempt
+    }
     setIsLoadingMsgs(false);
   }, []);
 
@@ -243,7 +249,9 @@ export default function MessagesPage() {
           fetchConversations(); // Update preview
         }
       }
-    } catch { /* ignore send error */ }
+    } catch {
+      toast({ title: 'Failed to send message', description: 'Please try again.', variant: 'destructive' });
+    }
     setIsSending(false);
   };
 

@@ -111,35 +111,44 @@ export default function ItemsPage() {
     return params.toString();
   }, []);
 
+  // Fetch items with debounce (instant for pagination, 300ms for filter/search changes)
+  const prevItemsPageRef = useRef(currentPage);
   useEffect(() => {
     let cancelled = false;
-    async function fetchItems() {
-      try {
-        setIsLoading(true);
-        const qs = buildQuery(filters, currentPage);
-        const response = await fetch(`/api/items?${qs}`);
-        if (response.ok && !cancelled) {
-          const data = await response.json();
-          setItems(data.docs || []);
-          setTotalDocs(data.totalDocs || 0);
-          setTotalPages(data.totalPages || 1);
-        }
-      } catch (error) {
-        console.error('Failed to fetch items:', error);
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-          if (shouldRestoreScroll.current) {
-            shouldRestoreScroll.current = false;
-            requestAnimationFrame(() => {
-              window.scrollTo(0, savedScrollY.current);
-            });
+    const isPageChange = prevItemsPageRef.current !== currentPage;
+    prevItemsPageRef.current = currentPage;
+    const delay = isPageChange ? 0 : 300;
+
+    const timer = setTimeout(() => {
+      async function fetchItems() {
+        try {
+          setIsLoading(true);
+          const qs = buildQuery(filters, currentPage);
+          const response = await fetch(`/api/items?${qs}`);
+          if (response.ok && !cancelled) {
+            const data = await response.json();
+            setItems(data.docs || []);
+            setTotalDocs(data.totalDocs || 0);
+            setTotalPages(data.totalPages || 1);
+          }
+        } catch (error) {
+          console.error('Failed to fetch items:', error);
+        } finally {
+          if (!cancelled) {
+            setIsLoading(false);
+            if (shouldRestoreScroll.current) {
+              shouldRestoreScroll.current = false;
+              requestAnimationFrame(() => {
+                window.scrollTo(0, savedScrollY.current);
+              });
+            }
           }
         }
       }
-    }
-    fetchItems();
-    return () => { cancelled = true; };
+      fetchItems();
+    }, delay);
+
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [filters, currentPage, buildQuery]);
 
   const goToPage = useCallback((page: number) => {

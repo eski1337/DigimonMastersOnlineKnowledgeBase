@@ -31,7 +31,6 @@ export function DigivolutionChain({
   currentDigimon,
   digivolvesFrom,
   digivolvesTo,
-  unlockedWithItem: _unlockedWithItem,
 }: DigivolutionChainProps) {
   const [evolutionChain, setEvolutionChain] = useState<DigimonInChain[]>([]);
   const [loading, setLoading] = useState(true);

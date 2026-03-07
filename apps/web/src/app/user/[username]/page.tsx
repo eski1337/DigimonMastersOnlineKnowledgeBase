@@ -16,6 +16,7 @@ import {
   ChevronDown, Trash2, Pencil, X, Save, Loader2,
 } from 'lucide-react';
 import { FaDiscord, FaTwitter, FaYoutube, FaTwitch } from 'react-icons/fa';
+import { useToast } from '@/components/ui/use-toast';
 
 /* ── Types ─────────────────────────────────────────────────────── */
 
@@ -158,6 +159,7 @@ export default function UserProfilePage() {
     allowProfileComments: 'everyone',
   });
 
+  const { toast } = useToast();
   const isOwnProfile = session?.user?.id === profile?.id;
 
   // Fetch profile
@@ -222,7 +224,9 @@ export default function UserProfilePage() {
         }
         setIsEditing(false);
       }
-    } catch { /* ignore */ }
+    } catch {
+      toast({ title: 'Failed to save profile', description: 'Please try again.', variant: 'destructive' });
+    }
     setIsSaving(false);
   };
 
@@ -236,7 +240,9 @@ export default function UserProfilePage() {
       setComments(prev => append ? [...prev, ...(data.docs || [])] : (data.docs || []));
       setHasMoreComments(data.hasNextPage || false);
       setCommentsPage(page);
-    } catch { /* ignore */ }
+    } catch {
+      // Comment fetch failure is non-critical — silently retry on next load
+    }
   }, [profile?.id]);
 
   useEffect(() => {
@@ -258,7 +264,9 @@ export default function UserProfilePage() {
         setCommentText('');
         fetchComments(1);
       }
-    } catch { /* ignore */ }
+    } catch {
+      toast({ title: 'Failed to post comment', description: 'Please try again.', variant: 'destructive' });
+    }
     setIsPostingComment(false);
   };
 
@@ -269,7 +277,9 @@ export default function UserProfilePage() {
       if (res.ok) {
         setComments(prev => prev.filter(c => c.id !== id));
       }
-    } catch { /* ignore */ }
+    } catch {
+      toast({ title: 'Failed to delete comment', variant: 'destructive' });
+    }
   };
 
   // Loading state

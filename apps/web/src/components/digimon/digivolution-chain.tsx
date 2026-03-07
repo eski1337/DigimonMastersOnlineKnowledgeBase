@@ -27,6 +27,33 @@ interface DigivolutionChainProps {
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
 
+// Fetch a Digimon by name, using a local cache to avoid duplicate requests
+async function fetchDigimonByName(
+  name: string,
+  cache: Map<string, any>,
+): Promise<any | null> {
+  if (cache.has(name)) return cache.get(name);
+  try {
+    const res = await fetch(
+      `${CMS_URL}/api/digimon?where[name][equals]=${encodeURIComponent(name)}&limit=1`,
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const doc = data.docs?.[0] ?? null;
+      cache.set(name, doc);
+      return doc;
+    }
+  } catch {
+    // Network error — return null, caller handles fallback
+  }
+  cache.set(name, null);
+  return null;
+}
+
+function getIconUrl(digimon: any): string | undefined {
+  return typeof digimon.icon === 'string' ? digimon.icon : digimon.icon?.url;
+}
+
 export function DigivolutionChain({
   currentDigimon,
   digivolvesFrom,
@@ -36,49 +63,82 @@ export function DigivolutionChain({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    const cache = new Map<string, any>();
+
+    async function findChainStart(name: string, visited: Set<string>): Promise<string> {
+      if (visited.has(name)) return name;
+      visited.add(name);
+      const doc = await fetchDigimonByName(name, cache);
+      if (doc?.digivolutions?.digivolvesFrom?.length > 0) {
+        return findChainStart(doc.digivolutions.digivolvesFrom[0].name, visited);
+      }
+      return name;
+    }
+
+    async function buildForwardChain(
+      name: string,
+      chain: DigimonInChain[],
+      visited: Set<string>,
+    ): Promise<void> {
+      if (visited.has(name)) return;
+      visited.add(name);
+
+      const doc = await fetchDigimonByName(name, cache);
+      if (!doc) return;
+
+      chain.push({
+        name: doc.name,
+        slug: doc.slug,
+        icon: getIconUrl(doc),
+      });
+
+      const evos = doc.digivolutions?.digivolvesTo;
+      if (!evos?.length) return;
+
+      if (evos.length > 1) {
+        // Multiple branches — fetch all in parallel
+        const branchDocs = await Promise.all(
+          evos.map((evo: any) => fetchDigimonByName(evo.name, cache)),
+        );
+        for (let i = 0; i < evos.length; i++) {
+          const branchDoc = branchDocs[i];
+          chain.push({
+            name: branchDoc?.name ?? evos[i].name,
+            slug: branchDoc?.slug ?? evos[i].name?.toLowerCase().replace(/\s+/g, '-'),
+            icon: branchDoc ? getIconUrl(branchDoc) : undefined,
+            requiredLevel: evos[i].requiredLevel,
+            requiredItem: evos[i].requiredItem,
+            isBranch: true,
+          });
+        }
+      } else {
+        // Single evolution — continue chain, carry level/item from evo data
+        const nextEvo = evos[0];
+        // Pre-set level/item so we don't need a third pass
+        await buildForwardChain(nextEvo.name, chain, visited);
+        // Apply the requirement to the next entry we just added
+        const nextEntry = chain.find(c => c.name === nextEvo.name);
+        if (nextEntry) {
+          nextEntry.requiredLevel = nextEvo.requiredLevel;
+          nextEntry.requiredItem = nextEvo.requiredItem;
+        }
+      }
+    }
+
     async function buildChain() {
       try {
-        const visited = new Set<string>();
         const chain: DigimonInChain[] = [];
-        
-        // Start by going backwards to find the beginning of the chain
-        let startDigimon = currentDigimon.name;
-        if (digivolvesFrom && digivolvesFrom.length > 0) {
-          startDigimon = await findChainStart(currentDigimon.name, visited);
+
+        // Walk backwards to find chain start
+        let startName = currentDigimon.name;
+        if (digivolvesFrom?.length) {
+          startName = await findChainStart(currentDigimon.name, new Set<string>());
         }
-        
-        // Now build forward from the start
-        await buildForwardChain(startDigimon, chain, new Set<string>());
-        
-        // Fix levels: Apply level/item from previous digimon's digivolvesTo data
-        for (let i = 0; i < chain.length - 1; i++) {
-          try {
-            const currentName = chain[i].name;
-            const nextName = chain[i + 1].name;
-            
-            const response = await fetch(
-              `${CMS_URL}/api/digimon?where[name][equals]=${encodeURIComponent(currentName)}&limit=1`
-            );
-            
-            if (response.ok) {
-              const data = await response.json();
-              const digimon = data.docs[0];
-              
-              const evoData = digimon?.digivolutions?.digivolvesTo?.find(
-                (evo: any) => evo.name === nextName
-              );
-              
-              if (evoData) {
-                chain[i + 1].requiredLevel = evoData.requiredLevel;
-                chain[i + 1].requiredItem = evoData.requiredItem;
-              }
-            }
-          } catch (error) {
-            console.error(`Failed to fix levels for ${chain[i].name}:`, error);
-          }
-        }
-        
-        // Fallback: If chain is empty, at least add current Digimon
+
+        // Walk forward from start
+        await buildForwardChain(startName, chain, new Set<string>());
+
         if (chain.length === 0) {
           chain.push({
             name: currentDigimon.name,
@@ -86,135 +146,24 @@ export function DigivolutionChain({
             icon: currentDigimon.icon,
           });
         }
-        
-        setEvolutionChain(chain);
-      } catch (error) {
-        console.error('Failed to build evolution chain:', error);
-        // On error, still show current Digimon
-        setEvolutionChain([{
-          name: currentDigimon.name,
-          slug: currentDigimon.slug,
-          icon: currentDigimon.icon,
-        }]);
+
+        if (!cancelled) setEvolutionChain(chain);
+      } catch {
+        if (!cancelled) {
+          setEvolutionChain([{
+            name: currentDigimon.name,
+            slug: currentDigimon.slug,
+            icon: currentDigimon.icon,
+          }]);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-    
+
     buildChain();
+    return () => { cancelled = true; };
   }, [currentDigimon, digivolvesFrom, digivolvesTo]);
-
-  async function findChainStart(digimonName: string, visited: Set<string>): Promise<string> {
-    if (visited.has(digimonName)) return digimonName;
-    visited.add(digimonName);
-    
-    try {
-      const response = await fetch(
-        `${CMS_URL}/api/digimon?where[name][equals]=${encodeURIComponent(digimonName)}&limit=1`
-      );
-      
-      if (response.ok) {
-        const data = await response.json();
-        const digimon = data.docs?.[0];
-        
-        if (digimon?.digivolutions?.digivolvesFrom?.length > 0) {
-          // Go back one more step
-          return await findChainStart(digimon.digivolutions.digivolvesFrom[0].name, visited);
-        }
-      }
-    } catch (error) {
-      console.error(`Failed to find chain start for ${digimonName}:`, error);
-    }
-    
-    return digimonName;
-  }
-
-  async function buildForwardChain(
-    digimonName: string,
-    chain: DigimonInChain[],
-    visited: Set<string>,
-    branchIndex: number = 0
-  ): Promise<void> {
-    if (visited.has(digimonName)) {
-      return;
-    }
-    visited.add(digimonName);
-    
-    try {
-      const response = await fetch(
-        `${CMS_URL}/api/digimon?where[name][equals]=${encodeURIComponent(digimonName)}&limit=1`
-      );
-      
-      if (response.ok) {
-        const data = await response.json();
-        const digimon = data.docs?.[0];
-        
-        if (digimon) {
-          const iconUrl = typeof digimon.icon === 'string'
-            ? digimon.icon
-            : digimon.icon?.url;
-            
-          chain.push({
-            name: digimon.name,
-            slug: digimon.slug,
-            icon: iconUrl,
-            requiredLevel: undefined,
-            requiredItem: undefined,
-          });
-          
-          // Check for branching evolutions
-          if (digimon.digivolutions?.digivolvesTo?.length > 0) {
-            const evolutions = digimon.digivolutions.digivolvesTo;
-            if (evolutions.length > 1) {
-              // Multiple branches - fetch full data for each
-              for (const evo of evolutions) {
-                try {
-                  const branchResponse = await fetch(
-                    `${CMS_URL}/api/digimon?where[name][equals]=${encodeURIComponent(evo.name)}&limit=1`
-                  );
-                  
-                  if (branchResponse.ok) {
-                    const branchData = await branchResponse.json();
-                    const branchDigimon = branchData.docs?.[0];
-                    
-                    if (branchDigimon) {
-                      const branchIconUrl = typeof branchDigimon.icon === 'string'
-                        ? branchDigimon.icon
-                        : branchDigimon.icon?.url;
-                      
-                      chain.push({
-                        name: branchDigimon.name,
-                        slug: branchDigimon.slug,
-                        icon: branchIconUrl,
-                        requiredItem: evo.requiredItem,
-                        isBranch: true,
-                      });
-                    }
-                  }
-                } catch (error) {
-                  console.error(`Failed to fetch branch ${evo.name}:`, error);
-                  // Add without icon if fetch fails
-                  chain.push({
-                    name: evo.name,
-                    slug: evo.name?.toLowerCase().replace(/\s+/g, '-'),
-                    requiredItem: evo.requiredItem,
-                    isBranch: true,
-                  });
-                }
-              }
-            } else {
-              // Single evolution - continue chain recursively
-              await buildForwardChain(evolutions[0].name, chain, visited, branchIndex);
-            }
-          }
-        }
-      } else {
-        console.error(`Failed to fetch ${digimonName}: HTTP ${response.status}`);
-      }
-    } catch (error) {
-      console.error(`Failed to build chain for ${digimonName}:`, error);
-    }
-  }
 
 
   if (loading) {

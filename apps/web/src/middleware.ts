@@ -4,8 +4,20 @@ import { getToken } from 'next-auth/jwt';
 
 // ── Edge-compatible in-memory rate limiter (no Redis/Node deps) ──────
 const rateLimitMap = new Map<string, { count: number; reset: number }>();
+let lastCleanup = Date.now();
+const CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
+function cleanupRateLimitMap() {
+  const now = Date.now();
+  if (now - lastCleanup < CLEANUP_INTERVAL) return;
+  lastCleanup = now;
+  for (const [key, entry] of rateLimitMap) {
+    if (entry.reset < now) rateLimitMap.delete(key);
+  }
+}
 
 function edgeRateLimit(key: string, max: number, windowMs: number) {
+  cleanupRateLimitMap();
   const now = Date.now();
   const entry = rateLimitMap.get(key);
   if (!entry || entry.reset < now) {

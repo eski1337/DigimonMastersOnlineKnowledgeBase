@@ -297,6 +297,10 @@ function TableBlockView({ block }: { block: TableBlockData }) {
     }))
   );
 
+  // Detect if first column is an icon column (empty header + cells have iconUrl or no value)
+  const isIconCol = headers.length > 0 && headers[0] === '' &&
+    rows.some(r => r[0] && (r[0].iconUrl || (!r[0].value?.trim())));
+
   return (
     <div className="my-3">
       {block.title && <h3 className="text-lg font-semibold mb-1.5 text-foreground">{block.title}</h3>}
@@ -306,7 +310,7 @@ function TableBlockView({ block }: { block: TableBlockData }) {
             <thead>
               <tr>
                 {headers.map((h, i) => (
-                  <th key={i} className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-secondary/50 first:rounded-tl-md last:rounded-tr-md whitespace-nowrap">
+                  <th key={i} className={`px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-secondary/50 first:rounded-tl-md last:rounded-tr-md whitespace-nowrap ${i === 0 && isIconCol ? 'w-10' : ''}`}>
                     {h}
                   </th>
                 ))}
@@ -316,11 +320,24 @@ function TableBlockView({ block }: { block: TableBlockData }) {
           <tbody>
             {rows.map((row, i) => (
               <tr key={i} className="hover:bg-secondary/20 transition-colors">
-                {row.map((cell, j) => (
-                  <td key={j} className={`px-3 py-1.5 text-sm border-t border-border/50 align-middle ${j === 0 ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
-                    {renderCellContent(cell, j === 0)}
-                  </td>
-                ))}
+                {row.map((cell, j) => {
+                  // First column icon cell: render icon image
+                  if (j === 0 && isIconCol) {
+                    const iconSrc = getIconUrl(cell.icon, cell.iconUrl);
+                    return (
+                      <td key={j} className="px-1.5 py-1 border-t border-border/50 align-middle w-10 text-center">
+                        {iconSrc ? (
+                          <img src={iconSrc} alt="" className="w-8 h-8 object-contain inline-block" />
+                        ) : null}
+                      </td>
+                    );
+                  }
+                  return (
+                    <td key={j} className={`px-3 py-1.5 text-sm border-t border-border/50 align-middle ${j === (isIconCol ? 1 : 0) ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
+                      {renderCellContent(cell, j === (isIconCol ? 1 : 0))}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
@@ -441,9 +458,13 @@ export function BlockRenderer({ blocks }: { blocks: GuideBlock[] }) {
         case 'table':
           elements.push(<TableBlockView key={i} block={block} />);
           break;
-        case 'imageGrid':
-          elements.push(<ImageGridBlockView key={i} block={block} />);
+        case 'imageGrid': {
+          // Skip trailing "Images" dump grids (all icons already matched to tables)
+          const grid = block as ImageGridBlockData;
+          if (grid.title === 'Images' && i === blocks.length - 1) break;
+          elements.push(<ImageGridBlockView key={i} block={grid} />);
           break;
+        }
         default:
           break;
       }

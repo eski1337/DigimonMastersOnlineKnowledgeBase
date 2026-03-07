@@ -65,11 +65,12 @@ export function resolveDigimonImage(url: string | null | undefined): string {
 }
 
 const ELEMENT_FILENAME_MAP: Record<string, string> = {
-  'Pitch Black': 'Pitch_Black',
+  'pitch black': 'Pitch_Black',
 };
 
 export function getElementIconPath(element: string): string {
-  const fileName = ELEMENT_FILENAME_MAP[element] || element.replace(/\s+/g, '_');
+  const key = element.toLowerCase();
+  const fileName = ELEMENT_FILENAME_MAP[key] || element.replace(/\s+/g, '_');
   return `/icons/Elements/${fileName}.png`;
 }
 

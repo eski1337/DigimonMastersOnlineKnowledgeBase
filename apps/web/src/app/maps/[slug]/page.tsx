@@ -169,8 +169,8 @@ export default async function MapDetailPage({ params }: { params: { slug: string
   const wildGroups = groupWildDigimon(map.wildDigimon || []);
 
   const session = await getServerSession(authOptions);
-  const userRole = (session?.user as any)?.role;
-  const canEdit = ['owner', 'admin', 'editor'].includes(userRole);
+  const userRole = session?.user?.role;
+  const canEdit = !!userRole && ['owner', 'admin', 'editor'].includes(userRole);
 
   return (
     <div className="container py-8 max-w-6xl">

@@ -282,7 +282,7 @@ export default function AuditLogPage() {
 
   useEffect(() => {
     if (status === 'loading') return;
-    if (!session?.user || (session.user as any).role !== 'owner') {
+    if (!session?.user || session.user.role !== 'owner') {
       router.push('/');
       return;
     }
@@ -305,7 +305,7 @@ export default function AuditLogPage() {
     );
   }
 
-  if (!session?.user || (session.user as any).role !== 'owner') {
+  if (!session?.user || session.user.role !== 'owner') {
     return null;
   }
 

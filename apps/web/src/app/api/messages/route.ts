@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     const isParticipant = conv.participants?.some(
       (p: any) => (typeof p.user === 'string' ? p.user : p.user?.id) === session.user.id
     );
-    const isAdmin = ['admin', 'owner'].includes((session.user as any).role);
+    const isAdmin = !!session.user.role && ['admin', 'owner'].includes(session.user.role);
 
     if (!isParticipant && !isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -223,7 +223,7 @@ export async function POST(request: NextRequest) {
     }).catch(() => {}); // Non-critical
 
     // Send notification to the recipient
-    const senderName = (session.user as any).username || session.user.name || 'Someone';
+    const senderName = session.user.username || session.user.name || 'Someone';
     // Determine recipient: the other participant in the conversation
     const notifyRecipientId = recipientId || null;
     if (token && notifyRecipientId && notifyRecipientId !== session.user.id) {

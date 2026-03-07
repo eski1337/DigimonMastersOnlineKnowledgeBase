@@ -18,6 +18,6 @@ export default async function ProfilePage() {
   const user = session.user;
 
   // Redirect to the public profile page (preserve original casing)
-  const username = (user as any).username || (user as any).name || user.id;
+  const username = user.username || user.name || user.id;
   redirect(`/user/${encodeURIComponent(username)}`);
 }

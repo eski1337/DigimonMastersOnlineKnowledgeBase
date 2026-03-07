@@ -2,17 +2,90 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Info, AlertTriangle, Lightbulb } from 'lucide-react';
 
+/* ── Slate types ───────────────────────────────────────────────── */
+
+interface SlateNode {
+  type?: string;
+  url?: string;
+  text?: string;
+  bold?: boolean;
+  italic?: boolean;
+  code?: boolean;
+  underline?: boolean;
+  strikethrough?: boolean;
+  children?: SlateNode[];
+}
+
+interface MediaRef {
+  url: string;
+  alt?: string;
+}
+
+interface RichTextBlock {
+  blockType: 'richText';
+  content: SlateNode[];
+}
+
+interface CalloutBlock {
+  blockType: 'callout';
+  type: string;
+  content: SlateNode[];
+}
+
+interface TableHeader {
+  label: string;
+}
+
+interface TableRow {
+  cells: Array<{
+    value?: string;
+    icon?: MediaRef | string | null;
+    iconUrl?: string;
+    lines?: Array<{ text?: string; amount?: string; icon?: MediaRef | null; iconUrl?: string }>;
+  }>;
+}
+
+interface TableBlockData {
+  blockType: 'table';
+  title?: string;
+  headers?: TableHeader[];
+  rows?: TableRow[];
+}
+
+interface ImageGridImage {
+  image?: MediaRef;
+  imageUrl?: string;
+  caption?: string;
+}
+
+interface ImageGridBlockData {
+  blockType: 'imageGrid';
+  title?: string;
+  columns?: string;
+  images?: ImageGridImage[];
+}
+
+interface ImageBlockData {
+  blockType: 'image';
+  image?: MediaRef;
+  imageUrl?: string;
+  caption?: string;
+  size?: string;
+}
+
+type GuideBlock = RichTextBlock | CalloutBlock | TableBlockData | ImageGridBlockData | ImageBlockData;
+
 /* ── Slate richText helpers ─────────────────────────────────────── */
 
-function renderSlate(nodes: any[]): React.ReactNode {
+function renderSlate(nodes: SlateNode[]): React.ReactNode {
   if (!nodes || !Array.isArray(nodes)) return null;
   return nodes.map((node, i) => {
     if (node.type === 'h1') return <h1 key={i} className="text-3xl font-bold mt-5 mb-2 text-foreground">{renderChildren(node.children)}</h1>;
     if (node.type === 'h2') return <h2 key={i} className="text-2xl font-bold mt-5 mb-2 text-foreground">{renderChildren(node.children)}</h2>;
     if (node.type === 'h3') return <h3 key={i} className="text-xl font-semibold mt-4 mb-1.5 text-foreground">{renderChildren(node.children)}</h3>;
     if (node.type === 'h4') return <h4 key={i} className="text-lg font-semibold mt-3 mb-1 text-foreground">{renderChildren(node.children)}</h4>;
-    if (node.type === 'ul') return <ul key={i} className="list-disc pl-5 mb-2 space-y-0.5 text-muted-foreground text-sm">{renderSlate(node.children)}</ul>;
-    if (node.type === 'ol') return <ol key={i} className="list-decimal pl-5 mb-2 space-y-0.5 text-muted-foreground text-sm">{renderSlate(node.children)}</ol>;
+    if (node.type === 'ul') return <ul key={i} className="list-disc pl-5 mb-2 space-y-0.5 text-muted-foreground text-sm">{renderSlate(node.children ?? [])}</ul>;
+    if (node.type === 'ol') return <ol key={i} className="list-decimal pl-5 mb-2 space-y-0.5 text-muted-foreground text-sm">{renderSlate(node.children ?? [])}</ol>;
     if (node.type === 'li') {
       const inner = node.children?.[0]?.children ? renderChildren(node.children[0].children) : renderChildren(node.children);
       return <li key={i}>{inner}</li>;
@@ -20,13 +93,13 @@ function renderSlate(nodes: any[]): React.ReactNode {
     if (node.type === 'blockquote') return <blockquote key={i} className="border-l-4 border-primary/40 pl-4 italic text-muted-foreground my-4">{renderChildren(node.children)}</blockquote>;
     if (node.type === 'link') return <a key={i} href={node.url} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">{renderChildren(node.children)}</a>;
     // Default paragraph
-    const text = node.children?.map((c: any) => c.text).join('');
+    const text = node.children?.map((c) => c.text).join('');
     if (text === '') return <div key={i} className="h-1" />;
     return <p key={i} className="mb-1.5 text-muted-foreground leading-normal text-sm">{renderChildren(node.children)}</p>;
   });
 }
 
-function renderChildren(children: any[]): React.ReactNode {
+function renderChildren(children?: SlateNode[]): React.ReactNode {
   if (!children) return null;
   return children.map((child, i) => {
     if (child.text !== undefined) {
@@ -48,11 +121,11 @@ function renderChildren(children: any[]): React.ReactNode {
 
 /* ── Block renderers ────────────────────────────────────────────── */
 
-function RichTextBlock({ block }: { block: any }) {
+function RichTextBlockView({ block }: { block: RichTextBlock }) {
   return <div>{renderSlate(block.content)}</div>;
 }
 
-function CalloutBlock({ block }: { block: any }) {
+function CalloutBlockView({ block }: { block: CalloutBlock }) {
   const styles: Record<string, { border: string; bg: string; icon: React.ReactNode }> = {
     info: {
       border: 'border-primary/30',
@@ -96,7 +169,7 @@ interface TableCell {
   lines?: CellLine[];
 }
 
-function getIconUrl(icon: any, iconUrl?: string): string | null {
+function getIconUrl(icon: MediaRef | string | null | undefined, iconUrl?: string): string | null {
   if (iconUrl) return iconUrl;
   if (!icon) return null;
   if (typeof icon === 'object' && icon.url) return icon.url;
@@ -205,14 +278,14 @@ function renderCellContent(cell: TableCell, isFirstCol: boolean) {
   );
 }
 
-function TableBlock({ block }: { block: any }) {
-  const headers: string[] = (block.headers || []).map((h: any) => h.label);
-  const rows: TableCell[][] = (block.rows || []).map((r: any) =>
-    (r.cells || []).map((c: any) => ({
+function TableBlockView({ block }: { block: TableBlockData }) {
+  const headers: string[] = (block.headers || []).map((h) => h.label);
+  const rows: TableCell[][] = (block.rows || []).map((r) =>
+    (r.cells || []).map((c) => ({
       value: c.value || '',
       icon: c.icon || null,
       iconUrl: c.iconUrl || undefined,
-      lines: c.lines?.map((l: any) => ({ ...l, iconUrl: l.iconUrl || undefined })) || null,
+      lines: c.lines?.map((l) => ({ ...l, iconUrl: l.iconUrl || undefined })) || undefined,
     }))
   );
 
@@ -249,7 +322,7 @@ function TableBlock({ block }: { block: any }) {
   );
 }
 
-function ImageGridBlock({ block }: { block: any }) {
+function ImageGridBlockView({ block }: { block: ImageGridBlockData }) {
   const cols = block.columns || '4';
   const gridCols: Record<string, string> = {
     '2': 'grid-cols-2',
@@ -261,7 +334,7 @@ function ImageGridBlock({ block }: { block: any }) {
     <div className="my-3">
       {block.title && <h2 className="text-xl font-bold mb-2 text-foreground">{block.title}</h2>}
       <div className={`grid ${gridCols[cols] || gridCols['4']} gap-3`}>
-        {(block.images || []).map((img: any, i: number) => {
+        {(block.images || []).map((img, i) => {
           const src = img.image?.url || img.imageUrl;
           if (!src) return null;
           return (
@@ -282,7 +355,7 @@ function ImageGridBlock({ block }: { block: any }) {
   );
 }
 
-function ImageBlock({ block }: { block: any }) {
+function ImageBlockView({ block }: { block: ImageBlockData }) {
   const src = block.image?.url || block.imageUrl;
   if (!src) return null;
 
@@ -291,7 +364,7 @@ function ImageBlock({ block }: { block: any }) {
     medium: 'max-w-lg',
     large: 'max-w-full',
   };
-  const sizeClass = sizeClasses[block.size] || sizeClasses.large;
+  const sizeClass = (block.size && sizeClasses[block.size]) || sizeClasses.large;
 
   return (
     <figure className={`my-3 ${sizeClass} mx-auto`}>
@@ -307,7 +380,7 @@ function ImageBlock({ block }: { block: any }) {
 
 /* ── Main renderer ──────────────────────────────────────────────── */
 
-export function BlockRenderer({ blocks }: { blocks: any[] }) {
+export function BlockRenderer({ blocks }: { blocks: GuideBlock[] }) {
   if (!blocks || !Array.isArray(blocks) || blocks.length === 0) return null;
 
   return (
@@ -315,15 +388,15 @@ export function BlockRenderer({ blocks }: { blocks: any[] }) {
       {blocks.map((block, i) => {
         switch (block.blockType) {
           case 'richText':
-            return <RichTextBlock key={i} block={block} />;
+            return <RichTextBlockView key={i} block={block} />;
           case 'callout':
-            return <CalloutBlock key={i} block={block} />;
+            return <CalloutBlockView key={i} block={block} />;
           case 'table':
-            return <TableBlock key={i} block={block} />;
+            return <TableBlockView key={i} block={block} />;
           case 'imageGrid':
-            return <ImageGridBlock key={i} block={block} />;
+            return <ImageGridBlockView key={i} block={block} />;
           case 'image':
-            return <ImageBlock key={i} block={block} />;
+            return <ImageBlockView key={i} block={block} />;
           default:
             return null;
         }

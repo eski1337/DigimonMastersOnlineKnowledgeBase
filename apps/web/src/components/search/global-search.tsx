@@ -150,6 +150,10 @@ export function GlobalSearch() {
           onChange={(e) => setQuery(e.target.value)}
           className="pl-10 pr-10"
           onFocus={() => query.length >= 2 && setIsOpen(true)}
+          aria-label="Search Digimon, guides, items, and more"
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-autocomplete="list"
         />
         {isLoading && (
           <Loader2 className="absolute right-3 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />

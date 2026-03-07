@@ -165,7 +165,7 @@ export function VisualEvolutionEditor({
                 }
               }
             } catch (e) {
-              console.log('X-Antibody fallback failed for:', ref.name);
+              // X-Antibody icon fallback is non-critical — silently ignore
             }
           }
           
@@ -196,7 +196,7 @@ export function VisualEvolutionEditor({
                     }
                   }
                 } catch (e) {
-                  console.log('X-Antibody fallback failed for:', data.name);
+                  // X-Antibody icon fallback is non-critical
                 }
               }
               
@@ -256,7 +256,7 @@ export function VisualEvolutionEditor({
             }
           }
         } catch (e) {
-          console.log('X-Antibody fallback failed for current Digimon');
+          // X-Antibody icon fallback is non-critical
         }
       }
       
@@ -372,7 +372,7 @@ export function VisualEvolutionEditor({
           }
         }
       } catch (e) {
-        console.log('X-Antibody fallback failed for:', digimon.name);
+        // X-Antibody icon fallback is non-critical
       }
     }
 

@@ -72,6 +72,7 @@ export function DigimonFilters({ filters, onFiltersChange }: DigimonFiltersProps
             onChange={e => handleSearchChange(e.target.value)}
             className="pl-10"
             type="search"
+            aria-label="Search Digimon by name"
           />
         </div>
       </div>

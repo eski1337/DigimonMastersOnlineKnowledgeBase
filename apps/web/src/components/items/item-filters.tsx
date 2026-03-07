@@ -19,6 +19,7 @@ export interface ItemFiltersState {
 const ITEM_CATEGORIES = [
   { value: 'evolution', label: 'Evolution' },
   { value: 'unlock', label: 'Unlock' },
+  { value: 'ride-mode-unlock', label: 'Ride Mode Unlock' },
   { value: 'consumable', label: 'Consumable' },
   { value: 'equipment', label: 'Equipment' },
   { value: 'material', label: 'Material' },
@@ -97,6 +98,7 @@ export function ItemFilters({ filters, onFiltersChange }: ItemFiltersProps) {
             onChange={e => handleSearchChange(e.target.value)}
             className="pl-10"
             type="search"
+            aria-label="Search items by name"
           />
         </div>
       </div>

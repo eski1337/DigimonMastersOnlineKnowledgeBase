@@ -35,13 +35,6 @@ export function DigivolutionEditor({
   currentDigivolutions,
   userRole 
 }: DigivolutionEditorProps) {
-  // Only show to Owner, Admin, Editor
-  const canEdit = userRole && ['owner', 'admin', 'editor'].includes(userRole.toLowerCase());
-  
-  if (!canEdit) {
-    return null;
-  }
-
   const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<DigimonSearchResult[]>([]);
@@ -51,6 +44,13 @@ export function DigivolutionEditor({
   const [digivolvesFrom, setDigivolvesFrom] = useState(currentDigivolutions?.digivolvesFrom || []);
   const [digivolvesTo, setDigivolvesTo] = useState(currentDigivolutions?.digivolvesTo || []);
   const [jogress, setJogress] = useState(currentDigivolutions?.jogress || []);
+
+  // Only show to Owner, Admin, Editor
+  const canEdit = userRole && ['owner', 'admin', 'editor'].includes(userRole.toLowerCase());
+  
+  if (!canEdit) {
+    return null;
+  }
 
   const searchDigimon = async (query: string) => {
     if (!query || query.length < 2) {

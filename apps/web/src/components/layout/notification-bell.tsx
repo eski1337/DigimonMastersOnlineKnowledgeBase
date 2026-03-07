@@ -57,7 +57,7 @@ export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
 
   const fetchNotifications = useCallback(async () => {
-    if (!session?.user) return;
+    if (!session?.user || document.hidden) return;
     try {
       const res = await fetch('/api/notifications?limit=20');
       if (res.ok) {
@@ -65,13 +65,25 @@ export function NotificationBell() {
         setNotifications(data.docs || []);
         setUnreadCount((data.docs || []).filter((n: Notification) => !n.isRead).length);
       }
-    } catch { /* ignore */ }
+    } catch {
+      // Network error — will retry on next poll
+    }
   }, [session?.user]);
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchNotifications, 30000);
+
+    // Re-fetch immediately when tab becomes visible again
+    const onVisibilityChange = () => {
+      if (!document.hidden) fetchNotifications();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, [fetchNotifications]);
 
   const markAsRead = async (ids: string[]) => {

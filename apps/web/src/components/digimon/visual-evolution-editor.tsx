@@ -43,15 +43,6 @@ export function VisualEvolutionEditor({
   digimonSlug: _digimonSlug,
   userRole
 }: VisualEvolutionEditorProps) {
-  // Strict role check - Only Owner, Admin, and Editor can access
-  const allowedRoles = ['owner', 'admin', 'editor'];
-  const canEdit = userRole && allowedRoles.includes(userRole.toLowerCase());
-  
-  // Return null if user doesn't have permission (component won't render)
-  if (!canEdit) {
-    return null;
-  }
-
   const [isOpen, setIsOpen] = useState(false);
   const [nodes, setNodes] = useState<DigimonNode[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
@@ -69,6 +60,15 @@ export function VisualEvolutionEditor({
   const [_panOffset, _setPanOffset] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Strict role check - Only Owner, Admin, and Editor can access
+  const allowedRoles = ['owner', 'admin', 'editor'];
+  const canEdit = userRole && allowedRoles.includes(userRole.toLowerCase());
+
+  // Return null if user doesn't have permission (after all hooks)
+  if (!canEdit) {
+    return null;
+  }
 
   const GRID_SIZE = 50;
   const snapToGrid = (value: number) => {

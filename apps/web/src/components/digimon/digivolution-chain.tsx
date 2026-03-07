@@ -51,8 +51,6 @@ export function DigivolutionChain({
         // Now build forward from the start
         await buildForwardChain(startDigimon, chain, new Set<string>());
         
-        console.log('Evolution chain built:', chain);
-        
         // Fix levels: Apply level/item from previous digimon's digivolvesTo data
         for (let i = 0; i < chain.length - 1; i++) {
           try {
@@ -74,7 +72,6 @@ export function DigivolutionChain({
               if (evoData) {
                 chain[i + 1].requiredLevel = evoData.requiredLevel;
                 chain[i + 1].requiredItem = evoData.requiredItem;
-                console.log(`Applied level ${evoData.requiredLevel} to ${nextName}`);
               }
             }
           } catch (error) {
@@ -84,7 +81,6 @@ export function DigivolutionChain({
         
         // Fallback: If chain is empty, at least add current Digimon
         if (chain.length === 0) {
-          console.log('Chain empty, adding current Digimon as fallback');
           chain.push({
             name: currentDigimon.name,
             slug: currentDigimon.slug,
@@ -141,12 +137,9 @@ export function DigivolutionChain({
     branchIndex: number = 0
   ): Promise<void> {
     if (visited.has(digimonName)) {
-      console.log(`Already visited ${digimonName}, stopping to prevent loop`);
       return;
     }
     visited.add(digimonName);
-    
-    console.log(`Building chain for: ${digimonName}`);
     
     try {
       const response = await fetch(
@@ -156,12 +149,6 @@ export function DigivolutionChain({
       if (response.ok) {
         const data = await response.json();
         const digimon = data.docs?.[0];
-        
-        console.log(`Fetched data for ${digimonName}:`, {
-          found: !!digimon,
-          hasEvolutions: !!digimon?.digivolutions,
-          digivolvesTo: digimon?.digivolutions?.digivolvesTo?.length || 0
-        });
         
         if (digimon) {
           const iconUrl = typeof digimon.icon === 'string'
@@ -176,15 +163,10 @@ export function DigivolutionChain({
             requiredItem: undefined,
           });
           
-          console.log(`Added ${digimon.name} to chain. Chain length: ${chain.length}`);
-          
           // Check for branching evolutions
           if (digimon.digivolutions?.digivolvesTo?.length > 0) {
             const evolutions = digimon.digivolutions.digivolvesTo;
-            console.log(`${digimon.name} has ${evolutions.length} evolution(s):`, evolutions.map((e: any) => e.name));
-            
             if (evolutions.length > 1) {
-              console.log('Multiple branches detected');
               // Multiple branches - fetch full data for each
               for (const evo of evolutions) {
                 try {
@@ -208,7 +190,6 @@ export function DigivolutionChain({
                         requiredItem: evo.requiredItem,
                         isBranch: true,
                       });
-                      console.log(`Added branch ${branchDigimon.name}`);
                     }
                   }
                 } catch (error) {
@@ -224,11 +205,8 @@ export function DigivolutionChain({
               }
             } else {
               // Single evolution - continue chain recursively
-              console.log(`Continuing chain with ${evolutions[0].name}`);
               await buildForwardChain(evolutions[0].name, chain, visited, branchIndex);
             }
-          } else {
-            console.log(`${digimon.name} has no further evolutions. Chain complete.`);
           }
         }
       } else {

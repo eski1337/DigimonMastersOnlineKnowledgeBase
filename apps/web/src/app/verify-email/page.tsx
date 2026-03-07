@@ -17,6 +17,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     const token = searchParams?.get('token');
+    let redirectTimer: ReturnType<typeof setTimeout>;
     
     if (!token) {
       setStatus('error');
@@ -35,7 +36,7 @@ export default function VerifyEmailPage() {
           setStatus('success');
           setMessage('Email verified successfully! You can now sign in.');
           // Redirect to sign in after 3 seconds
-          setTimeout(() => {
+          redirectTimer = setTimeout(() => {
             router.push('/auth/signin');
           }, 3000);
         } else {
@@ -50,6 +51,10 @@ export default function VerifyEmailPage() {
     };
 
     verifyEmail();
+
+    return () => {
+      clearTimeout(redirectTimer);
+    };
   }, [searchParams, router]);
 
   return (

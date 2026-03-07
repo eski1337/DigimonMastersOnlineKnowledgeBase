@@ -21,7 +21,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://cms.dmokb.info https://res.cloudinary.com https://dmowiki.com http://localhost:3001",
+              "img-src 'self' data: blob: https://cms.dmokb.info https://res.cloudinary.com https://dmowiki.com https://dmo.gameking.com http://localhost:3001",
               "font-src 'self'",
               "connect-src 'self' https://cms.dmokb.info https://discord.com http://localhost:3001",
               "frame-ancestors 'none'",

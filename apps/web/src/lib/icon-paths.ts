@@ -7,10 +7,14 @@
 
 export const PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
 
-/** Resolve a CMS media URL to an absolute URL */
+/** Resolve a CMS media URL to an absolute URL.
+ *  Returns empty string for null/undefined, or for invalid paths (e.g. raw MongoDB ObjectIDs). */
 export function resolveMediaUrl(url: string | null | undefined): string {
   if (!url) return '';
-  return url.startsWith('http') ? url : `${PUBLIC_CMS_URL}${url}`;
+  if (url.startsWith('http')) return url;
+  // Reject MongoDB ObjectIDs or other non-path strings (must start with /)
+  if (!url.startsWith('/')) return '';
+  return `${PUBLIC_CMS_URL}${url}`;
 }
 
 const FAMILY_FILENAME_MAP: Record<string, string> = {
@@ -32,6 +36,9 @@ const ATTACKER_TYPE_FILENAME_MAP: Record<string, string> = {
   'Short Attacker': 'ShortAttacker',
   'Near Attacker': 'NearAttacker',
   'Defender': 'Defender',
+  'Att.typeneeded': '',
+  'TBD': '',
+  '': '',
 };
 
 /** Bad icon patterns that should fall back to placeholder */
@@ -81,7 +88,9 @@ export function getFamilyIconPath(family: string): string {
 }
 
 export function getAttackerTypeIconPath(attackerType: string): string {
-  const fileName = ATTACKER_TYPE_FILENAME_MAP[attackerType] || attackerType.replace(/\s+/g, '');
+  const mapped = ATTACKER_TYPE_FILENAME_MAP[attackerType];
+  if (mapped === '') return '/icons/Placeholder/digiplaceholder.png';
+  const fileName = mapped || attackerType.replace(/\s+/g, '');
   return `/icons/AttackerType/${fileName}.png`;
 }
 

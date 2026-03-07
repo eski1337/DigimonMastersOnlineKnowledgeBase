@@ -328,7 +328,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     <span className="text-orange-400 font-semibold text-xs mb-2">Rank:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.rank ? (
-                        <Link href={`/digimon?rank=${encodeURIComponent(d.rank)}`} title={`View all ${d.rank} Digimon`}>
+                        <Link href={`/digimon?rank=${encodeURIComponent(d.rank)}`} prefetch={false} title={`View all ${d.rank} Digimon`}>
                           <Image 
                             src={getRankIconPath(d.rank)} 
                             alt={d.rank} 
@@ -350,7 +350,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     <span className="font-semibold text-orange-400 text-xs mb-2">Form:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.form ? (
-                        <Link href={`/digimon?form=${encodeURIComponent(d.form)}`} title={`View all ${d.form} Digimon`}>
+                        <Link href={`/digimon?form=${encodeURIComponent(d.form)}`} prefetch={false} title={`View all ${d.form} Digimon`}>
                           <span className="font-semibold text-foreground text-sm text-center hover:text-orange-300 transition-colors cursor-pointer">{d.form}</span>
                         </Link>
                       ) : (
@@ -364,7 +364,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     <span className="text-orange-400 font-semibold text-xs mb-2">Attribute:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.attribute ? (
-                        <Link href={`/digimon?attribute=${encodeURIComponent(d.attribute)}`} title={`View all ${d.attribute} Digimon`}>
+                        <Link href={`/digimon?attribute=${encodeURIComponent(d.attribute)}`} prefetch={false} title={`View all ${d.attribute} Digimon`}>
                           <Image 
                             src={getAttributeIconPath(d.attribute)} 
                             alt={d.attribute} 
@@ -386,7 +386,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     <span className="text-orange-400 font-semibold text-xs mb-2">Element:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.element ? (
-                        <Link href={`/digimon?element=${encodeURIComponent(d.element)}`} title={`View all ${d.element} Digimon`}>
+                        <Link href={`/digimon?element=${encodeURIComponent(d.element)}`} prefetch={false} title={`View all ${d.element} Digimon`}>
                           <Image 
                             src={getElementIconPath(d.element)} 
                             alt={d.element} 
@@ -417,7 +417,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                     <span className="text-orange-400 font-semibold text-xs mb-2">Attacker Type:</span>
                     <div className="flex items-center justify-center flex-1">
                       {d.attackerType ? (
-                        <Link href={`/digimon?attackerType=${encodeURIComponent(d.attackerType)}`} title={`View all ${d.attackerType} Digimon`}>
+                        <Link href={`/digimon?attackerType=${encodeURIComponent(d.attackerType)}`} prefetch={false} title={`View all ${d.attackerType} Digimon`}>
                           <Image 
                             src={getAttackerTypeIconPath(d.attackerType)} 
                             alt={d.attackerType} 
@@ -441,7 +441,7 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
                       <div className="flex gap-4 justify-center flex-wrap">
                         {d.families && d.families.length > 0 ? (
                           d.families.map((family: string, idx: number) => (
-                            <Link key={idx} href={`/digimon?family=${encodeURIComponent(family)}`} title={`View all ${family} Digimon`}>
+                            <Link key={idx} href={`/digimon?family=${encodeURIComponent(family)}`} prefetch={false} title={`View all ${family} Digimon`}>
                               <Image 
                                 src={getFamilyIconPath(family)} 
                                 alt={family} 

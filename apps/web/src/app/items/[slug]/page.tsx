@@ -115,8 +115,10 @@ export default async function ItemPage({ params }: { params: { slug: string } })
 
   const rarityStyle = RARITY_STYLES[item.rarity || ''] || RARITY_STYLES.common;
   const categoryColor = CATEGORY_COLORS[item.category || 'other'] || CATEGORY_COLORS.other;
-  const iconUrl = typeof item.icon === 'object' ? item.icon?.url : null;
-  const imageUrl = typeof item.image === 'object' ? item.image?.url : null;
+  const rawIconUrl = typeof item.icon === 'object' ? item.icon?.url : null;
+  const rawImageUrl = typeof item.image === 'object' ? item.image?.url : null;
+  const iconUrl = resolveMediaUrl(rawImageUrl || rawIconUrl) || null;
+  const imageUrl = iconUrl; // same resolved URL used in both hero and sidebar
   const hasEffects = item.effects && item.effects.length > 0;
   const hasObtainMethods = item.obtainMethods && item.obtainMethods.length > 0;
   const hasCrafting = item.craftingRecipe?.materials && item.craftingRecipe.materials.length > 0;
@@ -137,10 +139,10 @@ export default async function ItemPage({ params }: { params: { slug: string } })
         <div className="space-y-6">
           {/* Hero */}
           <div className="flex items-start gap-5">
-            {(iconUrl || imageUrl) ? (
+            {iconUrl ? (
               <div className={`w-20 h-20 rounded-xl bg-muted/50 flex items-center justify-center flex-shrink-0 overflow-hidden border-2 ${rarityStyle.border}`}>
                 <Image
-                  src={resolveMediaUrl(imageUrl || iconUrl)}
+                  src={iconUrl}
                   alt={item.name}
                   width={64}
                   height={64}
@@ -281,7 +283,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                 <div className="space-y-2">
                   {item.craftingRecipe!.materials!.map((mat, i) => (
                     <div key={i} className="flex items-center gap-3 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                      {mat.icon?.url && (
+                      {mat.icon?.url && resolveMediaUrl(mat.icon.url) && (
                         <Image src={resolveMediaUrl(mat.icon.url)} alt={mat.item} width={24} height={24} className="object-contain flex-shrink-0" />
                       )}
                       <span className="text-sm font-medium text-foreground">{mat.item}</span>
@@ -305,7 +307,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                 <div className="flex flex-wrap gap-3">
                   {item.relatedDigimon!.map(digi => (
                     <Link key={digi.id} href={`/digimon/${digi.slug}`} className="flex items-center gap-2 p-2 bg-orange-500/10 border border-orange-500/20 rounded-lg hover:bg-orange-500/20 transition-colors">
-                      {digi.icon?.url && (
+                      {digi.icon?.url && resolveMediaUrl(digi.icon.url) && (
                         <Image src={resolveMediaUrl(digi.icon.url)} alt={digi.name} width={28} height={28} className="object-contain" />
                       )}
                       <span className="text-sm font-medium">{digi.name}</span>
@@ -328,7 +330,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                 <div className="flex flex-wrap gap-3">
                   {item.relatedItems!.map(rel => (
                     <Link key={rel.id} href={`/items/${rel.slug}`} className="flex items-center gap-2 p-2 bg-primary/10 border border-primary/20 rounded-lg hover:bg-primary/20 transition-colors">
-                      {rel.icon?.url && (
+                      {rel.icon?.url && resolveMediaUrl(rel.icon.url) && (
                         <Image src={resolveMediaUrl(rel.icon.url)} alt={rel.name} width={24} height={24} className="object-contain" />
                       )}
                       <span className="text-sm font-medium">{rel.name}</span>
@@ -365,10 +367,10 @@ export default async function ItemPage({ params }: { params: { slug: string } })
 
             {/* Icon */}
             <div className="flex justify-center py-6 bg-muted/30">
-              {(iconUrl || imageUrl) ? (
+              {iconUrl ? (
                 <div className={`w-32 h-32 rounded-xl bg-background/80 flex items-center justify-center border-2 ${rarityStyle.border}`}>
                   <Image
-                    src={resolveMediaUrl(imageUrl || iconUrl)}
+                    src={iconUrl}
                     alt={item.name}
                     width={96}
                     height={96}

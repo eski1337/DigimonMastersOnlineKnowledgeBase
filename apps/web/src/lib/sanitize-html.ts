@@ -26,9 +26,21 @@ const SANITIZE_OPTIONS: sanitize.IOptions = {
     'td': ['colspan', 'rowspan'],
     'th': ['colspan', 'rowspan'],
   },
-  allowedSchemes: ['http', 'https', 'mailto'],
-  // Disallow all protocols not in allowedSchemes (blocks javascript:, data:, vbscript:)
+  allowedSchemes: ['http', 'https', 'mailto', 'data'],
+  allowedSchemesAppliedToAttributes: ['href', 'src'],
   disallowedTagsMode: 'discard',
+  transformTags: {
+    'img': (tagName: string, attribs: Record<string, string>) => {
+      if (attribs.src) {
+        // Fix malformed URLs like "https://dmo.gameking.com/data:image/png;base64,..."
+        const dataIdx = attribs.src.indexOf('data:image/');
+        if (dataIdx > 0) {
+          attribs.src = attribs.src.slice(dataIdx);
+        }
+      }
+      return { tagName, attribs };
+    },
+  },
 };
 
 /**

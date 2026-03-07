@@ -400,7 +400,7 @@ function DigimonIcon({
   );
 
   if (isClickable) {
-    return <Link href={`/digimon/${slug}`} className="block shrink-0">{content}</Link>;
+    return <Link href={`/digimon/${slug}`} prefetch={false} className="block shrink-0">{content}</Link>;
   }
   return <div className="shrink-0">{content}</div>;
 }

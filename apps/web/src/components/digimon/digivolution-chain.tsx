@@ -214,7 +214,7 @@ export function DigivolutionChain({
               {/* Digimon Icon */}
               <div className="flex flex-col items-center min-w-[100px]">
                 {isClickable ? (
-                  <Link href={`/digimon/${digimon.slug}`} className="group flex flex-col items-center">
+                  <Link href={`/digimon/${digimon.slug}`} prefetch={false} className="group flex flex-col items-center">
                     <div 
                       className={`relative w-20 h-20 rounded-xl border-2 transition-all shadow-lg ${
                         isCurrent 

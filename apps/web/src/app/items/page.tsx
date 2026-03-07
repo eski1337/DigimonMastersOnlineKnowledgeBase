@@ -227,7 +227,7 @@ export default function ItemsPage() {
                     <Card className="card-hover h-full group">
                       <CardHeader className="pb-3">
                         <div className="flex items-start gap-3">
-                          {item.icon?.url ? (
+                          {item.icon?.url && resolveMediaUrl(item.icon.url) ? (
                             <div className="w-10 h-10 rounded bg-muted/50 flex items-center justify-center flex-shrink-0 overflow-hidden border border-border/50">
                               <Image
                                 src={resolveMediaUrl(item.icon.url)}

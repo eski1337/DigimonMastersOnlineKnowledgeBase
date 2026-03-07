@@ -40,7 +40,7 @@ export function MobileNav() {
           <div className="flex flex-col h-full">
             {/* Header */}
             <div className="flex items-center justify-between px-4 h-16 border-b">
-              <Link href="/" className="font-bold text-lg" onClick={() => setOpen(false)}>
+              <Link href="/" prefetch={false} className="font-bold text-lg" onClick={() => setOpen(false)}>
                 DMO KB
               </Link>
               <Dialog.Close asChild>

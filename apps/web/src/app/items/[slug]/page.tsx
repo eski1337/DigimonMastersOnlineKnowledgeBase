@@ -146,6 +146,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                   width={64}
                   height={64}
                   className="object-contain"
+                  unoptimized
                 />
               </div>
             ) : (
@@ -283,7 +284,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                   {item.craftingRecipe!.materials!.map((mat, i) => (
                     <div key={i} className="flex items-center gap-3 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                       {mat.icon?.url && resolveMediaUrl(mat.icon.url) && (
-                        <Image src={resolveMediaUrl(mat.icon.url)} alt={mat.item} width={24} height={24} className="object-contain flex-shrink-0" />
+                        <Image src={resolveMediaUrl(mat.icon.url)} alt={mat.item} width={24} height={24} className="object-contain flex-shrink-0" unoptimized />
                       )}
                       <span className="text-sm font-medium text-foreground">{mat.item}</span>
                       {mat.amount && <span className="text-sm text-amber-400 ml-auto font-bold">x{mat.amount}</span>}
@@ -307,7 +308,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                   {item.relatedDigimon!.map(digi => (
                     <Link key={digi.id} href={`/digimon/${digi.slug}`} className="flex items-center gap-2 p-2 bg-orange-500/10 border border-orange-500/20 rounded-lg hover:bg-orange-500/20 transition-colors">
                       {digi.icon?.url && resolveMediaUrl(digi.icon.url) && (
-                        <Image src={resolveMediaUrl(digi.icon.url)} alt={digi.name} width={28} height={28} className="object-contain" />
+                        <Image src={resolveMediaUrl(digi.icon.url)} alt={digi.name} width={28} height={28} className="object-contain" unoptimized />
                       )}
                       <span className="text-sm font-medium">{digi.name}</span>
                     </Link>
@@ -330,7 +331,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                   {item.relatedItems!.map(rel => (
                     <Link key={rel.id} href={`/items/${rel.slug}`} className="flex items-center gap-2 p-2 bg-primary/10 border border-primary/20 rounded-lg hover:bg-primary/20 transition-colors">
                       {rel.icon?.url && resolveMediaUrl(rel.icon.url) && (
-                        <Image src={resolveMediaUrl(rel.icon.url)} alt={rel.name} width={24} height={24} className="object-contain" />
+                        <Image src={resolveMediaUrl(rel.icon.url)} alt={rel.name} width={24} height={24} className="object-contain" unoptimized />
                       )}
                       <span className="text-sm font-medium">{rel.name}</span>
                     </Link>
@@ -374,6 +375,7 @@ export default async function ItemPage({ params }: { params: { slug: string } })
                     width={96}
                     height={96}
                     className="object-contain"
+                    unoptimized
                   />
                 </div>
               ) : (

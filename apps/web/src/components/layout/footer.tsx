@@ -17,27 +17,27 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Content</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/digimon" className="text-muted-foreground hover:text-primary">
+                <Link href="/digimon" prefetch={false} className="text-muted-foreground hover:text-primary">
                   Digimon Database
                 </Link>
               </li>
               <li>
-                <Link href="/quests" className="text-muted-foreground hover:text-primary">
+                <Link href="/quests" prefetch={false} className="text-muted-foreground hover:text-primary">
                   Quests
                 </Link>
               </li>
               <li>
-                <Link href="/guides" className="text-muted-foreground hover:text-primary">
+                <Link href="/guides" prefetch={false} className="text-muted-foreground hover:text-primary">
                   Guides
                 </Link>
               </li>
               <li>
-                <Link href="/tools" className="text-muted-foreground hover:text-primary">
+                <Link href="/tools" prefetch={false} className="text-muted-foreground hover:text-primary">
                   Tools & Trackers
                 </Link>
               </li>
               <li>
-                <Link href="/maps" className="text-muted-foreground hover:text-primary">
+                <Link href="/maps" prefetch={false} className="text-muted-foreground hover:text-primary">
                   Maps
                 </Link>
               </li>
@@ -48,17 +48,17 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Community</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/about" className="text-muted-foreground hover:text-primary">
+                <Link href="/about" prefetch={false} className="text-muted-foreground hover:text-primary">
                   About
                 </Link>
               </li>
               <li>
-                <Link href="/contribute" className="text-muted-foreground hover:text-primary">
+                <Link href="/contribute" prefetch={false} className="text-muted-foreground hover:text-primary">
                   Contribute
                 </Link>
               </li>
               <li>
-                <Link href="/changelog" className="text-muted-foreground hover:text-primary">
+                <Link href="/changelog" prefetch={false} className="text-muted-foreground hover:text-primary">
                   Changelog
                 </Link>
               </li>

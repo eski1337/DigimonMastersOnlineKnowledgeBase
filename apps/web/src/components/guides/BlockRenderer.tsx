@@ -1,6 +1,15 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Info, AlertTriangle, Lightbulb } from 'lucide-react';
+import { resolveMediaUrl } from '@/lib/icon-paths';
+
+/** Resolve image src: CMS relative paths get the CMS base URL prepended, absolute URLs pass through */
+function resolveImgSrc(src: string | null | undefined): string | null {
+  if (!src) return null;
+  if (src.startsWith('http')) return src;
+  const resolved = resolveMediaUrl(src);
+  return resolved || null;
+}
 
 /* ── Slate types ───────────────────────────────────────────────── */
 
@@ -170,9 +179,9 @@ interface TableCell {
 }
 
 function getIconUrl(icon: MediaRef | string | null | undefined, iconUrl?: string): string | null {
-  if (iconUrl) return iconUrl;
+  if (iconUrl) return resolveImgSrc(iconUrl);
   if (!icon) return null;
-  if (typeof icon === 'object' && icon.url) return icon.url;
+  if (typeof icon === 'object' && icon.url) return resolveImgSrc(icon.url);
   return null;
 }
 
@@ -335,7 +344,7 @@ function ImageGridBlockView({ block }: { block: ImageGridBlockData }) {
       {block.title && <h2 className="text-xl font-bold mb-2 text-foreground">{block.title}</h2>}
       <div className={`grid ${gridCols[cols] || gridCols['4']} gap-3`}>
         {(block.images || []).map((img, i) => {
-          const src = img.image?.url || img.imageUrl;
+          const src = resolveImgSrc(img.image?.url) || img.imageUrl;
           if (!src) return null;
           return (
             <Card key={i} className="text-center overflow-hidden">
@@ -356,7 +365,7 @@ function ImageGridBlockView({ block }: { block: ImageGridBlockData }) {
 }
 
 function ImageBlockView({ block }: { block: ImageBlockData }) {
-  const src = block.image?.url || block.imageUrl;
+  const src = resolveImgSrc(block.image?.url) || block.imageUrl;
   if (!src) return null;
 
   const sizeClasses: Record<string, string> = {

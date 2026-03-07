@@ -58,6 +58,7 @@ const nextConfig = {
       },
     ],
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 86400,
   },
   experimental: {
     optimizePackageImports: ['lucide-react'],

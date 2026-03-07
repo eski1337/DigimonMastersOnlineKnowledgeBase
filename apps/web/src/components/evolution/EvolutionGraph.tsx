@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ReactFlow,
@@ -12,9 +12,9 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useEvolutionGraph } from './useEvolutionGraph';
-import { nodeTypes } from './nodeTypes';
+import { nodeTypes, compactNodeTypes } from './nodeTypes';
 import { edgeTypes, EDGE_COLORS, EDGE_LABELS } from './edgeTypes';
-import { buildFlowElements } from './dagreLayout';
+import { buildFlowElements, buildCompactFlowElements } from './dagreLayout';
 import styles from './evolution-graph.module.css';
 
 /* ── Props ────────────────────────────────────────────────────────────── */
@@ -29,15 +29,20 @@ interface EvolutionGraphProps {
 const CMS_EDITOR_URL = 'https://cms.dmokb.info/admin/evolution-editor';
 const EDIT_ROLES = ['admin', 'editor', 'owner'];
 
+type ViewMode = 'detailed' | 'compact';
+
 export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
   const router = useRouter();
   const { data, isLoading, error } = useEvolutionGraph(slug);
+  const [viewMode, setViewMode] = useState<ViewMode>('compact');
 
   // Build React Flow elements from API data
   const { nodes, edges } = useMemo(() => {
     if (!data || data.nodes.length === 0) return { nodes: [], edges: [] };
-    return buildFlowElements(data.nodes, data.edges, data.layout, slug);
-  }, [data, slug]);
+    return viewMode === 'compact'
+      ? buildCompactFlowElements(data.nodes, data.edges, data.layout, slug)
+      : buildFlowElements(data.nodes, data.edges, data.layout, slug);
+  }, [data, slug, viewMode]);
 
   // Detect which edge types are present for legend
   const activeEdgeTypes = useMemo(() => {
@@ -117,6 +122,24 @@ export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
     <div>
       <div className={styles.header}>
         <h2 className={styles.title}>Digivolution Graph</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+          {/* View toggle */}
+          <div className={styles.viewToggle}>
+            <button
+              onClick={() => setViewMode('compact')}
+              className={`${styles.viewToggleBtn} ${viewMode === 'compact' ? styles.viewToggleActive : ''}`}
+              title="Compact view"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            </button>
+            <button
+              onClick={() => setViewMode('detailed')}
+              className={`${styles.viewToggleBtn} ${viewMode === 'detailed' ? styles.viewToggleActive : ''}`}
+              title="Detailed view"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="7" rx="1"/><rect x="3" y="14" width="18" height="7" rx="1"/></svg>
+            </button>
+          </div>
         {userRole && EDIT_ROLES.includes(userRole) && data?.lineId && (
           <a
             href={`${CMS_EDITOR_URL}?line=${data.lineId}`}
@@ -128,6 +151,7 @@ export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
             Edit
           </a>
         )}
+        </div>
       </div>
 
       {/* Legend — only show if multiple edge types */}
@@ -147,9 +171,10 @@ export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
 
       <div className={styles.wrapper}>
         <ReactFlow
+          key={viewMode}
           nodes={nodes}
           edges={edges}
-          nodeTypes={nodeTypes}
+          nodeTypes={viewMode === 'compact' ? compactNodeTypes : nodeTypes}
           edgeTypes={edgeTypes}
           defaultViewport={defaultViewport}
           onInit={onInit}

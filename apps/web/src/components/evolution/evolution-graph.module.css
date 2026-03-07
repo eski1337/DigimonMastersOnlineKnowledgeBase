@@ -190,3 +190,66 @@
   font-size: 0.75rem;
   color: hsl(var(--muted-foreground) / 0.7);
 }
+
+/* ── View toggle ─────────────────────────────────────────────── */
+
+.viewToggle {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 8px;
+  background: rgba(75, 85, 99, 0.15);
+  border: 1px solid rgba(75, 85, 99, 0.2);
+}
+
+.viewToggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.viewToggleBtn:hover {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+}
+
+.viewToggleActive {
+  background: rgba(249, 115, 22, 0.2) !important;
+  color: #f97316 !important;
+  box-shadow: 0 0 6px rgba(249, 115, 22, 0.15);
+}
+
+/* ── Compact node tooltip ─────────────────────────────────────── */
+
+.wrapper :global(.compact-node-tooltip) {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(10, 10, 15, 0.95);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 50;
+}
+
+.wrapper :global(.react-flow__node:hover .compact-node-tooltip) {
+  opacity: 1;
+}

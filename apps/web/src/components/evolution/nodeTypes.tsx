@@ -168,8 +168,112 @@ function DigimonNodeInner({ data }: NodeProps) {
 
 export const DigimonNode = memo(DigimonNodeInner);
 
-/* ── Export node types map (must be defined outside component) ─────── */
+/* ── Compact DigimonNode — icon-only, name on hover ──────────────── */
+
+const COMPACT_SIZE = 90;
+const COMPACT_IMG = 78;
+
+function DigimonNodeCompactInner({ data }: NodeProps) {
+  const d = data as DigimonNodeData;
+  const resolvedIcon = resolveIconUrl(d.icon);
+  const hasIcon = resolvedIcon !== null;
+  const isCurrent = d.isCurrent === true;
+  const isClickable = Boolean(d.slug && !isCurrent);
+  const borderColor = isCurrent ? CURRENT_BORDER : NEUTRAL_BORDER;
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div
+        style={{
+          width: COMPACT_SIZE,
+          height: COMPACT_SIZE,
+          borderRadius: '12px',
+          border: `2px solid ${borderColor}`,
+          background: isCurrent
+            ? `linear-gradient(145deg, ${CURRENT_BG}, rgba(17,24,39,0.96))`
+            : `linear-gradient(145deg, ${NEUTRAL_BG}, rgba(17,24,39,0.96))`,
+          boxShadow: isCurrent
+            ? `0 0 16px ${CURRENT_GLOW}, 0 2px 6px rgba(0,0,0,0.4)`
+            : `0 0 8px ${NEUTRAL_GLOW}, 0 2px 6px rgba(0,0,0,0.3)`,
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: isClickable ? 'pointer' : 'default',
+          userSelect: 'none' as const,
+          transition: 'box-shadow 0.2s ease, transform 0.15s ease',
+        }}
+        className="evolution-node-card compact-node"
+      >
+        {hasIcon ? (
+          <img
+            src={resolvedIcon!}
+            alt={d.label}
+            width={COMPACT_IMG}
+            height={COMPACT_IMG}
+            style={{ width: COMPACT_IMG, height: COMPACT_IMG, objectFit: 'contain' }}
+            loading="lazy"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+              (e.target as HTMLImageElement).parentElement!.querySelector('span')!.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <span style={{
+          color: '#4b5563', fontSize: '24px', fontWeight: 700,
+          display: hasIcon ? 'none' : 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          width: '100%', height: '100%',
+        }}>?</span>
+
+        {/* Current indicator ring */}
+        {isCurrent && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: -3,
+              borderRadius: '14px',
+              border: '2px solid rgba(249,115,22,0.3)',
+              pointerEvents: 'none',
+              animation: 'currentPulse 2s ease-in-out infinite',
+            }}
+          />
+        )}
+      </div>
+
+      {/* Hover tooltip — name + form */}
+      <div className="compact-node-tooltip">
+        <span style={{ fontWeight: 700, fontSize: '12px', color: isCurrent ? '#fb923c' : '#e5e7eb' }}>
+          {d.label}
+        </span>
+        {d.level && (
+          <span style={{ fontSize: '10px', color: BADGE_COLOR, textTransform: 'uppercase' as const }}>
+            {d.level}
+          </span>
+        )}
+      </div>
+
+      {/* Handles */}
+      <Handle type="source" position={Position.Left} id="left" style={{ width: 5, height: 5, background: borderColor, border: '1.5px solid rgba(17,24,39,0.8)', left: -3 }} />
+      <Handle type="source" position={Position.Right} id="right" style={{ width: 5, height: 5, background: borderColor, border: '1.5px solid rgba(17,24,39,0.8)', right: -3 }} />
+      <Handle type="source" position={Position.Top} id="top" style={{ width: 5, height: 5, background: borderColor, border: '1.5px solid rgba(17,24,39,0.8)', top: -3 }} />
+      <Handle type="source" position={Position.Bottom} id="bottom" style={{ width: 5, height: 5, background: borderColor, border: '1.5px solid rgba(17,24,39,0.8)', bottom: -3 }} />
+    </div>
+  );
+}
+
+export const DigimonNodeCompact = memo(DigimonNodeCompactInner);
+
+/* ── Compact dimensions for layout ─────────────────────────────────── */
+export const COMPACT_NODE_WIDTH = COMPACT_SIZE + 20;
+export const COMPACT_NODE_HEIGHT = COMPACT_SIZE + 10;
+
+/* ── Export node types maps (must be defined outside component) ───── */
 
 export const nodeTypes = {
   digimon: DigimonNode,
+} as const;
+
+export const compactNodeTypes = {
+  digimon: DigimonNodeCompact,
 } as const;

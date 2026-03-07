@@ -2,6 +2,7 @@ import dagre from '@dagrejs/dagre';
 import type { EvolutionNode, EvolutionEdge, EvolutionLayout } from './useEvolutionGraph';
 import type { Node, Edge } from '@xyflow/react';
 import type { DigimonNodeData } from './nodeTypes';
+import { COMPACT_NODE_WIDTH, COMPACT_NODE_HEIGHT } from './nodeTypes';
 
 /* ── Constants ────────────────────────────────────────────────────────── */
 
@@ -137,6 +138,87 @@ function autoLayout(
   });
 
   // Auto-assign handles based on dagre positions
+  const posMap = new Map<string, { x: number; y: number }>();
+  for (const n of nodes) posMap.set(n.id, n.position);
+  for (const edge of edges) {
+    const sPos = posMap.get(edge.source);
+    const tPos = posMap.get(edge.target);
+    if (sPos && tPos) {
+      const dx = tPos.x - sPos.x;
+      const dy = tPos.y - sPos.y;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        edge.sourceHandle = dx > 0 ? 'right' : 'left';
+        edge.targetHandle = dx > 0 ? 'left' : 'right';
+      } else {
+        edge.sourceHandle = dy > 0 ? 'bottom' : 'top';
+        edge.targetHandle = dy > 0 ? 'top' : 'bottom';
+      }
+    }
+  }
+
+  return { nodes, edges };
+}
+
+/* ── Compact Dagre auto-layout (smaller nodes, tighter spacing) ─────── */
+
+export function buildCompactFlowElements(
+  apiNodes: EvolutionNode[],
+  apiEdges: EvolutionEdge[],
+  layout: EvolutionLayout | null | undefined,
+  currentSlug: string,
+): { nodes: Node<DigimonNodeData>[]; edges: Edge[] } {
+  const edges: Edge[] = apiEdges.map((e) => ({
+    id: e.id,
+    source: e.source,
+    target: e.target,
+    type: 'evolution',
+    data: {
+      evolutionType: e.evolutionType,
+      requiredLevel: e.requiredLevel,
+      requiredItem: e.requiredItem,
+    },
+    animated: e.evolutionType === 'jogress',
+  }));
+
+  // Always use auto-layout for compact mode (ignore saved layout since dimensions differ)
+  const g = new dagre.graphlib.Graph();
+  g.setDefaultEdgeLabel(() => ({}));
+  g.setGraph({
+    rankdir: 'LR',
+    ranksep: 80,
+    nodesep: 30,
+    marginx: 15,
+    marginy: 15,
+  });
+
+  for (const n of apiNodes) {
+    g.setNode(n.id, { width: COMPACT_NODE_WIDTH, height: COMPACT_NODE_HEIGHT });
+  }
+  for (const e of apiEdges) {
+    g.setEdge(e.source, e.target);
+  }
+
+  dagre.layout(g);
+
+  const nodes: Node<DigimonNodeData>[] = apiNodes.map((n) => {
+    const pos = g.node(n.id);
+    return {
+      id: n.id,
+      type: 'digimon',
+      position: {
+        x: (pos?.x ?? 0) - COMPACT_NODE_WIDTH / 2,
+        y: (pos?.y ?? 0) - COMPACT_NODE_HEIGHT / 2,
+      },
+      data: {
+        label: n.label,
+        slug: n.slug,
+        icon: n.icon,
+        level: n.level,
+        isCurrent: n.slug === currentSlug,
+      },
+    };
+  });
+
   const posMap = new Map<string, { x: number; y: number }>();
   for (const n of nodes) posMap.set(n.id, n.position);
   for (const edge of edges) {

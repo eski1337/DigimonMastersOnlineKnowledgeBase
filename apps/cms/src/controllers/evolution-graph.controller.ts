@@ -105,6 +105,7 @@ export function createEvolutionGraphController(payload: Payload) {
             label: doc.name,
             slug: doc.slug,
             icon: getIcon(doc),
+            mainImage: getMainImage(doc),
             level: doc.form || undefined,
           });
         }
@@ -204,6 +205,7 @@ interface GraphNode {
   label: string;
   slug: string;
   icon?: string;
+  mainImage?: string;
   level?: string;
 }
 
@@ -214,6 +216,14 @@ interface GraphEdge {
   evolutionType: string;
   requiredLevel?: number | null;
   requiredItem?: string | null;
+}
+
+function getMainImage(doc: any): string | undefined {
+  if (doc.mainImage) {
+    const img = typeof doc.mainImage === 'object' ? doc.mainImage : null;
+    if (img?.url) return img.url;
+  }
+  return undefined;
 }
 
 function getIcon(doc: any): string | undefined {

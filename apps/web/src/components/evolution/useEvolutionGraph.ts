@@ -9,6 +9,7 @@ export interface EvolutionNode {
   label: string;
   slug: string;
   icon?: string;
+  mainImage?: string;
   level?: string;
 }
 

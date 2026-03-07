@@ -9,6 +9,7 @@ export interface DigimonNodeData {
   label: string;
   slug: string;
   icon?: string;
+  mainImage?: string;
   level?: string;
   isCurrent?: boolean;
   [key: string]: unknown;
@@ -41,52 +42,6 @@ function Handles({ isCurrent, size = 6 }: { isCurrent: boolean; size?: number })
     </>
   );
 }
-
-/* ── Detailed DigimonNode ──────────────────────────────────────────── */
-
-function DigimonNodeInner({ data }: NodeProps) {
-  const d = data as DigimonNodeData;
-  const resolvedIcon = resolveIconUrl(d.icon);
-  const hasIcon = resolvedIcon !== null;
-  const isCurrent = d.isCurrent === true;
-  const isClickable = Boolean(d.slug && !isCurrent);
-
-  const cls = [
-    'evo-node',
-    'evo-node--detailed',
-    isCurrent && 'evo-node--current',
-    isClickable && 'evo-node--clickable',
-  ].filter(Boolean).join(' ');
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <div className={cls}>
-        <div className="evo-node__icon-wrap">
-          {hasIcon ? (
-            <img
-              src={resolvedIcon!}
-              alt={d.label}
-              className="evo-node__icon-img"
-              loading="lazy"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-                const sib = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
-                if (sib) sib.style.display = 'flex';
-              }}
-            />
-          ) : null}
-          <span className="evo-node__icon-fallback" style={{ display: hasIcon ? 'none' : 'flex' }}>?</span>
-        </div>
-        <span className="evo-node__name">{d.label}</span>
-        {d.level && <span className="evo-node__badge">{d.level}</span>}
-        <Handles isCurrent={isCurrent} size={6} />
-      </div>
-      {isCurrent && <div className="evo-node__pulse" />}
-    </div>
-  );
-}
-
-export const DigimonNode = memo(DigimonNodeInner);
 
 /* ── Compact DigimonNode — icon-only, name on hover ──────────────── */
 
@@ -138,16 +93,66 @@ function DigimonNodeCompactInner({ data }: NodeProps) {
 
 export const DigimonNodeCompact = memo(DigimonNodeCompactInner);
 
+/* ── Artwork DigimonNode — mainImage, name on hover ──────────────── */
+
+function DigimonNodeArtworkInner({ data }: NodeProps) {
+  const d = data as DigimonNodeData;
+  const resolvedImg = resolveIconUrl(d.mainImage) || resolveIconUrl(d.icon);
+  const hasImg = resolvedImg !== null;
+  const isCurrent = d.isCurrent === true;
+  const isClickable = Boolean(d.slug && !isCurrent);
+
+  const cls = [
+    'evo-node',
+    'evo-node--compact',
+    isCurrent && 'evo-node--current',
+    isClickable && 'evo-node--clickable',
+  ].filter(Boolean).join(' ');
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div className={cls}>
+        {hasImg ? (
+          <img
+            src={resolvedImg!}
+            alt={d.label}
+            className="evo-node__compact-img"
+            loading="lazy"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+              const sib = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
+              if (sib) sib.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <span className="evo-node__icon-fallback evo-node__icon-fallback--lg" style={{ display: hasImg ? 'none' : 'flex' }}>?</span>
+        <Handles isCurrent={isCurrent} size={5} />
+      </div>
+
+      {/* Tooltip */}
+      <div className="evo-tooltip">
+        <span className="evo-tooltip__name">{d.label}</span>
+        {d.level && <span className="evo-tooltip__badge">{d.level}</span>}
+        <div className="evo-tooltip__arrow" />
+      </div>
+
+      {isCurrent && <div className="evo-node__pulse evo-node__pulse--compact" />}
+    </div>
+  );
+}
+
+export const DigimonNodeArtwork = memo(DigimonNodeArtworkInner);
+
 /* ── Compact dimensions for layout ─────────────────────────────────── */
 export const COMPACT_NODE_WIDTH = 190;
 export const COMPACT_NODE_HEIGHT = 190;
 
 /* ── Export node types maps ────────────────────────────────────────── */
 
-export const nodeTypes = {
-  digimon: DigimonNode,
-} as const;
-
 export const compactNodeTypes = {
   digimon: DigimonNodeCompact,
+} as const;
+
+export const artworkNodeTypes = {
+  digimon: DigimonNodeArtwork,
 } as const;

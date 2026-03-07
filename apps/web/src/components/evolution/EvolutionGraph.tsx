@@ -12,9 +12,9 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useEvolutionGraph } from './useEvolutionGraph';
-import { nodeTypes, compactNodeTypes } from './nodeTypes';
+import { compactNodeTypes, artworkNodeTypes } from './nodeTypes';
 import { edgeTypes, EDGE_COLORS, EDGE_LABELS } from './edgeTypes';
-import { buildFlowElements, buildCompactFlowElements } from './dagreLayout';
+import { buildCompactFlowElements } from './dagreLayout';
 import styles from './evolution-graph.module.css';
 
 /* ── Props ────────────────────────────────────────────────────────────── */
@@ -29,20 +29,18 @@ interface EvolutionGraphProps {
 const CMS_EDITOR_URL = 'https://cms.dmokb.info/admin/evolution-editor';
 const EDIT_ROLES = ['admin', 'editor', 'owner'];
 
-type ViewMode = 'detailed' | 'compact';
+type ViewMode = 'icon' | 'artwork';
 
 export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
   const router = useRouter();
   const { data, isLoading, error } = useEvolutionGraph(slug);
-  const [viewMode, setViewMode] = useState<ViewMode>('compact');
+  const [viewMode, setViewMode] = useState<ViewMode>('icon');
 
   // Build React Flow elements from API data
   const { nodes, edges } = useMemo(() => {
     if (!data || data.nodes.length === 0) return { nodes: [], edges: [] };
-    return viewMode === 'compact'
-      ? buildCompactFlowElements(data.nodes, data.edges, data.layout, slug)
-      : buildFlowElements(data.nodes, data.edges, data.layout, slug);
-  }, [data, slug, viewMode]);
+    return buildCompactFlowElements(data.nodes, data.edges, data.layout, slug);
+  }, [data, slug]);
 
   // Detect which edge types are present for legend
   const activeEdgeTypes = useMemo(() => {
@@ -126,18 +124,18 @@ export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
           {/* View toggle */}
           <div className={styles.viewToggle}>
             <button
-              onClick={() => setViewMode('compact')}
-              className={`${styles.viewToggleBtn} ${viewMode === 'compact' ? styles.viewToggleActive : ''}`}
-              title="Compact view"
+              onClick={() => setViewMode('icon')}
+              className={`${styles.viewToggleBtn} ${viewMode === 'icon' ? styles.viewToggleActive : ''}`}
+              title="Icon view"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
             </button>
             <button
-              onClick={() => setViewMode('detailed')}
-              className={`${styles.viewToggleBtn} ${viewMode === 'detailed' ? styles.viewToggleActive : ''}`}
-              title="Detailed view"
+              onClick={() => setViewMode('artwork')}
+              className={`${styles.viewToggleBtn} ${viewMode === 'artwork' ? styles.viewToggleActive : ''}`}
+              title="Artwork view"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="7" rx="1"/><rect x="3" y="14" width="18" height="7" rx="1"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
             </button>
           </div>
         {userRole && EDIT_ROLES.includes(userRole) && data?.lineId && (
@@ -174,7 +172,7 @@ export function EvolutionGraph({ slug, userRole }: EvolutionGraphProps) {
           key={viewMode}
           nodes={nodes}
           edges={edges}
-          nodeTypes={viewMode === 'compact' ? compactNodeTypes : nodeTypes}
+          nodeTypes={viewMode === 'icon' ? compactNodeTypes : artworkNodeTypes}
           edgeTypes={edgeTypes}
           defaultViewport={defaultViewport}
           onInit={onInit}

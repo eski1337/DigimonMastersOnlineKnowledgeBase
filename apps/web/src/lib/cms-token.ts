@@ -10,7 +10,7 @@ const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL 
 let cachedToken: string | null = null;
 let tokenExpiresAt = 0;
 
-const TOKEN_LIFETIME_MS = 60 * 60 * 1000; // 1 hour (Payload default is 2h)
+const TOKEN_LIFETIME_MS = 6 * 24 * 60 * 60 * 1000; // 6 days (Payload tokenExpiration is 7 days)
 const REFRESH_BUFFER_MS = 5 * 60 * 1000;  // refresh 5 min early
 
 export async function getCmsToken(): Promise<string> {

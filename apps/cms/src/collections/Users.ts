@@ -5,6 +5,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info';
 const Users: CollectionConfig = {
   slug: 'users',
   auth: {
+    tokenExpiration: 604800, // 7 days (in seconds) — prevents force-logout while editing
     maxLoginAttempts: 10,
     lockTime: 300000, // 5 minutes (down from default 10)
     verify: {

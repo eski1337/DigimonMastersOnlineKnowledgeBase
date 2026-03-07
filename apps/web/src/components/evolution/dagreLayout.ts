@@ -159,10 +159,7 @@ function autoLayout(
   return { nodes, edges };
 }
 
-/* ── Compact layout — uses saved layout scaled down, or Dagre fallback ── */
-
-const SCALE_X = COMPACT_NODE_WIDTH / NODE_WIDTH;
-const SCALE_Y = COMPACT_NODE_HEIGHT / NODE_HEIGHT;
+/* ── Compact layout — uses saved layout as-is, or Dagre fallback ─────── */
 
 export function buildCompactFlowElements(
   apiNodes: EvolutionNode[],
@@ -188,13 +185,13 @@ export function buildCompactFlowElements(
   let nodes: Node<DigimonNodeData>[];
 
   if (hasLayout) {
-    // Scale saved positions proportionally for compact nodes
+    // Use saved positions as-is — nodes are smaller visually but fitView handles zoom
     nodes = apiNodes.map((n) => {
       const pos = layout!.nodes[n.id] ?? { x: 0, y: 0 };
       return {
         id: n.id,
         type: 'digimon',
-        position: { x: pos.x * SCALE_X, y: pos.y * SCALE_Y },
+        position: { x: pos.x, y: pos.y },
         data: {
           label: n.label,
           slug: n.slug,

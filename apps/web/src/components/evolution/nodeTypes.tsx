@@ -79,9 +79,9 @@ function DigimonNodeInner({ data }: NodeProps) {
         </div>
         <span className="evo-node__name">{d.label}</span>
         {d.level && <span className="evo-node__badge">{d.level}</span>}
+        <Handles isCurrent={isCurrent} size={6} />
       </div>
       {isCurrent && <div className="evo-node__pulse" />}
-      <Handles isCurrent={isCurrent} size={6} />
     </div>
   );
 }
@@ -121,6 +121,7 @@ function DigimonNodeCompactInner({ data }: NodeProps) {
           />
         ) : null}
         <span className="evo-node__icon-fallback evo-node__icon-fallback--lg" style={{ display: hasIcon ? 'none' : 'flex' }}>?</span>
+        <Handles isCurrent={isCurrent} size={5} />
       </div>
 
       {/* Tooltip */}
@@ -131,7 +132,6 @@ function DigimonNodeCompactInner({ data }: NodeProps) {
       </div>
 
       {isCurrent && <div className="evo-node__pulse evo-node__pulse--compact" />}
-      <Handles isCurrent={isCurrent} size={5} />
     </div>
   );
 }

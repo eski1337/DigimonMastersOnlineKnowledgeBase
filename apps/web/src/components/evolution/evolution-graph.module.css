@@ -71,6 +71,7 @@
 /* ── Node base ────────────────────────────────────────────────────── */
 
 .wrapper :global(.evo-node) {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -81,7 +82,7 @@
   box-shadow: var(--evo-node-shadow);
   transition: box-shadow 0.2s ease, transform 0.18s ease, border-color 0.2s ease;
   user-select: none;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .wrapper :global(.evo-node--clickable) { cursor: pointer; }

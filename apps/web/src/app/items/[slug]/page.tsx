@@ -118,7 +118,6 @@ export default async function ItemPage({ params }: { params: { slug: string } })
   const rawIconUrl = typeof item.icon === 'object' ? item.icon?.url : null;
   const rawImageUrl = typeof item.image === 'object' ? item.image?.url : null;
   const iconUrl = resolveMediaUrl(rawImageUrl || rawIconUrl) || null;
-  const imageUrl = iconUrl; // same resolved URL used in both hero and sidebar
   const hasEffects = item.effects && item.effects.length > 0;
   const hasObtainMethods = item.obtainMethods && item.obtainMethods.length > 0;
   const hasCrafting = item.craftingRecipe?.materials && item.craftingRecipe.materials.length > 0;

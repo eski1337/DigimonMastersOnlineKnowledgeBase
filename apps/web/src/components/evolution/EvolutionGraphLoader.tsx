@@ -13,7 +13,7 @@ const EvolutionGraph = dynamic(
     loading: () => (
       <div className={styles.wrapper}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Evolution Graph</h2>
+          <h2 className={styles.title}>Digivolution Graph</h2>
         </div>
         <div className={styles.skeleton}>
           <div className={styles.spinner} />

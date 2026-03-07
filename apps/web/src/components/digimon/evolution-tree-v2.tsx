@@ -88,7 +88,7 @@ export function EvolutionTreeV2({
   if (loading) {
     return (
       <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-2 border-orange-500/40 rounded-xl p-6 shadow-2xl">
-        <h2 className="text-2xl font-bold text-orange-400 mb-4">Evolution Tree</h2>
+        <h2 className="text-2xl font-bold text-orange-400 mb-4">Digivolution Tree</h2>
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-400"></div>
         </div>
@@ -99,7 +99,7 @@ export function EvolutionTreeV2({
   if (nodes.length === 0 && !digivolvesFrom?.length && !digivolvesTo?.length) {
     return (
       <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-2 border-orange-500/40 rounded-xl p-6 shadow-2xl">
-        <h2 className="text-2xl font-bold text-orange-400 mb-6">Evolution Tree</h2>
+        <h2 className="text-2xl font-bold text-orange-400 mb-6">Digivolution Tree</h2>
         <div className="flex items-center justify-center">
           <DigimonIcon name={currentDigimon.name} icon={currentDigimon.icon} slug={currentDigimon.slug} isCurrent />
         </div>
@@ -291,7 +291,7 @@ export function EvolutionTreeV2({
 
   return (
     <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-2 border-orange-500/40 rounded-xl p-6 shadow-2xl">
-      <h2 className="text-2xl font-bold text-orange-400 mb-6">Evolution Tree</h2>
+      <h2 className="text-2xl font-bold text-orange-400 mb-6">Digivolution Tree</h2>
       <div className="overflow-x-auto pb-2">
         <div className="min-w-fit">
           {orderedLines.map((line, lineIdx) => {

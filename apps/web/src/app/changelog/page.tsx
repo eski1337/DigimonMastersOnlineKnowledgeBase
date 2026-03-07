@@ -30,10 +30,10 @@ const changelog: ChangelogEntry[] = [
     date: 'March 1, 2026',
     version: '1.5.0',
     changes: [
-      { type: 'added', text: 'Digivolution graph — interactive evolution tree on every Digimon profile page showing all evolution paths.' },
-      { type: 'added', text: 'Bridge visualization on evolution graphs — edges now show clear gaps at crossings so overlapping lines are distinguishable.' },
-      { type: 'changed', text: 'Evolution graph uses smooth-step routing for cleaner connections between nodes.' },
-      { type: 'fixed', text: 'Evolution graph edges now render correctly on all Digimon profile pages.' },
+      { type: 'added', text: 'Digivolution graph — interactive digivolution tree on every Digimon profile page showing all digivolution paths.' },
+      { type: 'added', text: 'Bridge visualization on digivolution graphs — edges now show clear gaps at crossings so overlapping lines are distinguishable.' },
+      { type: 'changed', text: 'Digivolution graph uses smooth-step routing for cleaner connections between nodes.' },
+      { type: 'fixed', text: 'Digivolution graph edges now render correctly on all Digimon profile pages.' },
     ],
   },
   {
@@ -77,7 +77,7 @@ const changelog: ChangelogEntry[] = [
     version: '1.1.0',
     changes: [
       { type: 'added', text: 'True Digivice crafting guide with full material tables and aura images.' },
-      { type: 'added', text: 'Digimon evolution tree visualization on profile pages.' },
+      { type: 'added', text: 'Digimon digivolution tree visualization on profile pages.' },
     ],
   },
   {

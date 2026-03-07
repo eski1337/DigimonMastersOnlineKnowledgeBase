@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+const PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
+const SKILL_PLACEHOLDER = '/icons/Placeholder/digiplaceholder.png';
+
 interface Skill {
   name: string;
   icon?: string | { url: string };
@@ -53,7 +56,11 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
               ? skill.icon 
               : skill.icon?.url;
             // Guard: if it's a raw MongoDB ObjectId (24-char hex), it's unresolved — skip it
-            const skillIconUrl = rawIconUrl && /^[a-f0-9]{24}$/.test(rawIconUrl) ? undefined : rawIconUrl;
+            const resolvedUrl = rawIconUrl && /^[a-f0-9]{24}$/.test(rawIconUrl) ? undefined : rawIconUrl;
+            // Resolve relative /media/ paths to full CMS URL
+            const skillIconUrl = resolvedUrl
+              ? (resolvedUrl.startsWith('/') ? `${PUBLIC_CMS_URL}${resolvedUrl}` : resolvedUrl)
+              : undefined;
             
             // Parse damage per level (stored as JSON string: [{"level":1,"damage":1234},...])
             let damageEntries: { level: number; damage: number }[] = [];
@@ -79,19 +86,19 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
               <Card key={index} className="bg-card border-blue-500/30">
                 <CardContent className="pt-5 pb-4 px-4">
                   <div className="flex gap-3">
-                    {skillIconUrl && (
-                      <div className="flex-shrink-0">
-                        <div className="relative w-16 h-16 bg-black/30 rounded-lg p-1.5 border-2 border-blue-500/30">
-                          <Image 
-                            src={skillIconUrl} 
-                            alt={skill.name}
-                            fill
-                            sizes="64px"
-                            className="object-contain"
-                          />
-                        </div>
+                    <div className="flex-shrink-0">
+                      <div className="relative w-16 h-16 bg-black/30 rounded-lg p-1.5 border-2 border-blue-500/30">
+                        <Image 
+                          src={skillIconUrl || SKILL_PLACEHOLDER} 
+                          alt={skill.name}
+                          fill
+                          sizes="64px"
+                          className="object-contain"
+                          unoptimized
+                          onError={(e) => { (e.target as HTMLImageElement).src = SKILL_PLACEHOLDER; }}
+                        />
                       </div>
-                    )}
+                    </div>
                     <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <h3 className="text-lg font-bold text-blue-400 leading-tight min-w-0 break-words">{skill.name}</h3>

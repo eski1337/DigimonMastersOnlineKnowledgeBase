@@ -88,8 +88,8 @@ export function useEvolutionGraph(slug: string): UseEvolutionGraphResult {
         });
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === 'AbortError') return;
-        const message = err instanceof Error ? err.message : 'Failed to load evolution graph';
-        console.error('Evolution graph fetch error:', message);
+        const message = err instanceof Error ? err.message : 'Failed to load digivolution graph';
+        console.error('Digivolution graph fetch error:', message);
         setError(message);
       } finally {
         if (!controller.signal.aborted) {

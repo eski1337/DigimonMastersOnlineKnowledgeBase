@@ -172,7 +172,7 @@ export function EvolutionTree({
     return (
       <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-2 border-orange-500/40 rounded-xl p-6 shadow-2xl">
         <h2 className="text-2xl font-bold text-orange-400 mb-4">
-          Complete Evolution Tree
+          Complete Digivolution Tree
         </h2>
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-400"></div>
@@ -311,7 +311,7 @@ export function EvolutionTree({
         
         <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
           <p className="text-sm text-yellow-300">
-            ⚠️ Complete evolution tree unavailable. Showing basic evolution info.
+            ⚠️ Complete digivolution tree unavailable. Showing basic digivolution info.
           </p>
         </div>
       </div>
@@ -321,7 +321,7 @@ export function EvolutionTree({
   return (
     <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-2 border-orange-500/40 rounded-xl p-6 shadow-2xl">
       <h2 className="text-2xl font-bold text-orange-400 mb-8">
-        Complete Evolution Tree
+        Complete Digivolution Tree
       </h2>
       
       <div className="overflow-x-auto pb-4">

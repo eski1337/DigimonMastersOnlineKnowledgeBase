@@ -529,7 +529,7 @@ export function VisualEvolutionEditor({
       if (response.ok) {
         toast({
           title: 'Layout Saved!',
-          description: 'Evolution tree layout saved successfully',
+          description: 'Digivolution tree layout saved successfully',
         });
       } else {
         const errorData = await response.json();
@@ -628,8 +628,8 @@ export function VisualEvolutionEditor({
 
       if (response.ok) {
         toast({
-          title: 'Evolution Line Saved!',
-          description: `Shared evolution tree saved. All ${digimonInLine.length} Digimon will show this tree.`,
+          title: 'Digivolution Line Saved!',
+          description: `Shared digivolution tree saved. All ${digimonInLine.length} Digimon will show this tree.`,
         });
         setTimeout(() => window.location.reload(), 2000);
       } else {

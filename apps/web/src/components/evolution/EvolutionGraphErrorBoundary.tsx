@@ -28,10 +28,10 @@ export class EvolutionGraphErrorBoundary extends Component<Props, State> {
       return (
         <div className={styles.wrapper}>
           <div className={styles.header}>
-            <h2 className={styles.title}>Evolution Graph</h2>
+            <h2 className={styles.title}>Digivolution Graph</h2>
           </div>
           <div className={styles.fallback}>
-            <p className={styles.fallbackText}>Evolution graph failed to load.</p>
+            <p className={styles.fallbackText}>Digivolution graph failed to load.</p>
             <button
               onClick={() => this.setState({ hasError: false })}
               className="mt-2 text-sm text-orange-400 underline hover:text-orange-300 transition-colors"

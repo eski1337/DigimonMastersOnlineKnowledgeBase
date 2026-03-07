@@ -54,7 +54,7 @@ export default function AboutPage() {
               <div>
                 <h3 className="font-semibold mb-1">Comprehensive Data</h3>
                 <p className="text-sm text-muted-foreground">
-                  Detailed Digimon profiles, evolution trees, skill data, item databases, crafting guides, and more.
+                  Detailed Digimon profiles, digivolution trees, skill data, item databases, crafting guides, and more.
                 </p>
               </div>
             </div>

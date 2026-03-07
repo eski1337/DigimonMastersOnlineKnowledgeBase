@@ -2,7 +2,6 @@
 
 import { memo } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import Image from 'next/image';
 
 /* ── Node data shape ──────────────────────────────────────────────────── */
 
@@ -25,17 +24,27 @@ const CURRENT_GLOW = 'rgba(249,115,22,0.35)';
 const CURRENT_BG = 'rgba(249,115,22,0.08)';
 const BADGE_COLOR = '#9ca3af';       // gray-400
 
-function isValidIconUrl(icon?: string): boolean {
-  if (!icon) return false;
-  if (icon.includes('placeholder')) return false;
-  return icon.startsWith('http') || icon.startsWith('/media/');
+const PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
+
+function resolveIconUrl(icon?: string): string | null {
+  if (!icon) return null;
+  // Raw MongoDB ObjectId — unresolved relationship
+  if (/^[a-f0-9]{24}$/.test(icon)) return null;
+  // Relative CMS path — prepend CMS domain
+  if (icon.startsWith('/media/') || icon.startsWith('/Images/')) {
+    return `${PUBLIC_CMS_URL}${icon}`;
+  }
+  // Already absolute
+  if (icon.startsWith('http')) return icon;
+  return null;
 }
 
 /* ── DigimonNode component ────────────────────────────────────────────── */
 
 function DigimonNodeInner({ data }: NodeProps) {
   const d = data as DigimonNodeData;
-  const hasIcon = isValidIconUrl(d.icon);
+  const resolvedIcon = resolveIconUrl(d.icon);
+  const hasIcon = resolvedIcon !== null;
   const isCurrent = d.isCurrent === true;
   const isClickable = Boolean(d.slug && !isCurrent);
 
@@ -82,19 +91,17 @@ function DigimonNodeInner({ data }: NodeProps) {
         }}
       >
         {hasIcon ? (
-          <Image
-            src={d.icon!}
+          <img
+            src={resolvedIcon!}
             alt={d.label}
             width={72}
             height={72}
-            className="object-contain"
             style={{ width: 72, height: 72, objectFit: 'contain' }}
             loading="lazy"
-            unoptimized
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.querySelector('span')!.style.display = 'block'; }}
           />
-        ) : (
-          <span style={{ color: '#4b5563', fontSize: '20px' }}>?</span>
-        )}
+        ) : null}
+        <span style={{ color: '#4b5563', fontSize: '20px', display: hasIcon ? 'none' : 'block' }}>?</span>
       </div>
 
       {/* Name */}

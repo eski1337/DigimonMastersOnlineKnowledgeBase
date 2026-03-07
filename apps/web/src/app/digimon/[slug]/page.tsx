@@ -274,12 +274,12 @@ export default async function DigimonDetailPage({ params }: { params: { slug: st
           </div>
 
 
-          {/* Evolution Display */}
+          {/* Digivolution Display */}
           {USE_NEW_EVOLUTION ? (
             <EvolutionGraphLoader slug={d.slug} userRole={session?.user?.role as string | undefined} />
           ) : (
             <>
-              {/* Complete Evolution Tree - Always show */}
+              {/* Complete Digivolution Tree - Always show */}
               <EvolutionTree
                 currentDigimon={{ 
                   name: d.name, 

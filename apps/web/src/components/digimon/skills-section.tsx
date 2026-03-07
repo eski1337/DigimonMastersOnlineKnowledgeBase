@@ -4,8 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-const PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
+import { getElementIconPath, PUBLIC_CMS_URL } from '@/lib/icon-paths';
 const SKILL_PLACEHOLDER = '/icons/Placeholder/digiplaceholder.png';
 
 interface Skill {
@@ -27,12 +26,6 @@ interface SkillsSectionProps {
 
 export function SkillsSection({ skills }: SkillsSectionProps) {
   const [selectedLevels, setSelectedLevels] = useState<Record<number, number>>({});
-
-  // Icon path helper - duplicated here since we can't pass functions to Client Components
-  const getElementIconPath = (element: string) => {
-    const normalizedElement = element?.replace(/\s+/g, '_');
-    return `/icons/Elements/${normalizedElement}.png`;
-  };
 
   // Helper to display value or "?" if missing
   const displayValue = (value: number | null | undefined, suffix: string = ''): string => {

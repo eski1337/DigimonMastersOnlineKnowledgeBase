@@ -7,9 +7,9 @@ import { notFound } from 'next/navigation';
 import { MapGallery, MapOverlayViewer, HeroImageViewer } from '@/components/maps/map-gallery';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { getElementIconPath, getAttributeIconPath, resolveMediaUrl, PUBLIC_CMS_URL } from '@/lib/icon-paths';
 
 const CMS_URL = process.env.CMS_INTERNAL_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3001';
-const PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.dmokb.info';
 
 interface NPC {
   name: string;
@@ -84,16 +84,7 @@ function imgUrl(media: { url: string } | string | null | undefined): string | nu
   if (!media) return null;
   const url = typeof media === 'string' ? media : media.url;
   if (!url) return null;
-  return url.startsWith('http') ? url : `${PUBLIC_CMS_URL}${url}`;
-}
-
-function getElementIconPath(element: string): string {
-  return `/icons/Elements/${element.replace(/\s+/g, '_')}.png`;
-}
-
-function getAttributeIconPath(attribute: string): string {
-  if (attribute === 'Unknown') return '/icons/Attributes/Unknown_Attribute.png';
-  return `/icons/Attributes/${attribute}.png`;
+  return resolveMediaUrl(url) || null;
 }
 
 function getBehaviorIconPath(behavior: string): string {

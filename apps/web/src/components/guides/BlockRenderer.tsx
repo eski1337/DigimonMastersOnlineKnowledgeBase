@@ -370,12 +370,12 @@ function ImageBlockView({ block, compact }: { block: ImageBlockData; compact?: b
   // Compact mode: render as a small inline icon with caption below
   if (compact) {
     return (
-      <figure className="flex flex-col items-center text-center gap-1">
+      <figure className="flex flex-col items-center text-center gap-1 w-20">
         <div className="w-16 h-16 flex-shrink-0">
           <img src={src} alt={block.caption || ''} className="w-full h-full object-contain" />
         </div>
         {block.caption && (
-          <figcaption className="text-[10px] leading-tight text-muted-foreground max-w-[80px] line-clamp-2">{block.caption}</figcaption>
+          <figcaption className="text-[10px] leading-tight text-muted-foreground line-clamp-2">{block.caption}</figcaption>
         )}
       </figure>
     );
@@ -405,7 +405,7 @@ function ImageBlockView({ block, compact }: { block: ImageBlockData; compact?: b
 export function BlockRenderer({ blocks }: { blocks: GuideBlock[] }) {
   if (!blocks || !Array.isArray(blocks) || blocks.length === 0) return null;
 
-  // Group consecutive image blocks into compact rows when there are 3+ in a row
+  // Group consecutive image blocks (3+) into compact icon rows
   const elements: React.ReactNode[] = [];
   let i = 0;
   while (i < blocks.length) {
@@ -417,10 +417,9 @@ export function BlockRenderer({ blocks }: { blocks: GuideBlock[] }) {
       const runLength = runEnd - i;
 
       if (runLength >= 3) {
-        // Render as compact icon row
         const imageBlocks = blocks.slice(i, runEnd) as ImageBlockData[];
         elements.push(
-          <div key={i} className="my-3 flex flex-wrap gap-4 items-start">
+          <div key={i} className="my-3 flex flex-wrap gap-3 items-start">
             {imageBlocks.map((ib, j) => (
               <ImageBlockView key={`${i}-${j}`} block={ib} compact />
             ))}
@@ -428,7 +427,7 @@ export function BlockRenderer({ blocks }: { blocks: GuideBlock[] }) {
         );
         i = runEnd;
       } else {
-        elements.push(<ImageBlockView key={i} block={block} />);
+        elements.push(<ImageBlockView key={i} block={block as ImageBlockData} />);
         i++;
       }
     } else {

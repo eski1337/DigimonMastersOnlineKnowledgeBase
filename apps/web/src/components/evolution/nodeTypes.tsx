@@ -139,8 +139,8 @@ function DigimonNodeCompactInner({ data }: NodeProps) {
 export const DigimonNodeCompact = memo(DigimonNodeCompactInner);
 
 /* ── Compact dimensions for layout ─────────────────────────────────── */
-export const COMPACT_NODE_WIDTH = 96;
-export const COMPACT_NODE_HEIGHT = 96;
+export const COMPACT_NODE_WIDTH = 190;
+export const COMPACT_NODE_HEIGHT = 190;
 
 /* ── Export node types maps ────────────────────────────────────────── */
 

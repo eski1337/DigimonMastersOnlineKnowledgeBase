@@ -234,10 +234,10 @@ export function buildCompactFlowElements(
     g.setDefaultEdgeLabel(() => ({}));
     g.setGraph({
       rankdir: 'LR',
-      ranksep: 60,
-      nodesep: 24,
-      marginx: 15,
-      marginy: 15,
+      ranksep: 120,
+      nodesep: 50,
+      marginx: 20,
+      marginy: 20,
     });
 
     for (const n of apiNodes) {

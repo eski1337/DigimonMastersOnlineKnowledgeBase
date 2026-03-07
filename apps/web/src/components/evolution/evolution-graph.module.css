@@ -115,6 +115,7 @@
 /* ── Fallback icon ───────────────────────────────────────────────── */
 
 .wrapper :global(.evo-node__icon-fallback) {
+  display: flex;
   color: var(--evo-text-muted);
   font-size: 20px; font-weight: 700;
   align-items: center; justify-content: center;
@@ -186,7 +187,7 @@
   font-size: 12px; font-weight: 700;
   color: var(--evo-text);
 }
-.wrapper :global(.evo-node--current ~ .evo-tooltip .evo-tooltip__name) { color: #fb923c; }
+.wrapper :global(.evo-node--current + .evo-tooltip .evo-tooltip__name) { color: #fb923c; }
 
 .wrapper :global(.evo-tooltip__badge) {
   font-size: 9px; font-weight: 600;
@@ -330,11 +331,4 @@
 .fallbackText { font-size: 0.875rem; color: hsl(var(--muted-foreground)); }
 .fallbackSub  { font-size: 0.75rem;  color: hsl(var(--muted-foreground) / 0.7); }
 
-/* ── Outer card (unused but kept) ─────────────────────────────────── */
 
-.card {
-  border-radius: 0.75rem;
-  border: 1px solid var(--evo-border);
-  background: hsl(var(--card));
-  overflow: hidden;
-}

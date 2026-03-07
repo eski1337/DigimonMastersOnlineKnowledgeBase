@@ -177,7 +177,7 @@ export default async function MapDetailPage({ params }: { params: { slug: string
       {/* Breadcrumb + Edit */}
       <div className="flex items-center justify-between mb-6">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/maps" className="hover:text-foreground transition-colors">Maps</Link>
+          <Link href="/maps" prefetch={false} className="hover:text-foreground transition-colors">Maps</Link>
           <span>/</span>
           <span className="text-foreground font-medium">{map.name}</span>
         </nav>
@@ -337,7 +337,7 @@ export default async function MapDetailPage({ params }: { params: { slug: string
                                   )}
                                   <div className="min-w-0">
                                     {isFirst ? (
-                                      <Link href={`/digimon/${digiSlug}`} className="font-semibold hover:text-primary transition-colors">
+                                      <Link href={`/digimon/${digiSlug}`} prefetch={false} className="font-semibold hover:text-primary transition-colors">
                                         {group.baseName}
                                       </Link>
                                     ) : (
@@ -501,7 +501,7 @@ export default async function MapDetailPage({ params }: { params: { slug: string
                       </div>
                     );
                     return slug ? (
-                      <Link key={i} href={`/maps/${slug}`}>{inner}</Link>
+                      <Link key={i} href={`/maps/${slug}`} prefetch={false}>{inner}</Link>
                     ) : (
                       <div key={i}>{inner}</div>
                     );

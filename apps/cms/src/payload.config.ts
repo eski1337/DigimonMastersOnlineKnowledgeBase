@@ -90,6 +90,17 @@ export default buildConfig({
   admin: {
     user: Users.slug,
     bundler: webpackBundler(),
+    webpack: (config) => ({
+      ...config,
+      resolve: {
+        ...config.resolve,
+        fallback: {
+          ...(config.resolve?.fallback || {}),
+          fs: false,
+          path: false,
+        },
+      },
+    }),
     meta: {
       titleSuffix: '- DMO KB CMS',
       favicon: '/favicon.ico',

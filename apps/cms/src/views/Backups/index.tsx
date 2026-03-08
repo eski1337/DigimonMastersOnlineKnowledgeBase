@@ -169,23 +169,88 @@ function VerifyStatusBadge({ status }: { status: string | undefined }) {
 
 // ── Script Output Modal ──────────────────────────────────────────────────────
 
+function parseScriptResult(output: string): { finished: boolean; success: boolean; exitCode: number | null; label: string } {
+  const exitMatch = output.match(/--- Script exited with code (\d+) ---/);
+  if (exitMatch) {
+    const code = parseInt(exitMatch[1], 10);
+    return { finished: true, success: code === 0, exitCode: code, label: code === 0 ? 'Completed successfully' : `Failed (error code ${code})` };
+  }
+  if (output.includes('--- Timeout')) return { finished: true, success: false, exitCode: null, label: 'Timed out' };
+  if (output.match(/^ERROR:/m)) return { finished: false, success: false, exitCode: null, label: '' };
+  return { finished: false, success: false, exitCode: null, label: '' };
+}
+
 function ScriptOutputModal({ output, title, running, onClose }: { output: string; title: string; running: boolean; onClose: () => void }) {
   const preRef = useRef<HTMLPreElement>(null);
   useEffect(() => { if (preRef.current) preRef.current.scrollTop = preRef.current.scrollHeight; }, [output]);
 
+  const result = parseScriptResult(output);
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <div style={{ background: '#0f0f23', borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', width: '100%', maxWidth: 900, maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}>
+        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {running && <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', animation: 'pulse 1.5s infinite', boxShadow: '0 0 8px #4ade80' }} />}
+            {!running && result.finished && (
+              <span style={{ fontSize: 16 }}>{result.success ? '\u2705' : '\u274C'}</span>
+            )}
             <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#e2e8f0' }}>{title}</h3>
           </div>
           <button onClick={onClose} disabled={running} style={{ ...btnGhost, opacity: running ? 0.3 : 1 }}>Close</button>
         </div>
+
+        {/* Result Banner — shown when script finishes */}
+        {!running && result.finished && (
+          <div style={{
+            padding: '14px 20px',
+            display: 'flex', alignItems: 'center', gap: 12,
+            background: result.success ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)',
+            borderBottom: `1px solid ${result.success ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}`,
+          }}>
+            <span style={{ fontSize: 24 }}>{result.success ? '\u2705' : '\u274C'}</span>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: result.success ? '#4ade80' : '#f87171' }}>
+                {result.success ? 'Success!' : 'Something went wrong'}
+              </div>
+              <div style={{ fontSize: 12, color: result.success ? '#86efac' : '#fca5a5', marginTop: 2 }}>
+                {result.label}
+                {!result.success && ' \u2014 check the log below for details'}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Running indicator */}
+        {running && (
+          <div style={{
+            padding: '10px 20px',
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: 'rgba(59,130,246,0.06)',
+            borderBottom: '1px solid rgba(59,130,246,0.1)',
+          }}>
+            <span style={{ fontSize: 14 }}>\u23F3</span>
+            <span style={{ fontSize: 12, color: '#93c5fd' }}>Running... please wait, this may take a moment</span>
+          </div>
+        )}
+
+        {/* Log output */}
         <pre ref={preRef} style={{ flex: 1, overflow: 'auto', padding: 20, margin: 0, fontFamily: "'JetBrains Mono', monospace", fontSize: 11.5, lineHeight: 1.6, color: '#a3e635', background: '#0a0a1a', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
           {output || (running ? 'Waiting for output...' : 'No output.')}
         </pre>
+
+        {/* Bottom bar with close hint */}
+        {!running && result.finished && (
+          <div style={{ padding: '10px 20px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 11, color: '#475569' }}>
+              {result.success
+                ? 'The backup data above has been refreshed automatically.'
+                : 'If this keeps failing, check the server logs for more details.'}
+            </span>
+            <button onClick={onClose} style={{ ...btnGhost, padding: '5px 16px' }}>Close</button>
+          </div>
+        )}
       </div>
     </div>
   );

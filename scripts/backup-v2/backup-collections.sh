@@ -135,9 +135,9 @@ if [[ ${FAILURES} -eq 0 ]]; then
 else
     log_error "COLLECTION BACKUP — ${FAILURES} FAILURE(S) (${TOTAL_ELAPSED}s)"
 fi
-while IFS= read -r line; do
+printf '%b' "${SUMMARY}" | while IFS= read -r line || [[ -n "${line}" ]]; do
     [[ -n "${line}" ]] && log_info "${line}"
-done <<< "${SUMMARY}" || true
+done || true
 log_info "========================================"
 
 release_lock

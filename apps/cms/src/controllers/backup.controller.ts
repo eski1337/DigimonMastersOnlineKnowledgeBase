@@ -34,6 +34,7 @@ function runScriptStreaming(
   scriptName: string,
   extraEnv: Record<string, string> = {},
   timeoutMs = 600000,
+  scriptArgs: string[] = [],
 ): void {
   if (runningScript) {
     res.status(409).json({ error: `Script already running: ${runningScript}` });
@@ -53,7 +54,7 @@ function runScriptStreaming(
     'X-Content-Type-Options': 'nosniff',
   });
 
-  const proc = spawn('bash', [scriptPath], {
+  const proc = spawn('bash', [scriptPath, ...scriptArgs], {
     env: { ...process.env, ...BACKUP_ENV, ...extraEnv },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -227,12 +228,13 @@ export function testCollectionRestore(req: Request, res: Response): void {
   const collection = req.body?.collection || '';
   log.info({ user: user?.email, collection }, 'Test collection restore triggered');
 
-  // Use restore.sh --dry-run for collection restore preview
+  // Use restore.sh list to show available backups (non-interactive)
   const script = resolveV2Script('restore.sh');
   if (!script) { res.status(500).json({ error: 'Restore script not found' }); return; }
   runScriptStreaming(res, script, 'test-collection-restore',
     collection ? { RESTORE_COLLECTION: collection } : {},
     120000,
+    ['list'],
   );
 }
 

@@ -132,11 +132,7 @@ const btnBase: React.CSSProperties = {
   cursor: 'pointer', transition: 'all 0.15s', border: '1px solid',
   fontFamily: 'inherit',
 };
-const btnPrimary: React.CSSProperties = { ...btnBase, borderColor: '#3b82f6', background: 'rgba(59,130,246,0.12)', color: '#60a5fa' };
-const btnPurple: React.CSSProperties = { ...btnBase, borderColor: 'rgba(139,92,246,0.4)', background: 'rgba(139,92,246,0.08)', color: '#a78bfa' };
-const btnGreen: React.CSSProperties = { ...btnBase, borderColor: 'rgba(34,197,94,0.4)', background: 'rgba(34,197,94,0.08)', color: '#4ade80' };
 const btnGhost: React.CSSProperties = { ...btnBase, borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: '#94a3b8' };
-const btnOrange: React.CSSProperties = { ...btnBase, borderColor: 'rgba(251,146,60,0.4)', background: 'rgba(251,146,60,0.08)', color: '#fb923c' };
 
 const thStyle: React.CSSProperties = {
   padding: '8px 12px', textAlign: 'left', fontWeight: 600,
@@ -191,6 +187,65 @@ function ScriptOutputModal({ output, title, running, onClose }: { output: string
           {output || (running ? 'Waiting for output...' : 'No output.')}
         </pre>
       </div>
+    </div>
+  );
+}
+
+// ── Action Card Component ────────────────────────────────────────────────────
+
+interface ActionCardProps {
+  icon: string;
+  title: string;
+  description: string;
+  buttonLabel: string;
+  runningLabel: string;
+  color: string;
+  borderColor: string;
+  bgColor: string;
+  endpoint: string;
+  scriptRunning: string | null;
+  onRun: (endpoint: string, label: string) => void;
+}
+
+function ActionCard({ icon, title, description, buttonLabel, runningLabel, color, borderColor, bgColor, endpoint, scriptRunning, onRun }: ActionCardProps) {
+  const isThisRunning = scriptRunning === runningLabel;
+  const disabled = !!scriptRunning;
+  return (
+    <div style={{
+      ...card, display: 'flex', flexDirection: 'column', gap: 10, minHeight: 130,
+      borderColor: isThisRunning ? borderColor : 'rgba(255,255,255,0.06)',
+      transition: 'border-color 0.2s',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 18 }}>{icon}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9' }}>{title}</span>
+      </div>
+      <p style={{ fontSize: 11.5, color: '#94a3b8', margin: 0, lineHeight: 1.55, flex: 1 }}>{description}</p>
+      <button
+        onClick={() => onRun(endpoint, runningLabel)}
+        disabled={disabled}
+        style={{
+          ...btnBase, width: '100%', textAlign: 'center',
+          borderColor, background: bgColor, color,
+          opacity: disabled ? 0.4 : 1,
+        }}
+      >
+        {isThisRunning ? 'Running...' : buttonLabel}
+      </button>
+    </div>
+  );
+}
+
+// ── Section Header ───────────────────────────────────────────────────────────
+
+function SectionHeader({ icon, title, subtitle }: { icon: string; title: string; subtitle: string }) {
+  return (
+    <div style={{ marginBottom: 12, marginTop: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+        <span style={{ fontSize: 15 }}>{icon}</span>
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', margin: 0 }}>{title}</h2>
+      </div>
+      <p style={{ fontSize: 12, color: '#64748b', margin: 0, paddingLeft: 23 }}>{subtitle}</p>
     </div>
   );
 }
@@ -276,18 +331,7 @@ const BackupManagerInner: React.FC = () => {
           <h1 style={{ fontSize: 22, fontWeight: 750, margin: 0, color: '#f1f5f9', letterSpacing: '-0.03em' }}>Backup Manager</h1>
           {data?.cronInstalled && <span style={badge('#4ade80', 'rgba(34,197,94,0.12)')}>Cron Active</span>}
         </div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          <button onClick={fetchData} style={btnGhost}>Refresh</button>
-          <button onClick={() => runScript('/api/internal/backups/run', 'Full Backup')} disabled={!!scriptRunning} style={{ ...btnPrimary, opacity: scriptRunning ? 0.4 : 1 }}>
-            {scriptRunning === 'Full Backup' ? 'Running...' : 'Run Backup'}
-          </button>
-          <button onClick={() => runScript('/api/internal/backups/verify', 'Verify')} disabled={!!scriptRunning} style={{ ...btnPurple, opacity: scriptRunning ? 0.4 : 1 }}>
-            {scriptRunning === 'Verify' ? 'Running...' : 'Verify'}
-          </button>
-          <button onClick={() => runScript('/api/internal/backups/test-full', 'Test Restore')} disabled={!!scriptRunning} style={{ ...btnGreen, opacity: scriptRunning ? 0.4 : 1 }}>
-            {scriptRunning === 'Test Restore' ? 'Running...' : 'Test Restore'}
-          </button>
-        </div>
+        <button onClick={fetchData} style={btnGhost}>Refresh</button>
       </div>
 
       {/* ── Error ──────────────────────────────────────────── */}
@@ -309,7 +353,7 @@ const BackupManagerInner: React.FC = () => {
           )}
 
           {/* ── Summary Cards ────────────────────────────────── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 10, marginBottom: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 10, marginBottom: 28 }}>
             <div style={card}>
               <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.06em', marginBottom: 6 }}>Last Full Backup</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#f1f5f9', marginBottom: 4 }}>{safeStr(data.lastFullAge, 'Never')}</div>
@@ -342,25 +386,137 @@ const BackupManagerInner: React.FC = () => {
             </div>
           </div>
 
-          {/* ── Quick Actions ────────────────────────────────── */}
-          <div style={{ ...card, marginBottom: 24, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginRight: 8 }}>Quick Actions:</span>
-            <button onClick={() => runScript('/api/internal/backups/run-collections', 'Collections')} disabled={!!scriptRunning} style={{ ...btnGhost, opacity: scriptRunning ? 0.4 : 1 }}>
-              Backup Collections
-            </button>
-            <button onClick={() => runScript('/api/internal/backups/run-uploads', 'Uploads')} disabled={!!scriptRunning} style={{ ...btnGhost, opacity: scriptRunning ? 0.4 : 1 }}>
-              Backup Uploads
-            </button>
-            <button onClick={() => runScript('/api/internal/backups/run-incremental', 'Incremental')} disabled={!!scriptRunning} style={{ ...btnGhost, opacity: scriptRunning ? 0.4 : 1 }}>
-              Run Incremental
-            </button>
-            <button onClick={() => runScript('/api/internal/backups/test-uploads', 'Test Uploads')} disabled={!!scriptRunning} style={{ ...btnGreen, opacity: scriptRunning ? 0.4 : 1 }}>
-              Test Uploads Snapshot
-            </button>
-            <button onClick={() => runScript('/api/internal/backups/run-retention?dryRun=true', 'Retention Preview')} disabled={!!scriptRunning} style={{ ...btnOrange, opacity: scriptRunning ? 0.4 : 1 }}>
-              Retention Dry Run
-            </button>
+          {/* ════════════════════════════════════════════════════
+              SECTION 1 — CREATE BACKUPS
+              ════════════════════════════════════════════════════ */}
+          <SectionHeader
+            icon="&#128190;"
+            title="Create Backups"
+            subtitle="Run backup scripts manually. Each creates a timestamped snapshot you can download or restore from."
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 10, marginBottom: 28 }}>
+            <ActionCard
+              icon="&#128230;"
+              title="Full Backup"
+              description="Creates a complete MongoDB dump and manifest. This is the most important backup — it captures everything in one archive."
+              buttonLabel="Run Full Backup"
+              runningLabel="Full Backup"
+              color="#60a5fa" borderColor="#3b82f6" bgColor="rgba(59,130,246,0.12)"
+              endpoint="/api/internal/backups/run"
+              scriptRunning={scriptRunning} onRun={runScript}
+            />
+            <ActionCard
+              icon="&#128451;"
+              title="Backup Collections"
+              description="Backs up each MongoDB collection individually (digimons, items, maps, etc). Useful for granular restores of specific data."
+              buttonLabel="Run Collection Backup"
+              runningLabel="Collections"
+              color="#94a3b8" borderColor="rgba(255,255,255,0.15)" bgColor="rgba(255,255,255,0.04)"
+              endpoint="/api/internal/backups/run-collections"
+              scriptRunning={scriptRunning} onRun={runScript}
+            />
+            <ActionCard
+              icon="&#128248;"
+              title="Backup Uploads"
+              description="Snapshots all media files (images, icons, etc) using hardlinks for efficiency. Only changed files use extra disk space."
+              buttonLabel="Run Uploads Snapshot"
+              runningLabel="Uploads"
+              color="#94a3b8" borderColor="rgba(255,255,255,0.15)" bgColor="rgba(255,255,255,0.04)"
+              endpoint="/api/internal/backups/run-uploads"
+              scriptRunning={scriptRunning} onRun={runScript}
+            />
+            <ActionCard
+              icon="&#9650;"
+              title="Incremental Backup"
+              description="Captures only changes since the last backup (new/modified documents and files). Fast and lightweight."
+              buttonLabel="Run Incremental"
+              runningLabel="Incremental"
+              color="#94a3b8" borderColor="rgba(255,255,255,0.15)" bgColor="rgba(255,255,255,0.04)"
+              endpoint="/api/internal/backups/run-incremental"
+              scriptRunning={scriptRunning} onRun={runScript}
+            />
           </div>
+
+          {/* ════════════════════════════════════════════════════
+              SECTION 2 — VERIFY & TEST
+              ════════════════════════════════════════════════════ */}
+          <SectionHeader
+            icon="&#128270;"
+            title="Verify &amp; Test"
+            subtitle="Confirm your backups are healthy. These tests do NOT affect live data — they use temporary databases and are completely safe."
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 10, marginBottom: 28 }}>
+            <ActionCard
+              icon="&#9989;"
+              title="Verify Backups"
+              description="Checks archive integrity (gzip test), does a test restore into a temporary database, and compares document counts against live data."
+              buttonLabel="Run Verification"
+              runningLabel="Verify"
+              color="#a78bfa" borderColor="rgba(139,92,246,0.4)" bgColor="rgba(139,92,246,0.08)"
+              endpoint="/api/internal/backups/verify"
+              scriptRunning={scriptRunning} onRun={runScript}
+            />
+            <ActionCard
+              icon="&#128260;"
+              title="Test Full Restore"
+              description="Restores the latest full backup into a temporary database to confirm it works. The temp database is deleted afterward. Safe to run."
+              buttonLabel="Test Full Restore"
+              runningLabel="Test Restore"
+              color="#4ade80" borderColor="rgba(34,197,94,0.4)" bgColor="rgba(34,197,94,0.08)"
+              endpoint="/api/internal/backups/test-full"
+              scriptRunning={scriptRunning} onRun={runScript}
+            />
+            <ActionCard
+              icon="&#128451;"
+              title="Test Collection Restore"
+              description="Restores individual collection backups into a temporary database and verifies document counts match. Temp database is cleaned up."
+              buttonLabel="Test Collection Restore"
+              runningLabel="Test Collection"
+              color="#4ade80" borderColor="rgba(34,197,94,0.4)" bgColor="rgba(34,197,94,0.08)"
+              endpoint="/api/internal/backups/test-collection"
+              scriptRunning={scriptRunning} onRun={runScript}
+            />
+            <ActionCard
+              icon="&#128247;"
+              title="Test Uploads Snapshot"
+              description="Compares the latest uploads snapshot against the live media directory to verify file counts match and no files are missing."
+              buttonLabel="Test Uploads"
+              runningLabel="Test Uploads"
+              color="#4ade80" borderColor="rgba(34,197,94,0.4)" bgColor="rgba(34,197,94,0.08)"
+              endpoint="/api/internal/backups/test-uploads"
+              scriptRunning={scriptRunning} onRun={runScript}
+            />
+          </div>
+
+          {/* ════════════════════════════════════════════════════
+              SECTION 3 — MAINTENANCE
+              ════════════════════════════════════════════════════ */}
+          <SectionHeader
+            icon="&#128295;"
+            title="Maintenance"
+            subtitle="Housekeeping tasks for disk management. Dry-run mode previews what would happen without deleting anything."
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 10, marginBottom: 32 }}>
+            <ActionCard
+              icon="&#128465;"
+              title="Retention Dry Run"
+              description="Previews which old backups would be cleaned up by the retention policy. Nothing is deleted — this is a safe preview only."
+              buttonLabel="Preview Retention"
+              runningLabel="Retention Preview"
+              color="#fb923c" borderColor="rgba(251,146,60,0.4)" bgColor="rgba(251,146,60,0.08)"
+              endpoint="/api/internal/backups/run-retention?dryRun=true"
+              scriptRunning={scriptRunning} onRun={runScript}
+            />
+          </div>
+
+          {/* ════════════════════════════════════════════════════
+              SECTION 4 — BACKUP HISTORY
+              ════════════════════════════════════════════════════ */}
+          <SectionHeader
+            icon="&#128196;"
+            title="Backup History"
+            subtitle="Browse and download existing backups by type."
+          />
 
           {/* ── Tab Navigation ───────────────────────────────── */}
           <div style={{ display: 'flex', gap: 0, marginBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.06)', flexWrap: 'wrap' }}>

@@ -1,389 +1,543 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Component } from 'react';
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ── Types (matches BackupHealthV2 from the backend) ─────────────────────────
 
-interface BackupFileInfo {
+interface FullBackupInfo {
+  date: string;
+  mongoFile: string | null;
+  mongoSizeMB: number;
+  uploadsSnapshot?: string;
+  collections: Record<string, number>;
+  failures: number;
+  timestamp: string | null;
+}
+
+interface IncrementalInfo {
+  timestamp: string;
+  since: string;
+  mongoChangedDocs: number;
+  mongoChangedCollections: number;
+  uploadsChangedFiles: number;
+}
+
+interface CollectionBackupInfo {
+  collection: string;
+  latestFile: string | null;
+  latestTimestamp: string | null;
+  latestSizeMB: number;
+  documentCount: number;
+  totalBackups: number;
+}
+
+interface UploadsSnapshotInfo {
+  timestamp: string;
+  snapshotFiles: number;
+  newOrChangedFiles: number;
+  diskUsageMB: number;
+}
+
+interface DownloadableFile {
   filename: string;
+  path: string;
   sizeMB: number;
   sizeBytes: number;
   timestamp: string | null;
   ageHours: number;
-  isStale: boolean;
+  type: string;
 }
 
-interface RetentionCounts {
-  daily: number;
-  weekly: number;
-  monthly: number;
-  total: number;
+interface BackupHealthV2 {
+  version?: number;
+  backupRoot?: string;
+  backupRootExists?: boolean;
+  fullBackups?: FullBackupInfo[];
+  lastFullBackup?: FullBackupInfo | null;
+  lastFullAge?: string | null;
+  incrementalCount?: number;
+  lastIncremental?: IncrementalInfo | null;
+  lastIncrementalAge?: string | null;
+  recentIncrementals?: IncrementalInfo[];
+  collectionBackups?: CollectionBackupInfo[];
+  uploadsSnapshots?: UploadsSnapshotInfo[];
+  lastUploadsSnapshot?: UploadsSnapshotInfo | null;
+  lastBackupStatus?: string;
+  lastVerificationStatus?: string;
+  nextScheduledRun?: string | null;
+  cronInstalled?: boolean;
+  diskUsage?: Record<string, string>;
+  totalDiskUsage?: string;
+  warnings?: string[];
+  downloadableFiles?: DownloadableFile[];
 }
 
-interface BackupHealth {
-  lastBackupTime: string | null;
-  lastBackupAge: string | null;
-  lastBackupSizeMB: number | null;
-  lastBackupStatus: 'success' | 'failure' | 'unknown';
-  lastVerificationStatus: 'passed' | 'failed' | 'never_run';
-  lastVerificationTime: string | null;
-  retention: RetentionCounts;
-  nextScheduledRun: string | null;
-  backupDirExists: boolean;
-  uploadsBackupCount: number;
-  warnings: string[];
-  mongoFiles: BackupFileInfo[];
-  uploadsFiles: BackupFileInfo[];
-}
+// ── Safe accessor helpers (prevent crashes on missing data) ──────────────────
+
+const safeArr = <T,>(arr: T[] | undefined | null): T[] => Array.isArray(arr) ? arr : [];
+const safeObj = (obj: Record<string, string> | undefined | null): Record<string, string> => (obj && typeof obj === 'object') ? obj : {};
+const safeStr = (val: string | undefined | null, fallback = '\u2014'): string => val ?? fallback;
+const safeNum = (val: number | undefined | null, fallback = 0): number => val ?? fallback;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function formatSize(mb: number): string {
-  if (mb >= 1024) return `${(mb / 1024).toFixed(2)} GB`;
-  return `${mb.toFixed(2)} MB`;
+function fmtSize(mb: number | undefined | null): string {
+  const v = safeNum(mb);
+  if (v >= 1024) return `${(v / 1024).toFixed(2)} GB`;
+  if (v >= 1) return `${v.toFixed(2)} MB`;
+  return `${(v * 1024).toFixed(0)} KB`;
 }
 
-function formatAge(hours: number): string {
-  if (hours < 1) return `${Math.round(hours * 60)}m ago`;
-  if (hours < 24) return `${Math.round(hours)}h ago`;
-  const days = Math.floor(hours / 24);
-  const rem = Math.round(hours % 24);
-  return `${days}d ${rem}h ago`;
+function fmtDate(iso: string | null | undefined): string {
+  if (!iso) return '\u2014';
+  try { return new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+  catch { return iso; }
 }
 
-function formatDate(iso: string | null): string {
-  if (!iso) return '—';
-  try {
-    return new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  } catch {
-    return iso;
+// ── Error Boundary ───────────────────────────────────────────────────────────
+
+class BackupErrorBoundary extends Component<{ children: React.ReactNode }, { error: string | null }> {
+  state = { error: null as string | null };
+  static getDerivedStateFromError(err: Error) { return { error: err.message || 'Unknown error' }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 40, maxWidth: 700, margin: '40px auto', textAlign: 'center' }}>
+          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 12, padding: '24px 32px', marginBottom: 16 }}>
+            <h2 style={{ color: '#f87171', fontSize: 18, fontWeight: 700, margin: '0 0 8px 0' }}>Backup Manager Error</h2>
+            <p style={{ color: '#fca5a5', fontSize: 13, margin: '0 0 12px 0' }}>The backup page encountered an error and could not render.</p>
+            <pre style={{ background: '#1a1a2e', color: '#fb923c', padding: 12, borderRadius: 8, fontSize: 11, textAlign: 'left', overflow: 'auto', maxHeight: 120 }}>{this.state.error}</pre>
+          </div>
+          <button onClick={() => { this.setState({ error: null }); window.location.reload(); }}
+            style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: '#94a3b8', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
   }
 }
 
-// ── Status Badge ─────────────────────────────────────────────────────────────
+// ── Shared Styles ────────────────────────────────────────────────────────────
 
-function StatusBadge({ status, labels }: { status: string; labels: Record<string, { text: string; color: string; bg: string }> }) {
-  const cfg = labels[status] || { text: status, color: 'var(--ds-text-tertiary)', bg: 'var(--ds-bg-overlay)' };
-  return (
-    <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: 'var(--ds-radius-full)', fontSize: 11, fontWeight: 600, color: cfg.color, background: cfg.bg }}>
-      {cfg.text}
-    </span>
-  );
+const card: React.CSSProperties = {
+  background: '#1a1a2e', borderRadius: 12, padding: '16px 18px',
+  border: '1px solid rgba(255,255,255,0.06)',
+};
+const badge = (color: string, bg: string): React.CSSProperties => ({
+  display: 'inline-block', padding: '2px 10px', borderRadius: 999,
+  fontSize: 11, fontWeight: 600, color, background: bg,
+});
+const btnBase: React.CSSProperties = {
+  padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+  cursor: 'pointer', transition: 'all 0.15s', border: '1px solid',
+  fontFamily: 'inherit',
+};
+const btnPrimary: React.CSSProperties = { ...btnBase, borderColor: '#3b82f6', background: 'rgba(59,130,246,0.12)', color: '#60a5fa' };
+const btnPurple: React.CSSProperties = { ...btnBase, borderColor: 'rgba(139,92,246,0.4)', background: 'rgba(139,92,246,0.08)', color: '#a78bfa' };
+const btnGreen: React.CSSProperties = { ...btnBase, borderColor: 'rgba(34,197,94,0.4)', background: 'rgba(34,197,94,0.08)', color: '#4ade80' };
+const btnGhost: React.CSSProperties = { ...btnBase, borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: '#94a3b8' };
+const btnOrange: React.CSSProperties = { ...btnBase, borderColor: 'rgba(251,146,60,0.4)', background: 'rgba(251,146,60,0.08)', color: '#fb923c' };
+
+const thStyle: React.CSSProperties = {
+  padding: '8px 12px', textAlign: 'left', fontWeight: 600,
+  color: '#64748b', borderBottom: '1px solid rgba(255,255,255,0.06)',
+  fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em',
+};
+const tdStyle: React.CSSProperties = {
+  padding: '7px 12px', color: '#cbd5e1', fontSize: 12,
+  borderBottom: '1px solid rgba(255,255,255,0.03)',
+};
+const monoTd: React.CSSProperties = { ...tdStyle, fontFamily: "'JetBrains Mono', 'Fira Code', monospace", fontSize: 11 };
+
+// ── Status Badges ────────────────────────────────────────────────────────────
+
+function BackupStatusBadge({ status }: { status: string | undefined }) {
+  const m: Record<string, [string, string, string]> = {
+    success: ['Success', '#4ade80', 'rgba(34,197,94,0.12)'],
+    failure: ['Failed', '#f87171', 'rgba(239,68,68,0.12)'],
+    unknown: ['Unknown', '#94a3b8', 'rgba(148,163,184,0.1)'],
+  };
+  const [t, c, b] = m[status ?? 'unknown'] || m.unknown;
+  return <span style={badge(c, b)}>{t}</span>;
 }
 
-const backupLabels: Record<string, { text: string; color: string; bg: string }> = {
-  success: { text: 'Success', color: 'var(--ds-success)', bg: 'var(--ds-success-subtle)' },
-  failure: { text: 'Failed', color: 'var(--ds-error)', bg: 'var(--ds-error-subtle)' },
-  unknown: { text: 'Unknown', color: 'var(--ds-text-tertiary)', bg: 'var(--ds-bg-overlay)' },
-};
-
-const verifyLabels: Record<string, { text: string; color: string; bg: string }> = {
-  passed: { text: 'Passed', color: 'var(--ds-success)', bg: 'var(--ds-success-subtle)' },
-  failed: { text: 'Failed', color: 'var(--ds-error)', bg: 'var(--ds-error-subtle)' },
-  never_run: { text: 'Never Run', color: 'var(--ds-warning)', bg: 'var(--ds-warning-subtle)' },
-};
-
-// ── File Table ───────────────────────────────────────────────────────────────
-
-function BackupTable({ files, type }: { files: BackupFileInfo[]; type: string }) {
-  if (files.length === 0) {
-    return (
-      <div style={{ padding: 32, color: 'var(--ds-text-quaternary)', fontSize: 13, textAlign: 'center', background: 'var(--ds-bg-surface)', border: '1px solid var(--ds-border)', borderRadius: 'var(--ds-radius-xl)' }}>
-        No {type} backups found
-      </div>
-    );
-  }
-
-  const handleDownload = (filename: string) => {
-    window.open(`/api/internal/backups/${type}/${filename}`, '_blank');
+function VerifyStatusBadge({ status }: { status: string | undefined }) {
+  const m: Record<string, [string, string, string]> = {
+    passed: ['Passed', '#4ade80', 'rgba(34,197,94,0.12)'],
+    failed: ['Failed', '#f87171', 'rgba(239,68,68,0.12)'],
+    never_run: ['Never Run', '#fbbf24', 'rgba(251,191,36,0.12)'],
   };
-
-  const thStyle: React.CSSProperties = {
-    padding: '10px 12px', textAlign: 'left', fontWeight: 600,
-    color: 'var(--ds-text-tertiary)', borderBottom: '1px solid var(--ds-border)',
-    fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em',
-  };
-  const tdStyle: React.CSSProperties = {
-    padding: '8px 12px', color: 'var(--ds-text-primary)',
-    fontFamily: 'var(--ds-font-mono)', fontSize: 12,
-    borderBottom: '1px solid var(--ds-border-subtle)',
-  };
-
-  return (
-    <div style={{ borderRadius: 'var(--ds-radius-xl)', border: '1px solid var(--ds-border)', overflow: 'hidden', background: 'var(--ds-bg-surface)' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ background: 'var(--ds-bg-surface)' }}>
-            <th style={thStyle}>File</th>
-            <th style={thStyle}>Size</th>
-            <th style={thStyle}>Created</th>
-            <th style={thStyle}>Age</th>
-            <th style={thStyle}>Status</th>
-            <th style={{ ...thStyle, width: 90 }}>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {files.map((f) => (
-            <tr key={f.filename} style={{ transition: 'background 0.1s' }} onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--ds-bg-hover)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}>
-              <td style={tdStyle}>{f.filename}</td>
-              <td style={tdStyle}>{formatSize(f.sizeMB)}</td>
-              <td style={{ ...tdStyle, fontFamily: 'inherit' }}>{formatDate(f.timestamp)}</td>
-              <td style={tdStyle}>{formatAge(f.ageHours)}</td>
-              <td style={tdStyle}>
-                {f.isStale
-                  ? <span style={{ color: 'var(--ds-warning)', fontWeight: 600, fontSize: 11 }}>⚠ Stale</span>
-                  : <span style={{ color: 'var(--ds-success)', fontWeight: 600, fontSize: 11 }}>OK</span>
-                }
-              </td>
-              <td style={tdStyle}>
-                <button
-                  onClick={() => handleDownload(f.filename)}
-                  style={{
-                    padding: '4px 12px', borderRadius: 'var(--ds-radius-md)',
-                    border: '1px solid var(--ds-border-strong)', background: 'var(--ds-bg-elevated)',
-                    color: 'var(--ds-text-primary)', fontSize: 11, fontWeight: 600,
-                    cursor: 'pointer', transition: 'all 0.1s',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--ds-border-hover)'; e.currentTarget.style.background = 'var(--ds-bg-overlay)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--ds-border-strong)'; e.currentTarget.style.background = 'var(--ds-bg-elevated)'; }}
-                >
-                  Download
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  const [t, c, b] = m[status ?? 'never_run'] || m.never_run;
+  return <span style={badge(c, b)}>{t}</span>;
 }
 
 // ── Script Output Modal ──────────────────────────────────────────────────────
 
-function ScriptOutput({ output, title, onClose }: { output: string; title: string; onClose: () => void }) {
+function ScriptOutputModal({ output, title, running, onClose }: { output: string; title: string; running: boolean; onClose: () => void }) {
   const preRef = useRef<HTMLPreElement>(null);
-  useEffect(() => {
-    if (preRef.current) preRef.current.scrollTop = preRef.current.scrollHeight;
-  }, [output]);
+  useEffect(() => { if (preRef.current) preRef.current.scrollTop = preRef.current.scrollHeight; }, [output]);
 
   return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)',
-      zIndex: 10000, display: 'flex',
-      alignItems: 'center', justifyContent: 'center', padding: 24,
-    }}>
-      <div style={{
-        background: 'var(--ds-bg-app)', borderRadius: 'var(--ds-radius-2xl)',
-        border: '1px solid var(--ds-border)',
-        width: '100%', maxWidth: 800, maxHeight: '80vh',
-        display: 'flex', flexDirection: 'column',
-        boxShadow: 'var(--ds-shadow-xl)',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', borderBottom: '1px solid var(--ds-border)' }}>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--ds-text-primary)' }}>{title}</h3>
-          <button
-            onClick={onClose}
-            style={{
-              padding: '4px 12px', borderRadius: 'var(--ds-radius-md)',
-              border: '1px solid var(--ds-border-strong)', background: 'var(--ds-bg-elevated)',
-              color: 'var(--ds-text-primary)', fontSize: 11, fontWeight: 600, cursor: 'pointer',
-            }}
-          >
-            Close
-          </button>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ background: '#0f0f23', borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', width: '100%', maxWidth: 900, maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {running && <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', animation: 'pulse 1.5s infinite', boxShadow: '0 0 8px #4ade80' }} />}
+            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#e2e8f0' }}>{title}</h3>
+          </div>
+          <button onClick={onClose} disabled={running} style={{ ...btnGhost, opacity: running ? 0.3 : 1 }}>Close</button>
         </div>
-        <pre
-          ref={preRef}
-          style={{
-            flex: 1, overflow: 'auto', padding: 20, margin: 0,
-            fontFamily: 'var(--ds-font-mono)', fontSize: 12,
-            color: 'var(--ds-success)',
-            background: 'var(--ds-bg-inset)',
-            whiteSpace: 'pre-wrap', wordBreak: 'break-all',
-          }}
-        >
-          {output || 'Waiting for output...'}
+        <pre ref={preRef} style={{ flex: 1, overflow: 'auto', padding: 20, margin: 0, fontFamily: "'JetBrains Mono', monospace", fontSize: 11.5, lineHeight: 1.6, color: '#a3e635', background: '#0a0a1a', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+          {output || (running ? 'Waiting for output...' : 'No output.')}
         </pre>
       </div>
     </div>
   );
 }
 
-// ── Main Component ───────────────────────────────────────────────────────────
+// ── Inner Component (wrapped by error boundary) ─────────────────────────────
 
-const AdminBackupsPage: React.FC = () => {
-  const [health, setHealth] = useState<BackupHealth | null>(null);
+const BackupManagerInner: React.FC = () => {
+  const [data, setData] = useState<BackupHealthV2 | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [scriptRunning, setScriptRunning] = useState<string | null>(null);
   const [scriptOutput, setScriptOutput] = useState('');
   const [showOutput, setShowOutput] = useState(false);
+  const [activeTab, setActiveTab] = useState<'full' | 'incremental' | 'collections' | 'uploads' | 'files'>('full');
 
-  const fetchBackups = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
       const res = await fetch('/api/internal/backups');
-      if (res.status === 403) { setError('Admin access required'); return; }
-      if (!res.ok) { setError('Failed to fetch backup data'); return; }
-      const data = await res.json();
-      setHealth(data);
+      if (res.status === 403) { setError('Admin access required. Please log in.'); setLoading(false); return; }
+      if (!res.ok) { setError(`Failed to fetch: HTTP ${res.status}`); setLoading(false); return; }
+      const json = await res.json();
+      setData(json ?? {});
       setError('');
     } catch (e: any) {
-      setError(e.message || 'Failed to fetch');
+      setError(e.message || 'Network error');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { fetchBackups(); }, [fetchBackups]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  const runScript = async (endpoint: string, label: string) => {
+  const runScript = useCallback(async (endpoint: string, label: string) => {
     if (scriptRunning) return;
     setScriptRunning(label);
     setScriptOutput('');
     setShowOutput(true);
-
     try {
       const res = await fetch(endpoint, { method: 'POST' });
-
       if (res.status === 409) {
-        const data = await res.json();
-        setScriptOutput(`ERROR: ${data.error}\n`);
+        const d = await res.json();
+        setScriptOutput(`ERROR: ${d?.error ?? 'Conflict'}\n`);
         setScriptRunning(null);
         return;
       }
-
       if (!res.ok || !res.body) {
         setScriptOutput(`ERROR: HTTP ${res.status}\n`);
         setScriptRunning(null);
         return;
       }
-
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let done = false;
-
       while (!done) {
-        const { value, done: streamDone } = await reader.read();
-        done = streamDone;
-        if (value) {
-          const text = decoder.decode(value, { stream: !done });
-          setScriptOutput((prev) => prev + text);
-        }
+        const { value, done: d } = await reader.read();
+        done = d;
+        if (value) setScriptOutput((p) => p + decoder.decode(value, { stream: !done }));
       }
     } catch (e: any) {
-      setScriptOutput((prev) => prev + `\nERROR: ${e.message}\n`);
+      setScriptOutput((p) => p + `\nERROR: ${e.message}\n`);
     } finally {
       setScriptRunning(null);
-      setTimeout(fetchBackups, 1000);
+      setTimeout(fetchData, 1500);
     }
-  };
+  }, [scriptRunning, fetchData]);
 
-  const btnBase: React.CSSProperties = {
-    padding: '8px 16px', borderRadius: 'var(--ds-radius-lg)', fontSize: 13,
-    fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s', border: '1px solid',
-  };
+  // Safe data accessors
+  const fullBackups = safeArr(data?.fullBackups);
+  const recentIncrementals = safeArr(data?.recentIncrementals);
+  const collectionBackups = safeArr(data?.collectionBackups);
+  const uploadsSnapshots = safeArr(data?.uploadsSnapshots);
+  const downloadableFiles = safeArr(data?.downloadableFiles);
+  const warnings = safeArr(data?.warnings);
+  const diskUsage = safeObj(data?.diskUsage);
 
   return (
-    <div className="ds-fade-in" style={{ padding: '32px 32px', maxWidth: 1280, margin: '0 auto' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <a href="/admin" style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px',
-            borderRadius: 'var(--ds-radius-lg)', border: '1px solid var(--ds-border-strong)',
-            color: 'var(--ds-text-secondary)', textDecoration: 'none', fontSize: 13,
-            transition: 'all 0.1s', background: 'var(--ds-bg-elevated)',
-          }}>
-            ← Dashboard
-          </a>
-          <h1 style={{ fontSize: 24, fontWeight: 750, margin: 0, color: 'var(--ds-text-primary)', letterSpacing: '-0.03em' }}>Backup Manager</h1>
+    <div style={{ padding: '28px 32px', maxWidth: 1320, margin: '0 auto', color: '#e2e8f0', fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+
+      {/* ── Header ─────────────────────────────────────────── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <a href="/admin" style={{ ...btnGhost, textDecoration: 'none', fontSize: 12 }}>&larr; Dashboard</a>
+          <h1 style={{ fontSize: 22, fontWeight: 750, margin: 0, color: '#f1f5f9', letterSpacing: '-0.03em' }}>Backup Manager</h1>
+          {data?.cronInstalled && <span style={badge('#4ade80', 'rgba(34,197,94,0.12)')}>Cron Active</span>}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={fetchBackups} style={{ ...btnBase, borderColor: 'var(--ds-border-strong)', background: 'var(--ds-bg-elevated)', color: 'var(--ds-text-primary)' }}>
-            Refresh
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <button onClick={fetchData} style={btnGhost}>Refresh</button>
+          <button onClick={() => runScript('/api/internal/backups/run', 'Full Backup')} disabled={!!scriptRunning} style={{ ...btnPrimary, opacity: scriptRunning ? 0.4 : 1 }}>
+            {scriptRunning === 'Full Backup' ? 'Running...' : 'Run Backup'}
           </button>
-          <button
-            onClick={() => runScript('/api/internal/backups/run', 'Backup')}
-            disabled={!!scriptRunning}
-            style={{ ...btnBase, borderColor: 'var(--ds-accent)', background: 'var(--ds-accent-subtle)', color: 'var(--ds-accent)', opacity: scriptRunning ? 0.5 : 1 }}
-          >
-            {scriptRunning === 'Backup' ? 'Running...' : 'Run Backup Now'}
+          <button onClick={() => runScript('/api/internal/backups/verify', 'Verify')} disabled={!!scriptRunning} style={{ ...btnPurple, opacity: scriptRunning ? 0.4 : 1 }}>
+            {scriptRunning === 'Verify' ? 'Running...' : 'Verify'}
           </button>
-          <button
-            onClick={() => runScript('/api/internal/backups/verify', 'Verify')}
-            disabled={!!scriptRunning}
-            style={{ ...btnBase, borderColor: 'rgba(139,92,246,0.4)', background: 'rgba(139,92,246,0.08)', color: '#a78bfa', opacity: scriptRunning ? 0.5 : 1 }}
-          >
-            {scriptRunning === 'Verify' ? 'Running...' : 'Run Verify Now'}
+          <button onClick={() => runScript('/api/internal/backups/test-full', 'Test Restore')} disabled={!!scriptRunning} style={{ ...btnGreen, opacity: scriptRunning ? 0.4 : 1 }}>
+            {scriptRunning === 'Test Restore' ? 'Running...' : 'Test Restore'}
           </button>
         </div>
       </div>
 
-      {/* Error */}
+      {/* ── Error ──────────────────────────────────────────── */}
       {error && (
-        <div style={{ padding: '12px 16px', borderRadius: 'var(--ds-radius-xl)', background: 'var(--ds-error-subtle)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--ds-error)', marginBottom: 16, fontSize: 13 }}>
+        <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171', marginBottom: 16, fontSize: 13 }}>
           {error}
         </div>
       )}
 
-      {loading && (
-        <div style={{ textAlign: 'center', padding: 48, color: 'var(--ds-text-quaternary)' }}>Loading backup data...</div>
-      )}
+      {loading && !data && <div style={{ textAlign: 'center', padding: 64, color: '#64748b' }}>Loading backup data...</div>}
 
-      {health && (
+      {data && (
         <>
-          {/* Warnings */}
-          {health.warnings.length > 0 && (
-            <div style={{ padding: '10px 16px', borderRadius: 'var(--ds-radius-xl)', background: 'var(--ds-error-subtle)', border: '1px solid rgba(239,68,68,0.2)', marginBottom: 16 }}>
-              {health.warnings.map((w, i) => <div key={i} style={{ color: 'var(--ds-error)', fontSize: 13 }}>⚠ {w}</div>)}
+          {/* ── Warnings ─────────────────────────────────────── */}
+          {warnings.length > 0 && (
+            <div style={{ padding: '10px 16px', borderRadius: 10, background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.15)', marginBottom: 16 }}>
+              {warnings.map((w, i) => <div key={i} style={{ color: '#fbbf24', fontSize: 13 }}>&#9888; {w}</div>)}
             </div>
           )}
 
-          {/* Summary Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 28 }}>
-            <SummaryCard label="Last Backup" value={health.lastBackupAge || 'Never'}>
-              <StatusBadge status={health.lastBackupStatus} labels={backupLabels} />
-            </SummaryCard>
-            <SummaryCard label="Last Size" value={health.lastBackupSizeMB != null ? formatSize(health.lastBackupSizeMB) : '—'} />
-            <SummaryCard label="Verification">
-              <StatusBadge status={health.lastVerificationStatus} labels={verifyLabels} />
-              {health.lastVerificationTime && <div style={{ fontSize: 10, color: 'var(--ds-text-quaternary)', marginTop: 4 }}>{health.lastVerificationTime}</div>}
-            </SummaryCard>
-            <SummaryCard label="Retention" value={`${health.retention.total} total`}>
-              <div style={{ fontSize: 12, color: 'var(--ds-text-secondary)', fontVariantNumeric: 'tabular-nums' }}>
-                <span style={{ color: 'var(--ds-info)' }}>{health.retention.daily}</span> daily · <span style={{ color: 'var(--ds-info)' }}>{health.retention.weekly}</span> weekly · <span style={{ color: 'var(--ds-info)' }}>{health.retention.monthly}</span> monthly
+          {/* ── Summary Cards ────────────────────────────────── */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 10, marginBottom: 24 }}>
+            <div style={card}>
+              <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.06em', marginBottom: 6 }}>Last Full Backup</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#f1f5f9', marginBottom: 4 }}>{safeStr(data.lastFullAge, 'Never')}</div>
+              <BackupStatusBadge status={data.lastBackupStatus} />
+            </div>
+            <div style={card}>
+              <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.06em', marginBottom: 6 }}>Last Incremental</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#f1f5f9', marginBottom: 4 }}>{safeStr(data.lastIncrementalAge, 'Never')}</div>
+              <span style={{ fontSize: 11, color: '#64748b' }}>{safeNum(data.incrementalCount)} total</span>
+            </div>
+            <div style={card}>
+              <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.06em', marginBottom: 6 }}>Verification</div>
+              <VerifyStatusBadge status={data.lastVerificationStatus} />
+            </div>
+            <div style={card}>
+              <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.06em', marginBottom: 6 }}>Disk Usage</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#f1f5f9' }}>{safeStr(data.totalDiskUsage, '?')}</div>
+              <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>
+                {Object.entries(diskUsage).map(([k, v]) => <span key={k} style={{ marginRight: 8 }}>{k}: {v}</span>)}
               </div>
-            </SummaryCard>
-            <SummaryCard label="Next Scheduled" value={health.nextScheduledRun ? formatDate(health.nextScheduledRun) : '—'} />
-            <SummaryCard label="Backup Dir" value={health.backupDirExists ? 'Exists' : 'Missing'} valueColor={health.backupDirExists ? 'var(--ds-success)' : 'var(--ds-error)'} />
+            </div>
+            <div style={card}>
+              <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.06em', marginBottom: 6 }}>Backup Dir</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: data.backupRootExists ? '#4ade80' : '#f87171' }}>{data.backupRootExists ? 'Exists' : 'Missing'}</div>
+              <div style={{ fontSize: 10, color: '#475569', marginTop: 2, fontFamily: 'monospace' }}>{safeStr(data.backupRoot, 'unknown')}</div>
+            </div>
+            <div style={card}>
+              <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.06em', marginBottom: 6 }}>Next Scheduled</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9' }}>{fmtDate(data.nextScheduledRun)}</div>
+            </div>
           </div>
 
-          {/* MongoDB Backups */}
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--ds-text-primary)', margin: 0 }}>
-                MongoDB Backups <span style={{ fontWeight: 400, color: 'var(--ds-text-quaternary)', fontSize: 12 }}>({health.mongoFiles.length})</span>
-              </h2>
-            </div>
-            <BackupTable files={health.mongoFiles} type="mongo" />
+          {/* ── Quick Actions ────────────────────────────────── */}
+          <div style={{ ...card, marginBottom: 24, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginRight: 8 }}>Quick Actions:</span>
+            <button onClick={() => runScript('/api/internal/backups/run-collections', 'Collections')} disabled={!!scriptRunning} style={{ ...btnGhost, opacity: scriptRunning ? 0.4 : 1 }}>
+              Backup Collections
+            </button>
+            <button onClick={() => runScript('/api/internal/backups/run-uploads', 'Uploads')} disabled={!!scriptRunning} style={{ ...btnGhost, opacity: scriptRunning ? 0.4 : 1 }}>
+              Backup Uploads
+            </button>
+            <button onClick={() => runScript('/api/internal/backups/run-incremental', 'Incremental')} disabled={!!scriptRunning} style={{ ...btnGhost, opacity: scriptRunning ? 0.4 : 1 }}>
+              Run Incremental
+            </button>
+            <button onClick={() => runScript('/api/internal/backups/test-uploads', 'Test Uploads')} disabled={!!scriptRunning} style={{ ...btnGreen, opacity: scriptRunning ? 0.4 : 1 }}>
+              Test Uploads Snapshot
+            </button>
+            <button onClick={() => runScript('/api/internal/backups/run-retention?dryRun=true', 'Retention Preview')} disabled={!!scriptRunning} style={{ ...btnOrange, opacity: scriptRunning ? 0.4 : 1 }}>
+              Retention Dry Run
+            </button>
           </div>
 
-          {/* Uploads Backups */}
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--ds-text-primary)', margin: 0 }}>
-                Uploads Backups <span style={{ fontWeight: 400, color: 'var(--ds-text-quaternary)', fontSize: 12 }}>({health.uploadsFiles.length})</span>
-              </h2>
-            </div>
-            <BackupTable files={health.uploadsFiles} type="uploads" />
+          {/* ── Tab Navigation ───────────────────────────────── */}
+          <div style={{ display: 'flex', gap: 0, marginBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.06)', flexWrap: 'wrap' }}>
+            {([['full', 'Full Backups'], ['incremental', 'Incremental'], ['collections', 'Collections'], ['uploads', 'Upload Snapshots'], ['files', 'All Files']] as const).map(([key, label]) => (
+              <button key={key} onClick={() => setActiveTab(key)}
+                style={{
+                  ...btnBase, border: 'none', borderRadius: '8px 8px 0 0',
+                  background: activeTab === key ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  color: activeTab === key ? '#f1f5f9' : '#64748b',
+                  borderBottom: activeTab === key ? '2px solid #3b82f6' : '2px solid transparent',
+                  marginBottom: -1,
+                }}
+              >
+                {label}
+                {key === 'full' && ` (${fullBackups.length})`}
+                {key === 'incremental' && ` (${safeNum(data.incrementalCount)})`}
+                {key === 'collections' && ` (${collectionBackups.length})`}
+                {key === 'uploads' && ` (${uploadsSnapshots.length})`}
+                {key === 'files' && ` (${downloadableFiles.length})`}
+              </button>
+            ))}
           </div>
+
+          {/* ── Tab Content ──────────────────────────────────── */}
+
+          {activeTab === 'full' && (
+            <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
+              {fullBackups.length === 0 ? (
+                <div style={{ padding: 32, textAlign: 'center', color: '#475569', fontSize: 13 }}>No full backups found</div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr><th style={thStyle}>Date</th><th style={thStyle}>Mongo File</th><th style={thStyle}>Mongo Size</th><th style={thStyle}>Collections</th><th style={thStyle}>Status</th><th style={thStyle}>Download</th></tr>
+                  </thead>
+                  <tbody>
+                    {fullBackups.map((b) => (
+                      <tr key={b.date}>
+                        <td style={monoTd}>{b.date ?? '\u2014'}</td>
+                        <td style={monoTd}>{b.mongoFile || '\u2014'}</td>
+                        <td style={tdStyle}>{fmtSize(b.mongoSizeMB)}</td>
+                        <td style={tdStyle}>{Object.keys(b.collections ?? {}).length} collections</td>
+                        <td style={tdStyle}>
+                          {b.failures === 0 ? <span style={{ color: '#4ade80', fontWeight: 600, fontSize: 11 }}>OK</span>
+                            : b.failures > 0 ? <span style={{ color: '#f87171', fontWeight: 600, fontSize: 11 }}>FAILED ({b.failures})</span>
+                            : <span style={{ color: '#64748b', fontSize: 11 }}>?</span>}
+                        </td>
+                        <td style={tdStyle}>
+                          {b.mongoFile && (
+                            <button onClick={() => window.open(`/api/internal/backups/download/full/${b.date}/${b.mongoFile}`, '_blank')} style={{ ...btnGhost, padding: '3px 10px', fontSize: 11 }}>
+                              Download
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'incremental' && (
+            <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
+              {recentIncrementals.length === 0 ? (
+                <div style={{ padding: 32, textAlign: 'center', color: '#475569', fontSize: 13 }}>No incremental backups found</div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr><th style={thStyle}>Timestamp</th><th style={thStyle}>Since</th><th style={thStyle}>Mongo Docs</th><th style={thStyle}>Changed Collections</th><th style={thStyle}>Upload Files</th></tr>
+                  </thead>
+                  <tbody>
+                    {recentIncrementals.map((inc, idx) => (
+                      <tr key={inc.timestamp ?? idx}>
+                        <td style={monoTd}>{inc.timestamp ?? '\u2014'}</td>
+                        <td style={monoTd}>{inc.since ? inc.since.replace('T', ' ').replace('Z', '') : '\u2014'}</td>
+                        <td style={tdStyle}>{safeNum(inc.mongoChangedDocs)}</td>
+                        <td style={tdStyle}>{safeNum(inc.mongoChangedCollections)}</td>
+                        <td style={tdStyle}>{safeNum(inc.uploadsChangedFiles)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'collections' && (
+            <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
+              {collectionBackups.length === 0 ? (
+                <div style={{ padding: 32, textAlign: 'center', color: '#475569', fontSize: 13 }}>No collection backups found</div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr><th style={thStyle}>Collection</th><th style={thStyle}>Latest File</th><th style={thStyle}>Size</th><th style={thStyle}>Documents</th><th style={thStyle}>Total Backups</th><th style={thStyle}>Download</th></tr>
+                  </thead>
+                  <tbody>
+                    {collectionBackups.map((cb) => (
+                      <tr key={cb.collection}>
+                        <td style={{ ...tdStyle, fontWeight: 600 }}>{cb.collection ?? '\u2014'}</td>
+                        <td style={monoTd}>{cb.latestFile || '\u2014'}</td>
+                        <td style={tdStyle}>{fmtSize(cb.latestSizeMB)}</td>
+                        <td style={tdStyle}>{cb.documentCount || '\u2014'}</td>
+                        <td style={tdStyle}>{safeNum(cb.totalBackups)}</td>
+                        <td style={tdStyle}>
+                          {cb.latestFile && (
+                            <button onClick={() => window.open(`/api/internal/backups/download/collections/${cb.collection}/${cb.latestFile}`, '_blank')} style={{ ...btnGhost, padding: '3px 10px', fontSize: 11 }}>
+                              Download
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'uploads' && (
+            <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
+              {uploadsSnapshots.length === 0 ? (
+                <div style={{ padding: 32, textAlign: 'center', color: '#475569', fontSize: 13 }}>No upload snapshots found</div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr><th style={thStyle}>Timestamp</th><th style={thStyle}>Files</th><th style={thStyle}>Changed</th><th style={thStyle}>Disk Usage</th></tr>
+                  </thead>
+                  <tbody>
+                    {uploadsSnapshots.map((snap, idx) => (
+                      <tr key={snap.timestamp ?? idx}>
+                        <td style={monoTd}>{snap.timestamp ?? '\u2014'}</td>
+                        <td style={tdStyle}>{safeNum(snap.snapshotFiles).toLocaleString()}</td>
+                        <td style={tdStyle}>{safeNum(snap.newOrChangedFiles)}</td>
+                        <td style={tdStyle}>{fmtSize(snap.diskUsageMB)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'files' && (
+            <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
+              {downloadableFiles.length === 0 ? (
+                <div style={{ padding: 32, textAlign: 'center', color: '#475569', fontSize: 13 }}>No downloadable files found</div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr><th style={thStyle}>File</th><th style={thStyle}>Type</th><th style={thStyle}>Size</th><th style={thStyle}>Created</th><th style={thStyle}>Download</th></tr>
+                  </thead>
+                  <tbody>
+                    {downloadableFiles.map((f, idx) => (
+                      <tr key={f.path ?? idx}>
+                        <td style={monoTd}>{f.filename ?? '\u2014'}</td>
+                        <td style={tdStyle}><span style={badge(f.type === 'full' ? '#60a5fa' : '#a78bfa', f.type === 'full' ? 'rgba(59,130,246,0.12)' : 'rgba(139,92,246,0.1)')}>{f.type ?? '?'}</span></td>
+                        <td style={tdStyle}>{fmtSize(f.sizeMB)}</td>
+                        <td style={tdStyle}>{fmtDate(f.timestamp)}</td>
+                        <td style={tdStyle}>
+                          {f.path && <button onClick={() => window.open(`/api/internal/backups/download/${f.path}`, '_blank')} style={{ ...btnGhost, padding: '3px 10px', fontSize: 11 }}>Download</button>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
         </>
       )}
 
-      {/* Script output modal */}
+      {/* ── Script Output Modal ──────────────────────────── */}
       {showOutput && (
-        <ScriptOutput
+        <ScriptOutputModal
           output={scriptOutput}
           title={scriptRunning ? `Running: ${scriptRunning}...` : 'Script Output'}
+          running={!!scriptRunning}
           onClose={() => { if (!scriptRunning) setShowOutput(false); }}
         />
       )}
@@ -391,19 +545,12 @@ const AdminBackupsPage: React.FC = () => {
   );
 };
 
-// ── Summary Card ─────────────────────────────────────────────────────────────
+// ── Exported Component (wrapped in error boundary) ───────────────────────────
 
-function SummaryCard({ label, value, valueColor, children }: { label: string; value?: string; valueColor?: string; children?: React.ReactNode }) {
-  return (
-    <div style={{
-      background: 'var(--ds-bg-surface)', borderRadius: 'var(--ds-radius-xl)',
-      padding: '14px 16px', border: '1px solid var(--ds-border)',
-    }}>
-      <div style={{ fontSize: 11, color: 'var(--ds-text-quaternary)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600, marginBottom: 6 }}>{label}</div>
-      {value && <div style={{ fontSize: 14, fontWeight: 600, color: valueColor || 'var(--ds-text-primary)', marginBottom: children ? 6 : 0, fontVariantNumeric: 'tabular-nums' }}>{value}</div>}
-      {children}
-    </div>
-  );
-}
+const AdminBackupsPage: React.FC = () => (
+  <BackupErrorBoundary>
+    <BackupManagerInner />
+  </BackupErrorBoundary>
+);
 
 export default AdminBackupsPage;

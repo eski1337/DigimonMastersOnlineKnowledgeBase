@@ -5,6 +5,12 @@ const Systems: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: { en: 'Content', zhTw: '內容' },
+    preview: (doc) => {
+      const slug = (doc as any)?.slug;
+      if (!slug) return '';
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info';
+      return `${appUrl}/systems/${slug}`;
+    },
   },
   access: {
     read: () => true,

@@ -88,10 +88,10 @@ type GuideBlock = RichTextBlock | CalloutBlock | TableBlockData | ImageGridBlock
 function renderSlate(nodes: SlateNode[]): React.ReactNode {
   if (!nodes || !Array.isArray(nodes)) return null;
   return nodes.map((node, i) => {
-    if (node.type === 'h1') return <h1 key={i} className="text-3xl font-bold mt-5 mb-2 text-foreground">{renderChildren(node.children)}</h1>;
-    if (node.type === 'h2') return <h2 key={i} className="text-2xl font-bold mt-5 mb-2 text-foreground">{renderChildren(node.children)}</h2>;
-    if (node.type === 'h3') return <h3 key={i} className="text-xl font-semibold mt-4 mb-1.5 text-foreground">{renderChildren(node.children)}</h3>;
-    if (node.type === 'h4') return <h4 key={i} className="text-lg font-semibold mt-3 mb-1 text-foreground">{renderChildren(node.children)}</h4>;
+    if (node.type === 'h1') { const text = (node.children || []).map(c => c.text || '').join(''); return <h1 key={i} id={slugify(text)} className="text-3xl font-bold mt-8 mb-3 text-foreground scroll-mt-20">{renderChildren(node.children)}</h1>; }
+    if (node.type === 'h2') { const text = (node.children || []).map(c => c.text || '').join(''); return <h2 key={i} id={slugify(text)} className="text-2xl font-bold mt-8 mb-3 text-foreground border-b border-border/40 pb-2 scroll-mt-20">{renderChildren(node.children)}</h2>; }
+    if (node.type === 'h3') { const text = (node.children || []).map(c => c.text || '').join(''); return <h3 key={i} id={slugify(text)} className="text-xl font-semibold mt-6 mb-2 text-foreground scroll-mt-20">{renderChildren(node.children)}</h3>; }
+    if (node.type === 'h4') return <h4 key={i} className="text-lg font-semibold mt-4 mb-1.5 text-foreground">{renderChildren(node.children)}</h4>;
     if (node.type === 'ul') return <ul key={i} className="list-disc pl-5 mb-2 space-y-0.5 text-muted-foreground text-sm">{renderSlate(node.children ?? [])}</ul>;
     if (node.type === 'ol') return <ol key={i} className="list-decimal pl-5 mb-2 space-y-0.5 text-muted-foreground text-sm">{renderSlate(node.children ?? [])}</ol>;
     if (node.type === 'li') {
@@ -417,6 +417,32 @@ function ImageBlockView({ block, compact }: { block: ImageBlockData; compact?: b
   );
 }
 
+/* ── Heading extraction for Table of Contents ──────────────────── */
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+export function extractHeadings(blocks: GuideBlock[]): { text: string; level: string; id: string }[] {
+  const headings: { text: string; level: string; id: string }[] = [];
+  if (!blocks || !Array.isArray(blocks)) return headings;
+
+  for (const block of blocks) {
+    if (block.blockType !== 'richText') continue;
+    const rt = block as RichTextBlock;
+    for (const node of rt.content || []) {
+      if (node.type === 'h1' || node.type === 'h2' || node.type === 'h3') {
+        const text = (node.children || []).map(c => c.text || '').join('');
+        if (text.trim()) {
+          headings.push({ text: text.trim(), level: node.type, id: slugify(text) });
+        }
+      }
+    }
+  }
+
+  return headings;
+}
+
 /* ── Main renderer ──────────────────────────────────────────────── */
 
 export function BlockRenderer({ blocks }: { blocks: GuideBlock[] }) {
@@ -473,7 +499,7 @@ export function BlockRenderer({ blocks }: { blocks: GuideBlock[] }) {
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-3">
       {elements}
     </div>
   );

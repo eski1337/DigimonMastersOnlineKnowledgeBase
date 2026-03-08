@@ -32,6 +32,12 @@ const Digimon: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'form', 'rank', 'element', 'attribute', 'published'],
     group: { en: 'Game Data', zhTw: '遊戲資料' },
+    preview: (doc) => {
+      const slug = (doc as any)?.slug;
+      if (!slug) return '';
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://dmokb.info';
+      return `${appUrl}/digimon/${slug}`;
+    },
     components: {
       BeforeListTable: [ImportButton],
     },
